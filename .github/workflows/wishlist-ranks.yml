@@ -1,0 +1,119 @@
+# Daily snapshot of Steam's Top Wishlists ordering.
+#
+# This is the whole reason the rank estimator can exist in an extension with
+# many users. Reading the ordering costs 50-odd requests; doing that in every
+# installed copy would mean tens of thousands of requests a day against an
+# undocumented store endpoint, which is both rude and self-defeating — Valve
+# would close it and nobody would have it. One runner reads it once and the
+# result ships as a 30 KB file that every user downloads from a CDN.
+#
+# Output goes to the `data` branch, which is orphaned from `main`. A daily
+# commit of a regenerated file would otherwise become most of this
+# repository's history.
+#
+# Note for whoever finds this quiet in a few months: GitHub disables scheduled
+# workflows in public repositories after 60 days with no repository activity,
+# and commits pushed by this job with GITHUB_TOKEN are not reliably counted as
+# activity. If the snapshots stop, re-enable the workflow in the Actions tab or
+# fire it once with workflow_dispatch.
+
+name: wishlist-ranks
+
+on:
+  schedule:
+    # 03:17 UTC. Off the hour on purpose: every cron in the world fires at :00
+    # and GitHub queues scheduled jobs longer at those minutes.
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Two runs writing the same branch would race for the push. Queue instead of
+# cancelling: a half-finished crawl publishes nothing, so a cancelled run is
+# simply a lost day.
+concurrency:
+  group: wishlist-ranks
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # The anchor archive is cumulative, so it has to come back from the data
+      # branch before anything appends to it. A missing branch is the normal
+      # state of the first run.
+      - name: Restore the anchor archive
+        run: |
+          mkdir -p data
+          if git ls-remote --exit-code --heads origin data >/dev/null 2>&1; then
+            git fetch --depth=1 origin data
+            git show FETCH_HEAD:wishlist-anchors.ndjson > data/wishlist-anchors.ndjson 2>/dev/null \
+              || echo "no anchor archive on the data branch yet"
+          else
+            echo "no data branch yet; starting from empty"
+          fi
+
+      # Fails loudly and writes nothing if the ordering came back short. A
+      # truncated list does not look broken downstream — it looks like a store
+      # where fewer games are wishlisted, which moves every percentile.
+      - name: Snapshot the ordering
+        run: node tools/crawl-wishlist-ranks.mjs --out data/wishlist-ranks.json --delay 1500
+
+      # Disclosures are dense at the top of the ordering and thin at the
+      # bottom, and positions move fastest at the top, so the daily pass covers
+      # the head and Sunday covers everything. Scanning 5,000 games every day
+      # would be four times the request budget for the same anchors.
+      - name: Harvest disclosures
+        run: |
+          if [ "$(date -u +%u)" = "7" ]; then
+            node tools/harvest-anchors.mjs --ranks data/wishlist-ranks.json \
+              --out data/wishlist-anchors.ndjson --delay 250
+          else
+            node tools/harvest-anchors.mjs --ranks data/wishlist-ranks.json \
+              --out data/wishlist-anchors.ndjson --delay 250 --max-apps 1500
+          fi
+
+      # Reports; never blocks. This checks whether the published distribution
+      # still describes the ranked population, and the answer is something a
+      # person reads, not something a build decides on.
+      - name: Check the mapping against real disclosures
+        continue-on-error: true
+        run: node tools/calibrate-wishlist-rank.mjs --anchors data/wishlist-anchors.ndjson
+
+      - name: Publish to the data branch
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git ls-remote --exit-code --heads origin data >/dev/null 2>&1; then
+            git fetch --depth=1 origin data
+            git worktree add publish FETCH_HEAD
+            git -C publish checkout -B data
+          else
+            git worktree add --detach publish
+            git -C publish checkout --orphan data
+            git -C publish rm -rf --cached . >/dev/null 2>&1 || true
+            find publish -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+          fi
+
+          cp data/wishlist-ranks.json publish/
+          cp data/wishlist-anchors.ndjson publish/ 2>/dev/null || true
+
+          cd publish
+          git add -A
+          if git diff --staged --quiet; then
+            echo "nothing changed"
+          else
+            git commit -m "ranks: $(date -u +%F)"
+            git push origin data
+          fi

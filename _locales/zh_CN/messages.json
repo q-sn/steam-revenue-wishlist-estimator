@@ -1,0 +1,527 @@
+{
+  "extName": {
+    "message": "Wishlytic — Steam 收入与愿望单估算器"
+  },
+  "extDesc": {
+    "message": "在任意商店页面估算 Steam 游戏的销量、收入和愿望单数量。给出区间，而非虚假的精确值。免费，无需账号。"
+  },
+  "confReliable": {
+    "message": "可靠"
+  },
+  "confRough": {
+    "message": "粗略"
+  },
+  "confUnreliable": {
+    "message": "不可靠"
+  },
+  "confNoData": {
+    "message": "无数据"
+  },
+  "legendGood": {
+    "message": "各方法结果一致，区间较窄"
+  },
+  "legendFair": {
+    "message": "可用，但区间较宽，或没有其他方法可供交叉验证"
+  },
+  "legendLow": {
+    "message": "各方法结果冲突，或未通过合理性检查——请看区间，而不是中位数"
+  },
+  "legendNone": {
+    "message": "无法生成估算"
+  },
+  "rMethodsCombined": {
+    "message": "已合并 $1 种独立方法"
+  },
+  "rSingleMethod": {
+    "message": "仅一种方法，无法交叉验证"
+  },
+  "rNoCommonFigure": {
+    "message": "没有一个数值能同时满足所有方法：最近的两条区间相距 $1 倍"
+  },
+  "rFewReviews": {
+    "message": "评测数量少，因此扩大了区间"
+  },
+  "rCcuDisagree": {
+    "message": "按在线人数交叉验证，首发规模高于按评测的估算"
+  },
+  "rBandSpans": {
+    "message": "区间跨度 $1 倍"
+  },
+  "rAgree": {
+    "message": "各来源在预期区间内相互一致"
+  },
+  "rNoEstimate": {
+    "message": "没有可用的估算"
+  },
+  "mUnits": {
+    "message": "累计销量"
+  },
+  "mRevenue": {
+    "message": "开发者净收入"
+  },
+  "mWishlists": {
+    "message": "发售前愿望单数量"
+  },
+  "mFollowers": {
+    "message": "关注者"
+  },
+  "mTrend": {
+    "message": "本地趋势"
+  },
+  "wTooFewReviews": {
+    "message": "评测不足 $1 条。基于这样的样本推算累计销量只会得到噪声，因此暂不给出数字。"
+  },
+  "wNoReviewData": {
+    "message": "无法从此页面读取评测数量。"
+  },
+  "wNoEstimators": {
+    "message": "没有任何方法拥有足够数据来生成估算。"
+  },
+  "wNoFollowers": {
+    "message": "无法获取关注者数量。部分游戏的社区组并未与 App ID 绑定。"
+  },
+  "wFreeToPlay": {
+    "message": "**免费游戏。**收入来自内购和 DLC，而这些没有任何公开数据可查。"
+  },
+  "wNoPrice": {
+    "message": "数据不足，无法计算收入瀑布。"
+  },
+  "wReleased": {
+    "message": "发售时愿望单会随购买而消耗，而关注者会保留，因此该比例不再成立。总量通常会先冲到发售前的 2–4 倍，随后回落。"
+  },
+  "sMethods": {
+    "message": "各方法如何合并"
+  },
+  "sCcu": {
+    "message": "按在线人数交叉验证"
+  },
+  "sWeekOne": {
+    "message": "首周销量，两种算法"
+  },
+  "sMoney": {
+    "message": "钱都去了哪里"
+  },
+  "sWhy": {
+    "message": "这个倍数从何而来"
+  },
+  "wfList": {
+    "message": "按标价计算的销量"
+  },
+  "wfDiscount": {
+    "message": "历史平均折扣（$1%）"
+  },
+  "wfRegional": {
+    "message": "区域定价与增值税（$1）"
+  },
+  "wfRefunds": {
+    "message": "退款（$1%）"
+  },
+  "wfRoyalty": {
+    "message": "Valve 分成（30/25/20 阶梯）"
+  },
+  "wfReaches": {
+    "message": "到手金额"
+  },
+  "wfPerUnit": {
+    "message": "每份约 $1。"
+  },
+  "wfOfList": {
+    "message": "为标价的 $1"
+  },
+  "regionUsEu": {
+    "message": "以美国和欧盟买家为主"
+  },
+  "regionMixed": {
+    "message": "全球混合受众"
+  },
+  "regionEmerging": {
+    "message": "以独联体、东南亚、拉美和中国为主"
+  },
+  "ctxNone": {
+    "message": "未参加节日活动或获得推荐"
+  },
+  "ctxNextFest": {
+    "message": "参加过 Steam 节日活动"
+  },
+  "ctxFeatured": {
+    "message": "节日活动加商店推荐位"
+  },
+  "pathWishlists": {
+    "message": "愿望单 × 0.11"
+  },
+  "pathFollowers": {
+    "message": "关注者 × 2.5"
+  },
+  "nFromFollowers": {
+    "message": "基于 $1 名关注者 · $2"
+  },
+  "nCcuScope": {
+    "message": "该方法预测首周销量而非累计销量，因此不会并入上方数值。出现分歧时只会扩大区间。"
+  },
+  "nOneMethod": {
+    "message": "只有一种方法拥有可用数据。若有第二个来源，区间会明显收窄。"
+  },
+  "nGeoMean": {
+    "message": "加权几何平均"
+  },
+  "nWeight": {
+    "message": "权重 $1%"
+  },
+  "nTrendCompare": {
+    "message": "与您 $1 的访问对比。仅存储在本设备上。"
+  },
+  "nSparkCap": {
+    "message": "$1：$4 次访问间从 $2 到 $3"
+  },
+  "nBaseYear": {
+    "message": "基准，发售于 $1"
+  },
+  "nReviewsFinal": {
+    "message": "$1 条评测 × 最终倍数"
+  },
+  "nDisagreeRoutes": {
+    "message": "这两条已发表的经验法则相差 $1 倍。二者并列显示，而非取平均。"
+  },
+  "pillUnits": {
+    "message": "销量"
+  },
+  "pillReviews": {
+    "message": "条评测"
+  },
+  "mReviews": {
+    "message": "评测"
+  },
+  "mPlayers": {
+    "message": "当前在线"
+  },
+  "pillNet": {
+    "message": "净收入"
+  },
+  "pillWishlists": {
+    "message": "愿望单"
+  },
+  "ariaOpen": {
+    "message": "展开销量与愿望单估算"
+  },
+  "ariaCollapse": {
+    "message": "收起"
+  },
+  "footSettings": {
+    "message": "设置"
+  },
+  "tYesterday": {
+    "message": "昨天"
+  },
+  "tDaysAgo": {
+    "message": "$1 天前"
+  },
+  "tHoursAgo": {
+    "message": "$1 小时前"
+  },
+  "tJustNow": {
+    "message": "刚刚"
+  },
+  "optTitle": {
+    "message": "估算设置"
+  },
+  "optLede": {
+    "message": "默认值来自已发表的研究。如果你更了解自己的市场，请自行调整——没有人比你更清楚你的地区构成。"
+  },
+  "optRevenue": {
+    "message": "收入瀑布"
+  },
+  "optDiscount": {
+    "message": "历史平均折扣"
+  },
+  "optDiscountHint": {
+    "message": "在游戏生命周期内有多少销量低于标价成交。"
+  },
+  "optAudience": {
+    "message": "受众构成"
+  },
+  "optAudienceHint": {
+    "message": "区域定价与增值税对实际成交价的综合影响。"
+  },
+  "optRefund": {
+    "message": "退款率"
+  },
+  "optRefundHint": {
+    "message": "Valve 未公布平均值，并表示各游戏之间差异很大。"
+  },
+  "optOverlay": {
+    "message": "悬浮面板"
+  },
+  "optPosition": {
+    "message": "在页面上的位置"
+  },
+  "optPositionHint": {
+    "message": "面板在商店页面上的位置。"
+  },
+  "optScale": {
+    "message": "界面尺寸"
+  },
+  "optScaleHint": {
+    "message": "整体缩放悬浮面板，文字与控件一同变化。"
+  },
+  "optClear": {
+    "message": "缓存数据与本地历史"
+  },
+  "optClearHint": {
+    "message": "关注者数量、拥有者区间以及你的访问快照。仅保存在本设备，绝不外传。"
+  },
+  "optClearBtn": {
+    "message": "清除"
+  },
+  "optSave": {
+    "message": "保存设置"
+  },
+  "optReset": {
+    "message": "恢复默认值"
+  },
+  "optSaved": {
+    "message": "已保存"
+  },
+  "optPositionSaved": {
+    "message": "位置已保存"
+  },
+  "optCleared": {
+    "message": "已清除 $1 项"
+  },
+  "optNothingToClear": {
+    "message": "没有可清除的内容"
+  },
+  "optSanity": {
+    "message": "在当前设置下，开发者每份可拿到标价的 $1。混合受众通常在 40% 左右，以美欧为主的受众约 45%。若接近 70%，说明漏算了某项扣除。"
+  },
+  "posBR": {
+    "message": "右下角"
+  },
+  "posBL": {
+    "message": "左下角"
+  },
+  "posTR": {
+    "message": "右上角"
+  },
+  "posTL": {
+    "message": "左上角"
+  },
+  "pillPlayers": {
+    "message": "游戏中"
+  },
+  "labPillItems": {
+    "message": "展开前显示的数据"
+  },
+  "hintPillItems": {
+    "message": "顺序固定。没有数据的项会被跳过，不会显示破折号。"
+  },
+  "optPillReviews": {
+    "message": "评测"
+  },
+  "optPillUnits": {
+    "message": "销量"
+  },
+  "optPillNet": {
+    "message": "净收入"
+  },
+  "optPillWishlists": {
+    "message": "愿望单"
+  },
+  "optPillPlayers": {
+    "message": "当前在线"
+  },
+  "footSteamDB": {
+    "message": "SteamDB"
+  },
+  "footSteamDBHint": {
+    "message": "打开本面板推算所依据的原始官方数据"
+  },
+  "optLanguage": {
+    "message": "语言"
+  },
+  "optLanguageHint": {
+    "message": "作用于悬浮层和本页面，不影响 Steam 自身文本。"
+  },
+  "langAuto": {
+    "message": "跟随浏览器"
+  },
+  "optResetDone": {
+    "message": "已恢复默认"
+  },
+  "tipMidpoint": {
+    "message": "综合中值：$1"
+  },
+  "mBoxleiter": {
+    "message": "评测 × 校正系数"
+  },
+  "mOwnersBand": {
+    "message": "SteamSpy 拥有者区间"
+  },
+  "rRevenueAssumptions": {
+    "message": "销量区间加上瀑布式扣减的假设"
+  },
+  "rFollowerRatio": {
+    "message": "采用全体游戏的中位系数；关注者倍率介于 7 至 20 倍"
+  },
+  "mAllTimePeak": {
+    "message": "历史峰值"
+  },
+  "mTrend30": {
+    "message": "30 天趋势"
+  },
+  "nTrendAvg": {
+    "message": "平均同时在线 $1"
+  },
+  "nPp": {
+    "message": "$1 个百分点"
+  },
+  "nRecentVsAll": {
+    "message": "近期 $2 条评测中 $1 为好评。游戏上架满 45 天且窗口期内评测足够多之前，Valve 不计算该分数。"
+  },
+  "mPeak24h": {
+    "message": "24 小时峰值"
+  },
+  "mPositiveAllTime": {
+    "message": "好评率，全部时间"
+  },
+  "mPositiveRecent": {
+    "message": "好评率，近 30 天"
+  },
+  "nReviewScope": {
+    "message": "涵盖所有语言与购买方式。Steam 会按你的语言设置过滤页面上显示的数量，因此页面数字更小。"
+  },
+  "nFromFollowersOnly": {
+    "message": "基于 $1 名关注者"
+  },
+  "regionAuto": {
+    "message": "根据评测语言判断"
+  },
+  "optRegionAutoNote": {
+    "message": "每款游戏会按自己的评测语言取对应档位。此处没有具体游戏，因此按混合受众计算。"
+  },
+  "mPlaytime": {
+    "message": "玩家总时长 / 平均游戏时长"
+  },
+  "nCcuRow": {
+    "message": "历史峰值 × $1"
+  },
+  "nCcuLatePeak": {
+    "message": "历史同时在线峰值出现在发售后第 $1 天，那不是首发峰值，首周规则对它不适用。"
+  },
+  "nCcuNoPeakDate": {
+    "message": "没有带日期的在线人数历史，就无法区分首发峰值与后来的高峰，因此不给出首周估算。"
+  },
+  "nFromFollowersGenre": {
+    "message": "基于 $1 名关注者 · $2 类游戏平均每位关注者 $3 倍愿望单"
+  },
+  "nDerivedMark": {
+    "message": "* 幅度由我们自行设定：研究证实了该效应，但未给出数值"
+  },
+  "nRegionalAuto": {
+    "message": "有 $1 的评测来自 Steam 定价低于美区的市场，据此判定为：$2"
+  },
+  "nRevenueBand": {
+    "message": "这个区间不只是销量区间换算成钱：它还涵盖 $1 至 $2 的折扣和 $3 至 $4 的退款率。"
+  },
+  "rWishlistGenre": {
+    "message": "$1 类的类型系数，位于调查给出的 7 至 20 倍区间内"
+  },
+  "mFollowerRatio": {
+    "message": "关注者 × 已发表比率"
+  },
+  "mWishlistRank": {
+    "message": "Steam 愿望单排名"
+  },
+  "nWishlistRank": {
+    "message": "排名第 $1 位（共 $2 位）· 已公布游戏中的前 $3%"
+  },
+  "nWishlistBelowList": {
+    "message": "未进入 Steam 愿望单排名，该榜单止于约 $1"
+  },
+  "rWishlistRankOnly": {
+    "message": "无法读取关注者数量，因此商店排名是唯一方法"
+  },
+  "rWishlistBelowList": {
+    "message": "完全低于 Steam 愿望单排名，因此只有关注者比率给出答案"
+  },
+  "rWishlistRankPending": {
+    "message": "愿望单排名尚未下载，因此没有第二种方法"
+  },
+  "rWishlistCeiling": {
+    "message": "关注者比率给出的愿望单数高于该游戏未上榜的排名下限"
+  },
+  "rWishlistAccumulation": {
+    "message": "无法读取发售日期，因此不知道该游戏已累积了多少愿望单"
+  },
+  "nDlcExcluded": {
+    "message": "不含 $1 个 DLC 的收入，公开数据无法反映这部分。"
+  },
+  "nCommonRegion": {
+    "message": "所有方法都容许 $1 至 $2 这一区间。这里所说的一致指的是这段重叠，而不是各自中值之间的距离。"
+  },
+  "nNoCommonRegion": {
+    "message": "没有一个数值能同时满足所有方法：最近的两个区间相距 $1 倍，因此上面的区间涵盖了全部。"
+  },
+  "rPlaytimeDisagree": {
+    "message": "玩家总时长推出的数值落在此区间之外，但所依赖的平均游戏时长无人公布"
+  },
+  "nPlaytimeScope": {
+    "message": "由实测的 $1 玩家总时长除以假定的平均游戏时长得出。这个除数是薄弱环节：没有公开来源给出它，只能用评测样本代替。"
+  },
+  "sPlaytime": {
+    "message": "玩家总时长交叉验证"
+  },
+  "nPlaytimeDivisor": {
+    "message": "假定的平均游戏时长"
+  },
+  "nHours": {
+    "message": "$1 小时"
+  },
+  "rRegionalMeasured": {
+    "message": "受众构成来自评测语言的实测，而非假定"
+  },
+  "rRegionalAssumed": {
+    "message": "受众构成取自默认值；地区系数介于 0.60 至 0.88"
+  },
+  "rOwnersNoRecord": {
+    "message": "SteamSpy 尚未收录这款游戏的数据，因此没有第二种方法"
+  },
+  "rOwnersTooSmall": {
+    "message": "SteamSpy 的拥有者区间太小、不足采信，因此没有第二种方法"
+  },
+  "wTypeDemo": {
+    "message": "这是一个试玩版，且 Steam 未为其指明对应的完整游戏。试玩版没有销量可供推算。"
+  },
+  "wTypeDlc": {
+    "message": "这是 DLC。评测倍数是在本体游戏上测得的，而 DLC 的买家已经拥有本体、往往也已经写过评测，因此 DLC 的评测与销量之比是独有的，且无人公开过。"
+  },
+  "wTypeMusic": {
+    "message": "这是原声音乐。评测倍数是在游戏上测得的，而非专辑，也没有人为专辑公开过这样的倍数。"
+  },
+  "wTypeVideo": {
+    "message": "这是影片，不是游戏。这里没有任何销量推算方法所依据的对象。"
+  },
+  "wTypeHardware": {
+    "message": "这是硬件。它不按分成模式销售，因此分成那一步并不适用，而且从未有人为硬件设备测算过评测倍数。"
+  },
+  "wTypeMod": {
+    "message": "这是模组，不是在 Steam 上销售的游戏，因此没有可推算的对象。"
+  },
+  "wTypeAdvertising": {
+    "message": "这是宣传页面而非游戏，因此没有可推算的对象。"
+  },
+  "wUnsupportedType": {
+    "message": "这个商店页面不是游戏。页面类型陌生并不构成认定游戏倍数适用于它的理由。"
+  },
+  "nViaDemo": {
+    "message": "你正在试玩版页面上。此处的所有数字都是完整游戏的。"
+  },
+  "nBelongsTo": {
+    "message": "属于"
+  },
+  "mDemoReviews": {
+    "message": "试玩版评测数"
+  },
+  "nDemoReviews": {
+    "message": "测自试玩版本身，不参与上方任何数字的计算。"
+  }
+}

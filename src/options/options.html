@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-i18n="optTitle">Estimation settings</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; padding: 48px 24px;
+    background: #10131a; color: #dfe4ee;
+    font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-variant-numeric: tabular-nums;
+  }
+  main { max-width: 680px; margin: 0 auto; }
+  h1 { font-size: 26px; font-weight: 600; margin-bottom: 8px; }
+  .lede { color: #7c8698; margin-bottom: 34px; font-size: 16px; }
+  fieldset { border: 1px solid #2b3242; border-radius: 12px; padding: 22px 22px 8px; margin: 0 0 22px; }
+  legend { padding: 0 10px; color: #67c1f5; font-size: 15px; }
+  .field { display: flex; align-items: center; justify-content: space-between; gap: 22px; padding: 13px 0; }
+  .field + .field { border-top: 1px solid #1a1f2b; }
+  label { color: #c9d1e0; }
+  .hint { display: block; color: #6f7889; font-size: 14px; margin-top: 3px; }
+  input[type="range"] { width: 210px; height: 22px; accent-color: #67c1f5; }
+  select {
+    background: #1a1f2b; color: #dfe4ee; border: 1px solid #2b3242;
+    border-radius: 6px; font: inherit;
+    /* The native arrow renders hard against the right edge, so it is replaced
+       with one that can be positioned. */
+    appearance: none; -webkit-appearance: none;
+    padding: 7px 34px 7px 10px;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%238b95a8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    cursor: pointer;
+  }
+  select:hover { border-color: #3a4356; }
+  output { display: inline-block; min-width: 62px; text-align: right; color: #67c1f5; font-weight: 600; }
+  .control { display: flex; align-items: center; gap: 13px; flex: none; }
+  .field-stack { display: block; }
+  .checks { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 10px; }
+  .checks label {
+    display: flex; align-items: center; gap: 7px;
+    color: #c9d1e0; cursor: pointer; font-size: 13px;
+  }
+  .checks input { accent-color: #67c1f5; width: 15px; height: 15px; cursor: pointer; }
+  .checks input:focus-visible { outline: 2px solid #67c1f5; outline-offset: 2px; }
+  .actions { display: flex; gap: 13px; align-items: center; margin-top: 26px; }
+  button {
+    background: #1a1f2b; color: #dfe4ee; border: 1px solid #2b3242;
+    border-radius: 9px; padding: 11px 19px; font: inherit; cursor: pointer;
+  }
+  button:hover { border-color: #3a4356; }
+  button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid #67c1f5; outline-offset: 2px; }
+  .saved { color: #4ec9a5; font-size: 15px; opacity: 0; }
+  .saved.on { opacity: 1; }
+  .sanity { color: #7c8698; font-size: 15px; margin-top: 18px; }
+  .sanity b { color: #67c1f5; font-weight: 600; }
+  /* Quieter than the sentence above it: this explains where the profile came
+     from, which matters less than the figure it produced. */
+  .sanity-note { color: #5b6475; font-size: 13px; margin-top: 6px; }
+</style>
+</head>
+<body>
+<main>
+  <h1 data-i18n="optTitle">Estimation settings</h1>
+  <p class="lede" data-i18n="optLede"></p>
+
+  <fieldset>
+    <legend data-i18n="optRevenue"></legend>
+
+    <div class="field">
+      <label for="avgDiscount"><span data-i18n="optDiscount"></span>
+        <span class="hint" data-i18n="optDiscountHint"></span>
+      </label>
+      <div class="control">
+        <input type="range" id="avgDiscount" min="0" max="60" step="1">
+        <output for="avgDiscount" id="avgDiscountOut"></output>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="regionalProfile"><span data-i18n="optAudience"></span>
+        <span class="hint" data-i18n="optAudienceHint"></span>
+      </label>
+      <div class="control"><select id="regionalProfile"></select></div>
+    </div>
+
+    <div class="field">
+      <label for="refundRate"><span data-i18n="optRefund"></span>
+        <span class="hint" data-i18n="optRefundHint"></span>
+      </label>
+      <div class="control">
+        <input type="range" id="refundRate" min="0" max="20" step="0.5">
+        <output for="refundRate" id="refundRateOut"></output>
+      </div>
+    </div>
+  </fieldset>
+
+  <p class="sanity"></p>
+
+  <fieldset>
+    <legend data-i18n="optOverlay"></legend>
+
+    <div class="field">
+      <label for="language"><span data-i18n="optLanguage"></span>
+        <span class="hint" data-i18n="optLanguageHint"></span>
+      </label>
+      <div class="control"><select id="language"></select></div>
+    </div>
+
+    <div class="field field-stack">
+      <label><span data-i18n="labPillItems"></span>
+        <span class="hint" data-i18n="hintPillItems"></span>
+      </label>
+      <div class="checks" id="pillItems"></div>
+    </div>
+
+    <div class="field">
+      <label for="scale"><span data-i18n="optScale"></span>
+        <span class="hint" data-i18n="optScaleHint"></span>
+      </label>
+      <div class="control">
+        <input type="range" id="scale" min="100" max="200" step="5">
+        <output for="scale" id="scaleOut"></output>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="position"><span data-i18n="optPosition"></span>
+        <span class="hint" data-i18n="optPositionHint"></span>
+      </label>
+      <div class="control"><select id="position"></select></div>
+    </div>
+
+    <div class="field">
+      <label for="clear"><span data-i18n="optClear"></span>
+        <span class="hint" data-i18n="optClearHint"></span>
+      </label>
+      <div class="control"><button id="clear" type="button" data-i18n="optClearBtn"></button></div>
+    </div>
+  </fieldset>
+
+  <div class="actions">
+    <button id="save" type="button" data-i18n="optSave"></button>
+    <button id="reset" type="button" data-i18n="optReset"></button>
+    <span class="saved" id="saved"></span>
+  </div>
+
+</main>
+<script type="module" src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,527 @@
+{
+  "extName": {
+    "message": "Wishlytic — Steam Gelir ve İstek Listesi Tahmincisi"
+  },
+  "extDesc": {
+    "message": "Herhangi bir Steam mağaza sayfasında satış, gelir ve istek listesi tahmini. Sahte kesinlik yerine aralıklar. Ücretsiz, hesap gerekmez."
+  },
+  "confReliable": {
+    "message": "Güvenilir"
+  },
+  "confRough": {
+    "message": "Kabaca"
+  },
+  "confUnreliable": {
+    "message": "Güvenilmez"
+  },
+  "confNoData": {
+    "message": "Veri yok"
+  },
+  "legendGood": {
+    "message": "Yöntemler uyuşuyor ve aralık dar"
+  },
+  "legendFair": {
+    "message": "Kullanılabilir, ancak aralık geniş veya karşılaştıracak bir kaynak yoktu"
+  },
+  "legendLow": {
+    "message": "Yöntemler çelişiyor veya bir doğrulama başarısız oldu — orta değere değil aralığa bakın"
+  },
+  "legendNone": {
+    "message": "Tahmin üretilemedi"
+  },
+  "rMethodsCombined": {
+    "message": "$1 bağımsız yöntem birleştirildi"
+  },
+  "rSingleMethod": {
+    "message": "Tek yöntem, karşılaştırma yapılamadı"
+  },
+  "rNoCommonFigure": {
+    "message": "Hiçbir değer tüm yöntemlere uymuyor; en yakın aralıklar $1x uzakta"
+  },
+  "rFewReviews": {
+    "message": "Az inceleme olduğu için aralık genişletildi"
+  },
+  "rCcuDisagree": {
+    "message": "Oyuncu sayısı karşılaştırması, inceleme tahmininden daha büyük bir çıkışa işaret ediyor"
+  },
+  "rBandSpans": {
+    "message": "Aralık $1 kat genişlikte"
+  },
+  "rAgree": {
+    "message": "Kaynaklar beklenen aralıkta uyuşuyor"
+  },
+  "rNoEstimate": {
+    "message": "Kullanılabilir tahmin yok"
+  },
+  "mUnits": {
+    "message": "Toplam satılan adet"
+  },
+  "mRevenue": {
+    "message": "Geliştiricinin net geliri"
+  },
+  "mWishlists": {
+    "message": "Çıkış öncesi istek listesi"
+  },
+  "mFollowers": {
+    "message": "Takipçi"
+  },
+  "mTrend": {
+    "message": "Yerel eğiliminiz"
+  },
+  "wTooFewReviews": {
+    "message": "$1'den az inceleme var. Bundan çıkarılacak toplam tahmin gürültüden ibaret olur, bu yüzden henüz sayı yok."
+  },
+  "wNoReviewData": {
+    "message": "Bu sayfadan inceleme sayısı okunamadı."
+  },
+  "wNoEstimators": {
+    "message": "Hiçbir yöntemin tahmin için yeterli verisi yoktu."
+  },
+  "wNoFollowers": {
+    "message": "Takipçi sayısı yok. Bazı oyunlar uygulama kimliğine bağlı olmayan bir topluluk grubu kullanıyor."
+  },
+  "wFreeToPlay": {
+    "message": "**Ücretsiz oyun.** Gelir, hiçbir kamuya açık veride görünmeyen oyun içi satın alma ve DLC'den geliyor."
+  },
+  "wNoPrice": {
+    "message": "Gelir hesabı için yeterli veri yok."
+  },
+  "wReleased": {
+    "message": "Çıkışta istek listeleri satın almalarla tükenirken takipçiler kalır, bu yüzden oran artık geçerli değildir. Toplam genellikle çıkış öncesinin 2-4 katına ulaşır, sonra azalır."
+  },
+  "sMethods": {
+    "message": "Yöntemler nasıl birleştirildi"
+  },
+  "sCcu": {
+    "message": "Oyuncu sayısıyla karşılaştırma"
+  },
+  "sWeekOne": {
+    "message": "İlk hafta satışları, iki yol"
+  },
+  "sMoney": {
+    "message": "Para nereye gidiyor"
+  },
+  "sWhy": {
+    "message": "Bu çarpan nereden geliyor"
+  },
+  "wfList": {
+    "message": "Liste fiyatından adet"
+  },
+  "wfDiscount": {
+    "message": "Ortalama yaşam boyu indirim ($1%)"
+  },
+  "wfRegional": {
+    "message": "Bölgesel fiyatlar ve KDV ($1)"
+  },
+  "wfRefunds": {
+    "message": "İadeler ($1%)"
+  },
+  "wfRoyalty": {
+    "message": "Valve komisyonu (30/25/20, kademeli)"
+  },
+  "wfReaches": {
+    "message": "Geliştiriciye ulaşan"
+  },
+  "wfPerUnit": {
+    "message": "Birim başına yaklaşık $1."
+  },
+  "wfOfList": {
+    "message": "liste fiyatının $1'i"
+  },
+  "regionUsEu": {
+    "message": "Çoğunlukla ABD ve AB alıcıları"
+  },
+  "regionMixed": {
+    "message": "Karma küresel kitle"
+  },
+  "regionEmerging": {
+    "message": "Ağırlıkla BDT, Güneydoğu Asya, Latin Amerika, Çin"
+  },
+  "ctxNone": {
+    "message": "Festival veya öne çıkarma yok"
+  },
+  "ctxNextFest": {
+    "message": "Bir Steam festivaline katıldı"
+  },
+  "ctxFeatured": {
+    "message": "Festival ve mağaza vitrini"
+  },
+  "pathWishlists": {
+    "message": "İstek listesi × 0,11"
+  },
+  "pathFollowers": {
+    "message": "Takipçi × 2,5"
+  },
+  "nFromFollowers": {
+    "message": "$1 takipçiye göre · $2"
+  },
+  "nCcuScope": {
+    "message": "Bu, toplam değil ilk hafta satışını öngörür; bu yüzden yukarıdaki rakama hiçbir zaman karıştırılmaz. Çeliştiğinde yalnızca aralığı genişletir."
+  },
+  "nOneMethod": {
+    "message": "Yalnızca bir yöntemin kullanılabilir verisi vardı. İkinci bir kaynak aralığı belirgin şekilde daraltırdı."
+  },
+  "nGeoMean": {
+    "message": "Ağırlıklı geometrik ortalama"
+  },
+  "nWeight": {
+    "message": "ağırlık $1%"
+  },
+  "nTrendCompare": {
+    "message": "$1 ziyaretinizle karşılaştırma. Yalnızca bu cihazda saklanır."
+  },
+  "nSparkCap": {
+    "message": "$1: $4 ziyarette $2 ile $3 arası"
+  },
+  "nBaseYear": {
+    "message": "Temel, $1 çıkışlı"
+  },
+  "nReviewsFinal": {
+    "message": "$1 inceleme × nihai"
+  },
+  "nDisagreeRoutes": {
+    "message": "Bu yayımlanmış kurallar $1 kat farklı. Ortalaması alınmadan ikisi de gösteriliyor."
+  },
+  "pillUnits": {
+    "message": "adet"
+  },
+  "pillReviews": {
+    "message": "değerlendirme"
+  },
+  "mReviews": {
+    "message": "Değerlendirmeler"
+  },
+  "mPlayers": {
+    "message": "Şu anki oyuncu"
+  },
+  "pillNet": {
+    "message": "net"
+  },
+  "pillWishlists": {
+    "message": "istek listesi"
+  },
+  "ariaOpen": {
+    "message": "Satış ve istek listesi tahminini aç"
+  },
+  "ariaCollapse": {
+    "message": "Daralt"
+  },
+  "footSettings": {
+    "message": "Ayarlar"
+  },
+  "tYesterday": {
+    "message": "dün"
+  },
+  "tDaysAgo": {
+    "message": "$1 gün önce"
+  },
+  "tHoursAgo": {
+    "message": "$1 saat önce"
+  },
+  "tJustNow": {
+    "message": "az önce"
+  },
+  "optTitle": {
+    "message": "Tahmin ayarları"
+  },
+  "optLede": {
+    "message": "Varsayılanlar yayımlanmış araştırmalardan geliyor. Kendi pazarınızı daha iyi biliyorsanız değiştirin; bölgesel dağılımınızı sizden iyi kimse bilemez."
+  },
+  "optRevenue": {
+    "message": "Gelir dökümü"
+  },
+  "optDiscount": {
+    "message": "Ortalama yaşam boyu indirim"
+  },
+  "optDiscountHint": {
+    "message": "Oyunun ömrü boyunca liste fiyatının altında satılan oran."
+  },
+  "optAudience": {
+    "message": "Kitle dağılımı"
+  },
+  "optAudienceHint": {
+    "message": "Bölgesel fiyat ve KDV'nin gerçekleşen fiyata birlikte etkisi."
+  },
+  "optRefund": {
+    "message": "İade oranı"
+  },
+  "optRefundHint": {
+    "message": "Valve ortalama yayımlamıyor ve oyundan oyuna çok değiştiğini söylüyor."
+  },
+  "optOverlay": {
+    "message": "Yer paylaşımı"
+  },
+  "optPosition": {
+    "message": "Sayfadaki konum"
+  },
+  "optPositionHint": {
+    "message": "Mağaza sayfasında rozetin duracağı yer."
+  },
+  "optScale": {
+    "message": "Arayüz boyutu"
+  },
+  "optScaleHint": {
+    "message": "Metin ve denetimler dahil tüm yer paylaşımını ölçekler."
+  },
+  "optClear": {
+    "message": "Önbellek ve yerel geçmiş"
+  },
+  "optClearHint": {
+    "message": "Takipçi sayıları, sahip aralıkları ve ziyaret anlık görüntüleri. Yalnızca bu cihazda saklanır, hiçbir yere gönderilmez."
+  },
+  "optClearBtn": {
+    "message": "Temizle"
+  },
+  "optSave": {
+    "message": "Ayarları kaydet"
+  },
+  "optReset": {
+    "message": "Varsayılanlara dön"
+  },
+  "optSaved": {
+    "message": "Kaydedildi"
+  },
+  "optPositionSaved": {
+    "message": "Konum kaydedildi"
+  },
+  "optCleared": {
+    "message": "$1 kayıt temizlendi"
+  },
+  "optNothingToClear": {
+    "message": "Temizlenecek bir şey yok"
+  },
+  "optSanity": {
+    "message": "Bu ayarlarla geliştirici adet başına liste fiyatının $1 kadarını alır. Karma kitlede tipik değer %40, ağırlıkla ABD ve AB kitlesinde %45 civarıdır. %70'e yaklaşıyorsa bir kesinti eksiktir."
+  },
+  "posBR": {
+    "message": "Sağ alt"
+  },
+  "posBL": {
+    "message": "Sol alt"
+  },
+  "posTR": {
+    "message": "Sağ üst"
+  },
+  "posTL": {
+    "message": "Sol üst"
+  },
+  "pillPlayers": {
+    "message": "oyunda"
+  },
+  "labPillItems": {
+    "message": "Genişletmeden önce gösterilenler"
+  },
+  "hintPillItems": {
+    "message": "Sıra sabittir. Verisi olmayan öğe atlanır, tire görünmez."
+  },
+  "optPillReviews": {
+    "message": "Değerlendirmeler"
+  },
+  "optPillUnits": {
+    "message": "Satış adedi"
+  },
+  "optPillNet": {
+    "message": "Net gelir"
+  },
+  "optPillWishlists": {
+    "message": "İstek listeleri"
+  },
+  "optPillPlayers": {
+    "message": "Şu anki oyuncu"
+  },
+  "footSteamDB": {
+    "message": "SteamDB"
+  },
+  "footSteamDBHint": {
+    "message": "Bu panelin dayandığı ham veriyi aç"
+  },
+  "optLanguage": {
+    "message": "Dil"
+  },
+  "optLanguageHint": {
+    "message": "Yer paylaşımına ve bu sayfaya uygulanır. Steam'in kendi metni etkilenmez."
+  },
+  "langAuto": {
+    "message": "Tarayıcıyla aynı"
+  },
+  "optResetDone": {
+    "message": "Varsayılanlara sıfırlandı"
+  },
+  "tipMidpoint": {
+    "message": "Birleşik orta değer: $1"
+  },
+  "mBoxleiter": {
+    "message": "Değerlendirme × düzeltilmiş çarpan"
+  },
+  "mOwnersBand": {
+    "message": "SteamSpy sahip aralığı"
+  },
+  "rRevenueAssumptions": {
+    "message": "Satış aralığı artı hesap zincirinin varsayımları"
+  },
+  "rFollowerRatio": {
+    "message": "Tüm oyunların medyan çarpanı; takipçi oranı 7x ile 20x arasında"
+  },
+  "mAllTimePeak": {
+    "message": "Tüm zamanların zirvesi"
+  },
+  "mTrend30": {
+    "message": "30 günlük eğilim"
+  },
+  "nTrendAvg": {
+    "message": "Ortalama $1 eşzamanlı"
+  },
+  "nPp": {
+    "message": "$1 puan"
+  },
+  "nRecentVsAll": {
+    "message": "Son $2 değerlendirmenin $1 kadarı olumlu. Valve bu puanı, oyun 45 gündür yayında olup pencerede yeterli değerlendirme birikene kadar hesaplamaz."
+  },
+  "mPeak24h": {
+    "message": "24 saatlik zirve"
+  },
+  "mPositiveAllTime": {
+    "message": "Olumlu, tüm zamanlar"
+  },
+  "mPositiveRecent": {
+    "message": "Olumlu, son 30 gün"
+  },
+  "nReviewScope": {
+    "message": "Tüm diller ve tüm satın alma türleri. Steam sayfadaki sayıyı dil ayarlarınıza göre filtreler, oradaki rakam daha düşük olur."
+  },
+  "nFromFollowersOnly": {
+    "message": "$1 takipçiye göre"
+  },
+  "regionAuto": {
+    "message": "İnceleme dillerinden belirle"
+  },
+  "optRegionAutoNote": {
+    "message": "Her oyun, kendi incelemelerinin işaret ettiği profili alır. Bu önizlemede okunacak bir oyun yok, bu yüzden karma kitle varsayılıyor."
+  },
+  "mPlaytime": {
+    "message": "Oyuncu saatleri / ortalama oynama süresi"
+  },
+  "nCcuRow": {
+    "message": "Tüm zamanların zirvesi × $1"
+  },
+  "nCcuLatePeak": {
+    "message": "Tüm zamanların oyuncu zirvesi çıkıştan $1 gün sonra geldi; bu bir lansman zirvesi değil, ilk hafta kuralı buna uygulanmaz."
+  },
+  "nCcuNoPeakDate": {
+    "message": "Tarihli bir oyuncu geçmişi olmadan lansman zirvesi ile sonraki bir sıçrama ayırt edilemez, bu yüzden ilk hafta değeri gösterilmiyor."
+  },
+  "nFromFollowersGenre": {
+    "message": "$1 takipçiye göre · $2 oyunlarında takipçi başına ortalama $3x"
+  },
+  "nDerivedMark": {
+    "message": "* büyüklüğü biz seçtik: çalışma etkiyi doğruluyor ama ölçmüyor"
+  },
+  "nRegionalAuto": {
+    "message": "İncelemelerin $1 kadarı Steam'in ABD fiyatının altında fiyatladığı pazarlardan geliyor; bu şu anlama gelir: $2"
+  },
+  "nRevenueBand": {
+    "message": "Bu aralık yalnızca satış aralığının para karşılığı değil: $1 ile $2 arası indirimleri ve $3 ile $4 arası iadeleri de kapsıyor."
+  },
+  "rWishlistGenre": {
+    "message": "$1 için tür çarpanı, ankete göre 7x-20x aralığının içinde"
+  },
+  "mFollowerRatio": {
+    "message": "Takipçi × yayımlanmış oran"
+  },
+  "mWishlistRank": {
+    "message": "Steam istek listesi sıralaması"
+  },
+  "nWishlistRank": {
+    "message": "$2 oyun içinde $1. sıra · duyurulan oyunların ilk %$3"
+  },
+  "nWishlistBelowList": {
+    "message": "Steam istek listesi sıralamasında yok; sıralama yaklaşık $1 civarında bitiyor"
+  },
+  "rWishlistRankOnly": {
+    "message": "Okunabilir takipçi sayısı yok, bu yüzden tek yöntem mağaza sıralaması"
+  },
+  "rWishlistBelowList": {
+    "message": "Steam istek listesi sıralamasının tamamen altında, bu yüzden yalnızca takipçi oranı yanıt veriyor"
+  },
+  "rWishlistRankPending": {
+    "message": "İstek listesi sıralaması henüz gelmedi, bu yüzden ikinci bir yöntem yok"
+  },
+  "rWishlistCeiling": {
+    "message": "Takipçi oranı, bu oyunun yer almadığı sıralamanın en altından daha fazla istek listesi ima ediyor"
+  },
+  "rWishlistAccumulation": {
+    "message": "Okunabilir çıkış tarihi yok, bu yüzden istek listesi birikiminin ne kadarına ulaşıldığı bilinmiyor"
+  },
+  "nDlcExcluded": {
+    "message": "$1 DLC'den gelen gelir dahil değil; hiçbir kamuya açık veri bunu göstermiyor."
+  },
+  "nCommonRegion": {
+    "message": "Tüm yöntemler $1 ile $2 arasını kabul ediyor. Buradaki uyum, orta değerlerin yakınlığı değil, bu örtüşmedir."
+  },
+  "nNoCommonRegion": {
+    "message": "Hiçbir değer tüm yöntemleri karşılamıyor: en yakın aralıklar $1x uzakta, bu yüzden bant hepsini kapsıyor."
+  },
+  "rPlaytimeDisagree": {
+    "message": "Oyuncu saatleri bu aralığın dışında bir değere işaret ediyor; dayandığı ortalama oynama süresini ise kimse yayınlamıyor"
+  },
+  "nPlaytimeScope": {
+    "message": "Ölçülen $1 oyuncu saatinin, varsayılan bir ortalama oynama süresine bölümü. Zayıf halka bu bölen: hiçbir kamuya açık kaynak vermiyor, yerine inceleme örneklemi kullanılıyor."
+  },
+  "sPlaytime": {
+    "message": "Oyuncu saatleriyle çapraz kontrol"
+  },
+  "nPlaytimeDivisor": {
+    "message": "Varsayılan ortalama oynama süresi"
+  },
+  "nHours": {
+    "message": "$1 sa"
+  },
+  "rRegionalMeasured": {
+    "message": "Kitle dağılımı inceleme dillerinden okundu, varsayılmadı"
+  },
+  "rRegionalAssumed": {
+    "message": "Kitle dağılımı varsayılan; bölgesel katsayı 0,60 ile 0,88 arasında"
+  },
+  "rOwnersNoRecord": {
+    "message": "SteamSpy bu oyun için veri tutmuyor, bu yüzden ikinci bir yöntem yok"
+  },
+  "rOwnersTooSmall": {
+    "message": "SteamSpy'ın sahip aralığı güvenilecek kadar büyük değil, bu yüzden ikinci bir yöntem yok"
+  },
+  "wTypeDemo": {
+    "message": "Bu bir demo ve Steam buna karşılık gelen tam oyunu belirtmiyor. Bir demonun tahmin edilecek satışı yoktur."
+  },
+  "wTypeDlc": {
+    "message": "Bu bir DLC. İnceleme çarpanı ana oyunlar üzerinde ölçüldü; DLC alıcıları oyuna zaten sahiptir ve çoğu zaten inceleme yazmıştır, dolayısıyla DLC'nin satış başına inceleme oranı kendine özgüdür ve kimse bunu yayımlamadı."
+  },
+  "wTypeMusic": {
+    "message": "Bu bir müzik albümü. İnceleme çarpanı albümler değil oyunlar üzerinde ölçüldü ve albümler için böyle bir değer yayımlanmadı."
+  },
+  "wTypeVideo": {
+    "message": "Bu bir video, oyun değil. Satış tahmin yöntemlerinin ölçüldüğü hiçbir şey burada yok."
+  },
+  "wTypeHardware": {
+    "message": "Bu bir donanım. Gelir paylaşımı kapsamında satılmıyor, dolayısıyla komisyon adımı geçerli değil ve cihazlar için hiç inceleme çarpanı ölçülmedi."
+  },
+  "wTypeMod": {
+    "message": "Bu, Steam'de satılan bir oyun değil bir mod; dolayısıyla tahmin edilecek bir şey yok."
+  },
+  "wTypeAdvertising": {
+    "message": "Bu bir oyun değil tanıtım sayfası; dolayısıyla tahmin edilecek bir şey yok."
+  },
+  "wUnsupportedType": {
+    "message": "Bu mağaza sayfası bir oyun değil. Sayfa türünün tanıdık olmaması, oyun çarpanının ona uyduğunu varsaymak için gerekçe değildir."
+  },
+  "nViaDemo": {
+    "message": "Demo sayfasındasınız. Buradaki tüm sayılar tam oyuna aittir."
+  },
+  "nBelongsTo": {
+    "message": "Şunun parçası:"
+  },
+  "mDemoReviews": {
+    "message": "Demonun incelemeleri"
+  },
+  "nDemoReviews": {
+    "message": "Demonun kendisinde ölçüldü. Yukarıdaki hiçbir sayıya girdi değildir."
+  }
+}

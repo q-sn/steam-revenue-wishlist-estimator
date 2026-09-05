@@ -1,0 +1,62 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extName__",
+  "short_name": "Wishlytic",
+  "version": "0.1.0",
+  "default_locale": "en",
+  "description": "__MSG_extDesc__",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "permissions": [
+    "storage",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://store.steampowered.com/*",
+    "https://steamcommunity.com/*",
+    "https://api.steampowered.com/*",
+    "https://steamspy.com/*",
+    "https://steamcharts.com/*",
+    "https://cdn.jsdelivr.net/*",
+    "https://raw.githubusercontent.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background/service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://store.steampowered.com/app/*"
+      ],
+      "js": [
+        "src/content/main.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/core/*.js",
+        "src/content/overlay.js",
+        "src/content/scrape.js",
+        "src/content/i18n.js",
+        "_locales/*/messages.json"
+      ],
+      "matches": [
+        "https://store.steampowered.com/*"
+      ]
+    }
+  ],
+  "options_ui": {
+    "page": "src/options/options.html",
+    "open_in_tab": true
+  },
+  "action": {
+    "default_title": "__MSG_extName__"
+  }
+}

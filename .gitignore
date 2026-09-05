@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.zip
+.DS_Store
+.vscode/
+.idea/
+
+# Snapshots of Steam's wishlist ordering and the anchors harvested from it.
+# These are built by .github/workflows/wishlist-ranks.yml and published to the
+# `data` branch; a local run writes here so it never lands on main.
+data/
