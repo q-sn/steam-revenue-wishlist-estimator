@@ -126,7 +126,8 @@ export function estimateWishlists(game, opts = {}) {
     };
   }
 
-  const combined = combineEstimators(estimators);
+  // Stretch by the disagreement, not to the widest mark's own uncertainty.
+  const combined = combineEstimators(estimators, { widenBy: 'gap' });
 
   // The estimate claims more wishlists than the bottom of a list the game is
   // not on. Reported as a conflict, never averaged away.

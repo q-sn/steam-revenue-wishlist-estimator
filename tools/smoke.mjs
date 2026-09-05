@@ -512,6 +512,8 @@ const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
 const workerSrc = readFileSync(join(REPO, 'src/background/service-worker.js'), 'utf8');
 const overlaySrc = readFileSync(join(REPO, 'src/content/overlay.js'), 'utf8');
 const scrapeSrc = readFileSync(join(REPO, 'src/content/scrape.js'), 'utf8');
+const indexSrc = readFileSync(join(REPO, 'src/core/index.js'), 'utf8');
+const wishlistsSrc = readFileSync(join(REPO, 'src/core/wishlists.js'), 'utf8');
 
 const localeTags = readdirSync(join(REPO, '_locales'));
 const tables = Object.fromEntries(
@@ -1533,6 +1535,47 @@ check('the demo page still says whose figures it is showing',
   /game\.viaDemo/.test(overlaySrc) && /'nViaDemo'/.test(overlaySrc));
 check('and keeps the demo\u2019s own review count as a measured input',
   /'mDemoReviews'/.test(overlaySrc));
+
+group('Widening when the marks disagree');
+
+// Two rules, chosen by the caller. Sales keeps the envelope; wishlists
+// stretches by the disagreement, because its weights span 0.05 to 0.79 and a
+// wide, lightly weighted mark was setting the whole answer's width.
+const apart = [
+  { method: 'tight', range: { lo: 67_000, mid: 70_000, hi: 92_000 }, weight: 9.7 },
+  { method: 'vague', range: { lo: 43_000, mid: 74_000, hi: 149_000 }, weight: 0.7 },
+  { method: 'low', range: { lo: 24_000, mid: 35_000, hi: 49_000 }, weight: 2.0 }
+];
+const envelope = combineEstimators(apart);
+const stretched = combineEstimators(apart, { widenBy: 'gap' });
+
+check('both rules agree the marks do not overlap',
+  envelope.widened && stretched.widened && Math.abs(envelope.gap - stretched.gap) < 1e-9,
+  `nearest edges ${envelope.gap.toFixed(2)}x apart`);
+
+check('both leave the midpoint alone',
+  Math.abs(envelope.range.mid / stretched.range.mid - 1) < 1e-9,
+  'widening says how sure we are, not what the answer is');
+
+check('the envelope rule lets the vaguest mark set both edges', (() => {
+  const lo = Math.min(...apart.map((e) => e.range.lo));
+  const hi = Math.max(...apart.map((e) => e.range.hi));
+  return envelope.range.lo === lo && envelope.range.hi === hi;
+})(), `${(envelope.range.hi / envelope.range.lo).toFixed(1)}x from a ${envelope.gap.toFixed(2)}x disagreement`);
+
+check('stretching by the gap stays proportionate to it',
+  stretched.range.hi / stretched.range.lo < envelope.range.hi / envelope.range.lo / 2,
+  `${(stretched.range.hi / stretched.range.lo).toFixed(1)}x instead`);
+
+check('and it still covers more than an agreeing band would',
+  stretched.range.hi / stretched.range.lo > 1.5,
+  'a contradiction must cost something');
+
+check('sales keeps the envelope rule', indexSrc.includes('combineEstimators(estimators);'),
+  'the units path was never examined, so it does not move');
+
+check('wishlists asks for the other one',
+  wishlistsSrc.includes("combineEstimators(estimators, { widenBy: 'gap' })"));
 
 group('Reading a wishlist figure out of a news post');
 

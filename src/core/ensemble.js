@@ -40,7 +40,19 @@ export function precisionWeight(range) {
   return 1 / (width * width);
 }
 
-export function combineEstimators(estimators) {
+/**
+ * How a band opens when the marks admit no common figure.
+ *
+ *   envelope  cover every mark's own band, edge to edge
+ *   gap       keep the weighted band and stretch it by how far apart the
+ *             nearest edges are
+ *
+ * Envelope lets a mark set an edge regardless of its weight, so a wide,
+ * lightly weighted mark decides the answer's width. On a wishlist estimate
+ * that turned a 1.36x disagreement into a 6.1x band, with the top edge coming
+ * from a leg holding 5% of the weight.
+ */
+export function combineEstimators(estimators, { widenBy = 'envelope' } = {}) {
   const usable = estimators.filter((e) => e && e.range && e.weight > 0);
 
   if (!usable.length) return { ok: false, reason: 'no-estimators' };
@@ -76,8 +88,14 @@ export function combineEstimators(estimators) {
   // Widen only when no figure satisfies every method.
   let widened = false;
   if (!overlaps) {
-    lo = Math.min(lo, ...usable.map((e) => e.range.lo));
-    hi = Math.max(hi, ...usable.map((e) => e.range.hi));
+    if (widenBy === 'gap') {
+      const stretch = Math.sqrt(gap);
+      lo /= stretch;
+      hi *= stretch;
+    } else {
+      lo = Math.min(lo, ...usable.map((e) => e.range.lo));
+      hi = Math.max(hi, ...usable.map((e) => e.range.hi));
+    }
     widened = true;
   }
 
