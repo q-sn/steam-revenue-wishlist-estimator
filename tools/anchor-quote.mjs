@@ -14,6 +14,9 @@
 export const COUNT = String.raw`(\d{1,3}(?:[,.    ]\d{3})+|\d+(?:[.,]\d+)?\s*[kKmM]\b|\d{4,})`;
 export const MILESTONE = new RegExp(COUNT + String.raw`\s*\+?\s*(?:steam\s+)?wishlists?`, 'gi');
 
+/** Any figure a post states, for spotting a retrospective that quotes an older one. */
+export const ANY_FIGURE = new RegExp(COUNT + String.raw`\s*\+?\s*(?:steam\s+)?(?:wishlists?|wishlist mark|mark\b|now\b)`, 'gi');
+
 const ACHIEVED = /\b(?:hits?|reach\w*|passe?[ds]?|surpass\w*|cross\w*|exceed\w*|smash\w*|gather\w*|collect\w*|amassed|received|milestone|thanks?|thank you|celebrat\w*|achiev\w*|blasted|broke|broken|climbed|now (?:at|has|have|sitting)|(?:we|they)(?:'re| are) (?:now )?at|we(?:'ve| have)|got|over|more than|almost|nearly|approach\w*|nearing|added to|wishlisted|of you|sitting at|currently at|up to|already)\b/i;
 
 /** A figure the studio wants to reach. */

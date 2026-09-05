@@ -2,6 +2,7 @@
 /** Offline sanity checks. No network. Run before every commit. */
 
 import { readFileSync, readdirSync } from 'node:fs';
+import { milestonesIn } from './harvest-anchors.mjs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import {
@@ -1532,6 +1533,37 @@ check('the demo page still says whose figures it is showing',
   /game\.viaDemo/.test(overlaySrc) && /'nViaDemo'/.test(overlaySrc));
 check('and keeps the demo\u2019s own review count as a measured input',
   /'mDemoReviews'/.test(overlaySrc));
+
+group('Reading a wishlist figure out of a news post');
+
+// The harvester's parser had never been executed by a test. A refactor left
+// one of its patterns undeclared, node --check passed, and the daily job died
+// one second in with `ANY_FIGURE is not defined`.
+const read = (text) => {
+  const found = milestonesIn({ title: '', contents: text });
+  return found.length ? found[0].wishlists : null;
+};
+
+check('a plain milestone is read',
+  read('Stronghold 4 has eclipsed over 500k wishlists since its reveal, thank you!') === 500_000);
+
+check('a rung on a reward ladder is not a count',
+  read('Milestone Three: 1,500,000 wishlists 1x Companion Cosmetic Bundle') === null,
+  'this one shipped and read 1.5M for a game the curve puts at 666k');
+
+check('a number the parser assembled out of two is refused',
+  read('Weekly Changelog: v0.111 . Weekly Changelog: v0.1112500 wishlistsFirst, thanks so much') === null,
+  'v0.111 running into 2500 read as 1,112,500');
+
+check('but a count merely lacking a space is kept',
+  read('Thank you for the support on our Steam page.40,000 wishlists reached today') === 40_000,
+  'eight such rows in the archive are correct, so the rule must be narrow');
+
+check('a goal is not an achievement',
+  read('Help us reach 100,000 wishlists this month!') === null);
+
+check('a gain over a period is not a total',
+  read('35,000 Wishlists Over The Weekend!') === null);
 
 group('The seam between the collector and the core');
 

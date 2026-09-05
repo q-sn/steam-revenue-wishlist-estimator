@@ -23,7 +23,8 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import { COUNT, MILESTONE, rejectQuote } from './anchor-quote.mjs';
+import { pathToFileURL } from 'node:url';
+import { ANY_FIGURE, MILESTONE, rejectQuote } from './anchor-quote.mjs';
 
 const argv = process.argv.slice(2);
 const valueOf = (flag, fallback) => {
@@ -44,15 +45,6 @@ const MAX_BACKOFF_MS = 60_000;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const jitter = (ms) => Math.round(ms * (0.75 + Math.random() * 0.5));
 
-/**
- * A count immediately before the word "wishlist".
- *
- * Only that order. The mirror form — "wishlist" and then a number — reads
- * game titles as data: "Wishlist Warhammer 40,000: Dawn of War" scores as
- * forty thousand wishlists, and titles with numbers in them are common enough
- * that the pattern costs more than the handful of "wishlists: 50,000" posts
- * it would catch.
- */
 const stripHtml = (html) => String(html ?? '')
   .replace(/<[^>]+>/g, ' ')
   .replace(/&nbsp;/g, ' ')
@@ -77,7 +69,7 @@ function isRound(value) {
   return value % magnitude === 0 || value % (magnitude / 2) === 0;
 }
 
-function milestonesIn(item) {
+export function milestonesIn(item) {
   const text = stripHtml(`${item.title} . ${item.contents}`);
   const out = [];
 
@@ -310,7 +302,10 @@ async function main() {
   }
 }
 
-main().catch((err) => {
+// Importing this module must not start a crawl; the tests read milestonesIn.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((err) => {
   console.error(String(err.message ?? err));
   process.exit(1);
-});
+  });
+}
