@@ -216,7 +216,7 @@ Steam publishes no wishlist counts for anybody. Three marks answer: a figure the
 
 ### One fit behind two of the marks
 
-Turning a position into a count and carrying an old announcement forward to today are the same estimation problem, and they are estimated together — one median (L1) regression over 1,051 posts across 648 ranked games:
+Turning a position into a count and carrying an old announcement forward to today are the same estimation problem, and they are estimated together — one median (L1) regression over 1,234 posts across 732 ranked games:
 
 ```
 log(wishlists) = log a - b*log(rank + q) - alpha*log(1 + age/90) - rungk*gap
@@ -226,11 +226,11 @@ log(wishlists) = log a - b*log(rank + q) - alpha*log(1 + age/90) - rungk*gap
 
 `alpha` is one constant read by both marks, so the curve and the carry-forward cannot disagree about how fast a game grows.
 
-**Held-out accuracy**, over 5×10 folds split by game so that no game appears on both sides of a split: median absolute error **12.3%** on posts under 30 days old, 14.7% under 90, 19.4% under a year, 21.9% at any age. The band **0.695–1.294** is the p10 and p90 of that out-of-sample residual, and it covers 76% of anchors.
+**Held-out accuracy**, over 5×10 folds split by game so that no game appears on both sides of a split: median absolute error **12.9%** on posts under 30 days old, 15.7% under 90, 19.4% under a year, 22.2% at any age. The band **0.693–1.401** is the p10 and p90 of that out-of-sample residual. It is asymmetric because the residual is: a game can hold far more than its position implies, while an announced floor limits how much less.
 
 ### What the developer said, which outranks everything else here
 
-676 games have a wishlist figure their own studio published on their own store page, 648 of them ranked when the model was fitted — roughly one ranked game in nine. On the day it is posted such a figure carries **0.75** of the weight, because its band runs 0.858x to 1.351x of the announced figure against the curve's 0.695x to 1.294x. That share is not a constant: the announcement band widens with the age of the post, so the same figure four years later carries **0.04** and the curve decides instead. A fixed weight would have given a four-year-old floor the same vote as a fresh one, and did — it pushed the band to 10.2x and graded the answer red, so a game with a stale announcement scored worse than a game with none at all.
+744 games have a wishlist figure their own studio published on their own store page, 732 of them ranked when the model was fitted — roughly one ranked game in eight. On the day it is posted such a figure carries **0.75** of the weight, because its band runs 0.858x to 1.351x of the announced figure against the curve's 0.693x to 1.401x. That share is not a constant: the announcement band widens with the age of the post, so the same figure four years later carries **0.04** and the curve decides instead. A fixed weight would have given a four-year-old floor the same vote as a fresh one, and did — it pushed the band to 10.2x and graded the answer red, so a game with a stale announcement scored worse than a game with none at all.
 
 Two measured corrections turn a post into today's count.
 
@@ -420,15 +420,15 @@ A single source caps at the neutral level rather than dropping to red. Having on
 
 #### Wishlists are scored separately, and on different facts
 
-Width cannot grade a wishlist estimate, because it barely varies. Measured over the whole ordering it is 1.86x with the ranking alone, 2.11x with a follower count as well, and 2.27x to 2.31x where a stale announcement is on file. Width says which marks answered, not how good the evidence was, so it is kept only as a ceiling on the grade: 2.0x and 3.5x.
+Width cannot grade a wishlist estimate, because it barely varies. Measured over the whole ordering it is 2.02x with the ranking alone, 2.30x with a follower count as well, and 2.52x where a stale announcement is on file. Width says which marks answered, not how good the evidence was, so it is kept only as a ceiling on the grade: 2.0x and 3.5x.
 
 What grades the estimate is what kind of number it is.
 
 - **Green** — most of the answer is a figure the developer published. That holds while the figure is under about a month old, which is where its share of the weight crosses a half and also where the held-out error is 12.3% rather than 14.7%. Two independent things landing on the same month is the reason the threshold is not a chosen number: it is `share > 0.5`, and the month falls out of it.
-- **Neutral** — the answer is read off the store ranking. Held out, that curve lands within 25% for 73% of games and within 50% for 95%. This is the normal case and covers 97% of ranked games.
+- **Neutral** — the answer is read off the store ranking. Held out, that curve lands within 25% for 70% of games and within 50% for 91%. This is the normal case and covers 97% of ranked games.
 - **Red** — the marks contradict past 1.86x between their nearest edges, the follower ratio breaks the ceiling set by absence from the ordering, or the ranking cannot answer at all and only the follower ratio is left. The follower ratio is the weakest mark on file — 37% of games within 30% against the curve's 73% — so a game resting on it alone is at the bottom of the scale.
 
-**Counting methods is not evidence and no longer scores.** The previous scale gave a step up for having more than one mark answer. With the published table gone the two remaining inference marks are rank and follower count, and those correlate at -0.96 in logs — a game high in the ordering has many followers for the same reason it has many wishlists. Under the old rule the narrower answer scored worse than the wider one: the ranking alone gave a 1.86x band graded neutral, and adding the less accurate follower leg widened it to 2.11x and graded it green.
+**Counting methods is not evidence and no longer scores.** The previous scale gave a step up for having more than one mark answer. With the published table gone the two remaining inference marks are rank and follower count, and those correlate at -0.96 in logs — a game high in the ordering has many followers for the same reason it has many wishlists. Under the old rule the narrower answer scored worse than the wider one: the ranking alone gave a 2.02x band graded neutral, and adding the less accurate follower leg widened it to 2.30x and graded it green.
 
 **An unrecognised genre** used to cost a step and no longer does: the survey covers six tags, and marking a game down for falling outside somebody else's table penalised most games for a gap in the source rather than for anything about the estimate.
 

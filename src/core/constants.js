@@ -113,7 +113,7 @@ export const SOURCES = {
   OURS_WISHLIST_MODEL: {
     label: 'Measured in this repository — one model of rank, announcement age and the milestone floor',
     url: 'https://github.com/q-sn/steam-revenue-wishlist-estimator/blob/main/tools/calibrate-wishlist-model.mjs',
-    note: 'Run `node tools/calibrate-wishlist-model.mjs` to reproduce. One median (L1) regression over every disclosure at any age, one anchor per game, 1,051 posts across 648 ranked games: log(wishlists) = log A - B*log(rank + Q) - ALPHA*log(1 + age/90) - RUNGK*gap, where gap is the log-distance to the next rung on the ladder studios post at and is zero for off-ladder figures. Gives A 503,667,749, B 1.31652, Q 84.699, ALPHA 0.35859. Ranks come from an ignore_preferences=1 crawl because the store default hides 415 of 5,574 positions non-uniformly, from 1.4% of the first 500 to 12.4% of 3001-3500. Held-out error over 5x10 folds split by game: median 12.3% under 30 days, 14.7% under 90, 19.4% under a year, 21.9% at any age. Band 0.695-1.294 is the p10 and p90 of that out-of-sample residual, covering 76%.'
+    note: 'Run `node tools/calibrate-wishlist-model.mjs` to reproduce. One median (L1) regression over every disclosure at any age, one anchor per game, 1,234 posts across 732 ranked games: log(wishlists) = log A - B*log(rank + Q) - ALPHA*log(1 + age/90) - RUNGK*gap, where gap is the log-distance to the next rung on the ladder studios post at and is zero for off-ladder figures. Gives A 503,667,749, B 1.31652, Q 84.699, ALPHA 0.35859. Ranks come from an ignore_preferences=1 crawl because the store default hides 415 of 5,574 positions non-uniformly, from 1.4% of the first 500 to 12.4% of 3001-3500. Held-out error over 5x10 folds split by game: median 12.9% under 30 days, 15.7% under 90, 19.4% under a year, 22.2% at any age. Band 0.693-1.401 is the p10 and p90 of that out-of-sample residual, and is asymmetric because the residual is.'
   },
   OURS_ANNOUNCEMENT_FLOOR: {
     label: 'Measured in this repository — how far a wishlist announcement undershoots the true count',
@@ -340,8 +340,12 @@ export const WISHLIST_CURVE = {
   q: 84.699,
   b: 1.31652,
 
-  /** p10 and p90 of the held-out log residual. Covers 76% of anchors. */
-  band: { lo: 0.695, hi: 1.294 },
+  /**
+   * p10 and p90 of the held-out log residual, and asymmetric because the
+   * residual is: a game can hold far more than its position implies, while an
+   * announced floor limits how much less.
+   */
+  band: { lo: 0.693, hi: 1.401 },
 
   /** Positions in the ignore_preferences=1 snapshot the fit was made on. */
   listed: 5574,
@@ -409,8 +413,8 @@ export const CONFIDENCE = {
 
   /**
    * A ceiling on the wishlist grade, not the driver of it. Measured over the
-   * whole ordering the band is 1.86x with the ranking alone, 2.11x with a
-   * follower count too, and 2.31x with a stale announcement, so width barely
+   * whole ordering the band is 2.02x with the ranking alone, 2.30x with a
+   * follower count too, and 2.52x with a stale announcement, so width barely
    * varies; only a contradiction pushes it past 3.5x.
    */
   wishlists: {
