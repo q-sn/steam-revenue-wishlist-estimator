@@ -1,0 +1,527 @@
+{
+  "extName": {
+    "message": "Wishlytic — Estimador de ingresos y listas de deseos de Steam"
+  },
+  "extDesc": {
+    "message": "Estima ventas, ingresos y listas de deseos de juegos de Steam en cualquier página de la tienda. Rangos, no precisión falsa. Gratis, sin cuenta."
+  },
+  "confReliable": {
+    "message": "Fiable"
+  },
+  "confRough": {
+    "message": "Aproximado"
+  },
+  "confUnreliable": {
+    "message": "Poco fiable"
+  },
+  "confNoData": {
+    "message": "Sin datos"
+  },
+  "legendGood": {
+    "message": "Los métodos coinciden y el rango es estrecho"
+  },
+  "legendFair": {
+    "message": "Utilizable, pero el rango es amplio o no hubo con qué contrastarlo"
+  },
+  "legendLow": {
+    "message": "Los métodos discrepan o falló una comprobación: mira el rango, no el punto medio"
+  },
+  "legendNone": {
+    "message": "No se pudo generar una estimación"
+  },
+  "rMethodsCombined": {
+    "message": "$1 métodos independientes combinados"
+  },
+  "rSingleMethod": {
+    "message": "Un solo método, sin nada con que contrastar"
+  },
+  "rNoCommonFigure": {
+    "message": "Ninguna cifra encaja con todos los métodos: las bandas más cercanas distan $1x"
+  },
+  "rFewReviews": {
+    "message": "Pocas reseñas, por eso el rango se amplía"
+  },
+  "rCcuDisagree": {
+    "message": "El contraste por jugadores implica un lanzamiento mayor que la estimación por reseñas"
+  },
+  "rBandSpans": {
+    "message": "El rango abarca $1 veces"
+  },
+  "rAgree": {
+    "message": "Las fuentes coinciden dentro del rango esperado"
+  },
+  "rNoEstimate": {
+    "message": "No hay estimación utilizable"
+  },
+  "mUnits": {
+    "message": "Unidades vendidas, total"
+  },
+  "mRevenue": {
+    "message": "Ingresos netos del desarrollador"
+  },
+  "mWishlists": {
+    "message": "Listas de deseos antes del lanzamiento"
+  },
+  "mFollowers": {
+    "message": "Seguidores"
+  },
+  "mTrend": {
+    "message": "Tu tendencia local"
+  },
+  "wTooFewReviews": {
+    "message": "Menos de $1 reseñas. Una estimación total a partir de esto sería ruido, así que aún no hay cifra."
+  },
+  "wNoReviewData": {
+    "message": "No se pudo leer el número de reseñas en esta página."
+  },
+  "wNoEstimators": {
+    "message": "Ningún método tuvo datos suficientes para estimar."
+  },
+  "wNoFollowers": {
+    "message": "No hay recuento de seguidores. Algunos juegos usan un grupo de comunidad no vinculado al ID de la aplicación."
+  },
+  "wFreeToPlay": {
+    "message": "**Free to play.** Los ingresos vienen de compras dentro del juego y DLC, que ninguna señal pública expone."
+  },
+  "wNoPrice": {
+    "message": "Datos insuficientes para calcular la cascada de ingresos."
+  },
+  "wReleased": {
+    "message": "En el lanzamiento las listas de deseos se consumen con las compras mientras los seguidores permanecen, así que la proporción deja de valer. El total suele alcanzar 2-4 veces la cifra previa y luego decae."
+  },
+  "sMethods": {
+    "message": "Cómo se combinaron los métodos"
+  },
+  "sCcu": {
+    "message": "Contraste por número de jugadores"
+  },
+  "sWeekOne": {
+    "message": "Ventas de la primera semana, dos vías"
+  },
+  "sMoney": {
+    "message": "Adónde va el dinero"
+  },
+  "sWhy": {
+    "message": "De dónde sale este multiplicador"
+  },
+  "wfList": {
+    "message": "Unidades a precio de lista"
+  },
+  "wfDiscount": {
+    "message": "Descuento medio histórico ($1%)"
+  },
+  "wfRegional": {
+    "message": "Precios regionales e IVA ($1)"
+  },
+  "wfRefunds": {
+    "message": "Reembolsos ($1%)"
+  },
+  "wfRoyalty": {
+    "message": "Comisión de Valve (30/25/20, por tramos)"
+  },
+  "wfReaches": {
+    "message": "Llega al desarrollador"
+  },
+  "wfPerUnit": {
+    "message": "Unos $1 por unidad."
+  },
+  "wfOfList": {
+    "message": "$1 del precio de lista"
+  },
+  "regionUsEu": {
+    "message": "Sobre todo compradores de EE. UU. y la UE"
+  },
+  "regionMixed": {
+    "message": "Audiencia global mixta"
+  },
+  "regionEmerging": {
+    "message": "Predominan CEI, Sudeste Asiático, Latinoamérica y China"
+  },
+  "ctxNone": {
+    "message": "Sin festival ni destacado"
+  },
+  "ctxNextFest": {
+    "message": "Participó en un festival de Steam"
+  },
+  "ctxFeatured": {
+    "message": "Festival más destacado en la tienda"
+  },
+  "pathWishlists": {
+    "message": "Listas de deseos × 0,11"
+  },
+  "pathFollowers": {
+    "message": "Seguidores × 2,5"
+  },
+  "nFromFollowers": {
+    "message": "A partir de $1 seguidores · $2"
+  },
+  "nCcuScope": {
+    "message": "Esto predice las ventas de la primera semana, no el total, así que nunca se promedia con la cifra de arriba. Si discrepa, solo amplía el rango."
+  },
+  "nOneMethod": {
+    "message": "Solo un método tuvo datos utilizables. Una segunda fuente estrecharía bastante el rango."
+  },
+  "nGeoMean": {
+    "message": "Media geométrica ponderada"
+  },
+  "nWeight": {
+    "message": "peso $1%"
+  },
+  "nTrendCompare": {
+    "message": "Comparado con tu visita $1. Guardado solo en este dispositivo."
+  },
+  "nSparkCap": {
+    "message": "$1: de $2 a $3 en $4 visitas"
+  },
+  "nBaseYear": {
+    "message": "Base, lanzado en $1"
+  },
+  "nReviewsFinal": {
+    "message": "$1 reseñas × final"
+  },
+  "nDisagreeRoutes": {
+    "message": "Estas reglas publicadas difieren $1 veces. Se muestran ambas en lugar de promediarlas."
+  },
+  "pillUnits": {
+    "message": "unidades"
+  },
+  "pillReviews": {
+    "message": "reseñas"
+  },
+  "mReviews": {
+    "message": "Reseñas"
+  },
+  "mPlayers": {
+    "message": "Jugadores ahora"
+  },
+  "pillNet": {
+    "message": "neto"
+  },
+  "pillWishlists": {
+    "message": "en listas"
+  },
+  "ariaOpen": {
+    "message": "Abrir estimación de ventas y listas de deseos"
+  },
+  "ariaCollapse": {
+    "message": "Contraer"
+  },
+  "footSettings": {
+    "message": "Ajustes"
+  },
+  "tYesterday": {
+    "message": "ayer"
+  },
+  "tDaysAgo": {
+    "message": "hace $1 días"
+  },
+  "tHoursAgo": {
+    "message": "hace $1 h"
+  },
+  "tJustNow": {
+    "message": "ahora mismo"
+  },
+  "optTitle": {
+    "message": "Ajustes de estimación"
+  },
+  "optLede": {
+    "message": "Los valores por defecto provienen de estudios publicados. Cámbialos si conoces mejor tu mercado: nadie conoce tu reparto regional mejor que tú."
+  },
+  "optRevenue": {
+    "message": "Cascada de ingresos"
+  },
+  "optDiscount": {
+    "message": "Descuento medio histórico"
+  },
+  "optDiscountHint": {
+    "message": "Qué parte de las ventas ocurre por debajo del precio de lista durante la vida del juego."
+  },
+  "optAudience": {
+    "message": "Composición del público"
+  },
+  "optAudienceHint": {
+    "message": "Efecto combinado de precios regionales e IVA sobre el precio realizado."
+  },
+  "optRefund": {
+    "message": "Tasa de reembolsos"
+  },
+  "optRefundHint": {
+    "message": "Valve no publica un promedio y dice que varía mucho entre juegos."
+  },
+  "optOverlay": {
+    "message": "Superposición"
+  },
+  "optPosition": {
+    "message": "Posición en la página"
+  },
+  "optPositionHint": {
+    "message": "Dónde se coloca la píldora en la página de la tienda."
+  },
+  "optScale": {
+    "message": "Tamaño de la interfaz"
+  },
+  "optScaleHint": {
+    "message": "Escala toda la superposición, texto y controles a la vez."
+  },
+  "optClear": {
+    "message": "Datos en caché e historial local"
+  },
+  "optClearHint": {
+    "message": "Recuentos de seguidores, rangos de propietarios y capturas de tus visitas. Guardados solo en este dispositivo, nunca se transmiten."
+  },
+  "optClearBtn": {
+    "message": "Borrar"
+  },
+  "optSave": {
+    "message": "Guardar ajustes"
+  },
+  "optReset": {
+    "message": "Restablecer valores por defecto"
+  },
+  "optSaved": {
+    "message": "Guardado"
+  },
+  "optPositionSaved": {
+    "message": "Posición guardada"
+  },
+  "optCleared": {
+    "message": "Se borraron $1 entradas"
+  },
+  "optNothingToClear": {
+    "message": "Nada que borrar"
+  },
+  "optSanity": {
+    "message": "Con estos ajustes el desarrollador se queda con $1 del precio de lista por unidad. Un 40% es lo típico con público mixto y un 45% con público mayoritariamente de EE. UU. y la UE. Acercarse al 70% significa que falta una deducción."
+  },
+  "posBR": {
+    "message": "Abajo a la derecha"
+  },
+  "posBL": {
+    "message": "Abajo a la izquierda"
+  },
+  "posTR": {
+    "message": "Arriba a la derecha"
+  },
+  "posTL": {
+    "message": "Arriba a la izquierda"
+  },
+  "pillPlayers": {
+    "message": "en juego"
+  },
+  "labPillItems": {
+    "message": "Cifras visibles antes de expandir"
+  },
+  "hintPillItems": {
+    "message": "El orden es fijo. Un elemento se omite si no hay datos, así que nunca verás un guion."
+  },
+  "optPillReviews": {
+    "message": "Reseñas"
+  },
+  "optPillUnits": {
+    "message": "Unidades vendidas"
+  },
+  "optPillNet": {
+    "message": "Ingresos netos"
+  },
+  "optPillWishlists": {
+    "message": "Listas de deseos"
+  },
+  "optPillPlayers": {
+    "message": "Jugadores ahora"
+  },
+  "footSteamDB": {
+    "message": "SteamDB"
+  },
+  "footSteamDBHint": {
+    "message": "Abrir los datos originales de los que parte este panel"
+  },
+  "optLanguage": {
+    "message": "Idioma"
+  },
+  "optLanguageHint": {
+    "message": "Se aplica a la superposición y a esta página. No afecta al texto de Steam."
+  },
+  "langAuto": {
+    "message": "Igual que el navegador"
+  },
+  "optResetDone": {
+    "message": "Restablecido a los valores predeterminados"
+  },
+  "tipMidpoint": {
+    "message": "Punto medio combinado: $1"
+  },
+  "mBoxleiter": {
+    "message": "Reseñas × multiplicador ajustado"
+  },
+  "mOwnersBand": {
+    "message": "Rango de propietarios de SteamSpy"
+  },
+  "rRevenueAssumptions": {
+    "message": "Rango de ventas más los supuestos de la cascada"
+  },
+  "rFollowerRatio": {
+    "message": "Multiplicador mediano de todos los juegos; la proporción por seguidor va de 7x a 20x"
+  },
+  "mAllTimePeak": {
+    "message": "Pico histórico"
+  },
+  "mTrend30": {
+    "message": "Tendencia a 30 días"
+  },
+  "nTrendAvg": {
+    "message": "Promedio de $1 simultáneos"
+  },
+  "nPp": {
+    "message": "$1 pp"
+  },
+  "nRecentVsAll": {
+    "message": "$1 de $2 reseñas recientes son positivas. Valve no calcula esta puntuación hasta que el juego lleva 45 días y tiene suficientes reseñas en la ventana."
+  },
+  "mPeak24h": {
+    "message": "Pico en 24 h"
+  },
+  "mPositiveAllTime": {
+    "message": "Positivas, histórico"
+  },
+  "mPositiveRecent": {
+    "message": "Positivas, últimos 30 días"
+  },
+  "nReviewScope": {
+    "message": "Todos los idiomas y tipos de compra. Steam filtra el recuento de la página según tus idiomas, así que allí la cifra será menor."
+  },
+  "nFromFollowersOnly": {
+    "message": "A partir de $1 seguidores"
+  },
+  "regionAuto": {
+    "message": "Deducir de los idiomas de las reseñas"
+  },
+  "optRegionAutoNote": {
+    "message": "Cada juego recibe el perfil que indican sus propias reseñas. Esta vista previa no tiene ningún juego que leer, así que asume público mixto."
+  },
+  "mPlaytime": {
+    "message": "Horas jugadas / tiempo medio de juego"
+  },
+  "nCcuRow": {
+    "message": "Pico histórico × $1"
+  },
+  "nCcuLatePeak": {
+    "message": "El pico histórico de jugadores llegó $1 días después del lanzamiento, así que no es un pico de estreno y la regla de la primera semana no le aplica."
+  },
+  "nCcuNoPeakDate": {
+    "message": "Sin un historial de jugadores con fechas no hay forma de distinguir un pico de estreno de uno posterior, así que la cifra de la primera semana se omite."
+  },
+  "nFromFollowersGenre": {
+    "message": "A partir de $1 seguidores · los juegos de $2 promedian $3x deseos por seguidor"
+  },
+  "nDerivedMark": {
+    "message": "* magnitud elegida por nosotros: el estudio confirma el efecto pero no lo cuantifica"
+  },
+  "nRegionalAuto": {
+    "message": "El $1 de las reseñas viene de mercados con precios de Steam por debajo del estadounidense, lo que se interpreta como: $2"
+  },
+  "nRevenueBand": {
+    "message": "El rango no es solo el de ventas en dinero: también cubre descuentos del $1 al $2 y reembolsos del $3 al $4."
+  },
+  "rWishlistGenre": {
+    "message": "Multiplicador de género para $1, dentro del rango 7x-20x de la encuesta"
+  },
+  "mFollowerRatio": {
+    "message": "Seguidores × ratio publicado"
+  },
+  "mWishlistRank": {
+    "message": "Ranking de deseos de Steam"
+  },
+  "nWishlistRank": {
+    "message": "Puesto n.º $1 de $2 · top $3% de los juegos anunciados"
+  },
+  "nWishlistBelowList": {
+    "message": "Fuera del ranking de deseos de Steam, que termina cerca de $1"
+  },
+  "rWishlistRankOnly": {
+    "message": "Sin recuento de seguidores legible, así que el ranking de la tienda es el único método"
+  },
+  "rWishlistBelowList": {
+    "message": "Por debajo de todo el ranking de deseos de Steam, así que solo responde la ratio de seguidores"
+  },
+  "rWishlistRankPending": {
+    "message": "El ranking de deseos aún no ha llegado, así que no hay un segundo método"
+  },
+  "rWishlistCeiling": {
+    "message": "La ratio de seguidores implica más deseos que el fondo de un ranking en el que este juego no está"
+  },
+  "rWishlistAccumulation": {
+    "message": "Sin fecha de lanzamiento legible, no se sabe qué parte de sus deseos lleva acumulada"
+  },
+  "nDlcExcluded": {
+    "message": "No incluye los ingresos de $1 DLC, que ninguna señal pública revela."
+  },
+  "nCommonRegion": {
+    "message": "Todos los métodos admiten de $1 a $2. La coincidencia es ese solape, no la distancia entre sus valores centrales."
+  },
+  "nNoCommonRegion": {
+    "message": "Ninguna cifra satisface a todos los métodos: los rangos más cercanos distan $1x, así que la banda los cubre todos."
+  },
+  "rPlaytimeDisagree": {
+    "message": "Las horas jugadas implican una cifra fuera de esta banda, sobre un tiempo medio de juego que nadie publica"
+  },
+  "nPlaytimeScope": {
+    "message": "De $1 horas jugadas medidas, divididas por un tiempo medio de juego supuesto. Ese divisor es el eslabón débil: ninguna fuente pública lo publica y lo sustituye una muestra de reseñas."
+  },
+  "sPlaytime": {
+    "message": "Comprobación por horas jugadas"
+  },
+  "nPlaytimeDivisor": {
+    "message": "Tiempo medio de juego supuesto"
+  },
+  "nHours": {
+    "message": "$1 h"
+  },
+  "rRegionalMeasured": {
+    "message": "La composición del público se leyó de los idiomas de las reseñas, no se supuso"
+  },
+  "rRegionalAssumed": {
+    "message": "La composición del público es un valor por defecto; el factor regional va de 0,60 a 0,88"
+  },
+  "rOwnersNoRecord": {
+    "message": "SteamSpy no tiene datos de este juego, así que no hay un segundo método"
+  },
+  "rOwnersTooSmall": {
+    "message": "El rango de propietarios de SteamSpy es demasiado pequeño para fiarse, así que no hay un segundo método"
+  },
+  "wTypeDemo": {
+    "message": "Esto es una demo y Steam no indica ningún juego completo para ella. Una demo no tiene ventas que estimar."
+  },
+  "wTypeDlc": {
+    "message": "Esto es un DLC. El múltiplo de reseñas se midió en juegos base, y quien compra un DLC ya tiene el juego y a menudo ya lo ha reseñado, así que su proporción de reseñas por venta es propia y nadie la ha publicado."
+  },
+  "wTypeMusic": {
+    "message": "Esto es una banda sonora. El múltiplo de reseñas se midió en juegos, no en álbumes, y nadie ha publicado uno para ellos."
+  },
+  "wTypeVideo": {
+    "message": "Esto es un vídeo, no un juego. Aquí no hay nada sobre lo que se midieran los estimadores de ventas."
+  },
+  "wTypeHardware": {
+    "message": "Esto es hardware. No se vende bajo el reparto de ingresos, así que el paso de la comisión no aplica, y nunca se ha medido un múltiplo de reseñas para dispositivos."
+  },
+  "wTypeMod": {
+    "message": "Esto es un mod, no un juego que se venda en Steam, así que no hay nada que estimar."
+  },
+  "wTypeAdvertising": {
+    "message": "Esto es una página promocional y no un juego, así que no hay nada que estimar."
+  },
+  "wUnsupportedType": {
+    "message": "Esta página de la tienda no es un juego. Un tipo de página desconocido no es motivo para suponer que le aplica el múltiplo de los juegos."
+  },
+  "nViaDemo": {
+    "message": "Estás en la página de la demo. Todas las cifras aquí son del juego completo."
+  },
+  "nBelongsTo": {
+    "message": "Parte de"
+  },
+  "mDemoReviews": {
+    "message": "Reseñas de la demo"
+  },
+  "nDemoReviews": {
+    "message": "Medido en la propia demo. No es una entrada de ninguna cifra de arriba."
+  }
+}

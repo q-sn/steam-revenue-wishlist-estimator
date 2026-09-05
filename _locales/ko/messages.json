@@ -1,0 +1,527 @@
+{
+  "extName": {
+    "message": "Wishlytic — Steam 매출·위시리스트 추정기"
+  },
+  "extDesc": {
+    "message": "Steam 상점 페이지에서 판매량, 수익, 위시리스트를 추정합니다. 거짓된 정밀도 대신 범위를 보여줍니다. 무료, 계정 불필요."
+  },
+  "confReliable": {
+    "message": "신뢰 가능"
+  },
+  "confRough": {
+    "message": "대략적"
+  },
+  "confUnreliable": {
+    "message": "신뢰 어려움"
+  },
+  "confNoData": {
+    "message": "데이터 없음"
+  },
+  "legendGood": {
+    "message": "여러 방법이 일치하고 범위가 좁습니다"
+  },
+  "legendFair": {
+    "message": "사용할 수 있지만 범위가 넓거나 교차 검증할 방법이 없었습니다"
+  },
+  "legendLow": {
+    "message": "방법 간 결과가 어긋나거나 검증에 실패했습니다. 중앙값이 아니라 범위를 보세요"
+  },
+  "legendNone": {
+    "message": "추정치를 만들 수 없습니다"
+  },
+  "rMethodsCombined": {
+    "message": "독립적인 $1 개 방법을 결합"
+  },
+  "rSingleMethod": {
+    "message": "단일 방법, 교차 검증 불가"
+  },
+  "rNoCommonFigure": {
+    "message": "모든 방법에 맞는 값이 없습니다. 가장 가까운 구간끼리 $1배 떨어져 있습니다"
+  },
+  "rFewReviews": {
+    "message": "리뷰가 적어 범위를 넓혔습니다"
+  },
+  "rCcuDisagree": {
+    "message": "동시 접속자 교차 검증은 리뷰 추정보다 큰 출시 규모를 시사합니다"
+  },
+  "rBandSpans": {
+    "message": "범위 폭이 $1배"
+  },
+  "rAgree": {
+    "message": "출처들이 예상 범위 안에서 일치합니다"
+  },
+  "rNoEstimate": {
+    "message": "사용할 수 있는 추정치 없음"
+  },
+  "mUnits": {
+    "message": "누적 판매량"
+  },
+  "mRevenue": {
+    "message": "개발자 순수익"
+  },
+  "mWishlists": {
+    "message": "출시 전 위시리스트"
+  },
+  "mFollowers": {
+    "message": "팔로워"
+  },
+  "mTrend": {
+    "message": "로컬 추이"
+  },
+  "wTooFewReviews": {
+    "message": "리뷰가 $1개 미만입니다. 이 표본으로 누적 판매를 추정하면 잡음일 뿐이므로 아직 숫자를 내지 않습니다."
+  },
+  "wNoReviewData": {
+    "message": "이 페이지에서 리뷰 수를 읽을 수 없습니다."
+  },
+  "wNoEstimators": {
+    "message": "어떤 방법도 추정에 필요한 데이터가 충분하지 않았습니다."
+  },
+  "wNoFollowers": {
+    "message": "팔로워 수를 가져올 수 없습니다. 일부 게임은 앱 ID와 연결되지 않은 커뮤니티 그룹을 사용합니다."
+  },
+  "wFreeToPlay": {
+    "message": "**무료 게임입니다.** 수익은 인앱 구매와 DLC에서 나오며, 공개 지표로는 알 수 없습니다."
+  },
+  "wNoPrice": {
+    "message": "수익 산출에 필요한 데이터가 부족합니다."
+  },
+  "wReleased": {
+    "message": "출시 시점에 위시리스트는 구매로 소진되지만 팔로워는 남기 때문에 이 비율은 더 이상 성립하지 않습니다. 총량은 보통 출시 전의 2~4배까지 올랐다가 감소합니다."
+  },
+  "sMethods": {
+    "message": "방법 결합 방식"
+  },
+  "sCcu": {
+    "message": "동시 접속자 교차 검증"
+  },
+  "sWeekOne": {
+    "message": "첫 주 판매량, 두 가지 경로"
+  },
+  "sMoney": {
+    "message": "돈은 어디로 가는가"
+  },
+  "sWhy": {
+    "message": "이 배수의 근거"
+  },
+  "wfList": {
+    "message": "정가 기준 판매량"
+  },
+  "wfDiscount": {
+    "message": "전 기간 평균 할인 ($1%)"
+  },
+  "wfRegional": {
+    "message": "지역별 가격과 부가세 ($1)"
+  },
+  "wfRefunds": {
+    "message": "환불 ($1%)"
+  },
+  "wfRoyalty": {
+    "message": "Valve 수수료 (30/25/20, 구간별)"
+  },
+  "wfReaches": {
+    "message": "개발자에게 도달"
+  },
+  "wfPerUnit": {
+    "message": "개당 약 $1."
+  },
+  "wfOfList": {
+    "message": "정가의 $1"
+  },
+  "regionUsEu": {
+    "message": "주로 미국·EU 구매자"
+  },
+  "regionMixed": {
+    "message": "글로벌 혼합 이용자"
+  },
+  "regionEmerging": {
+    "message": "주로 CIS, 동남아, 중남미, 중국"
+  },
+  "ctxNone": {
+    "message": "페스티벌·피처링 없음"
+  },
+  "ctxNextFest": {
+    "message": "Steam 페스티벌 참가"
+  },
+  "ctxFeatured": {
+    "message": "페스티벌과 상점 피처링"
+  },
+  "pathWishlists": {
+    "message": "위시리스트 × 0.11"
+  },
+  "pathFollowers": {
+    "message": "팔로워 × 2.5"
+  },
+  "nFromFollowers": {
+    "message": "팔로워 $1명 기준 · $2"
+  },
+  "nCcuScope": {
+    "message": "이것은 누적이 아니라 첫 주 판매량을 예측하므로 위 수치에 평균으로 반영되지 않습니다. 어긋날 때 범위만 넓힙니다."
+  },
+  "nOneMethod": {
+    "message": "사용 가능한 데이터가 있는 방법은 하나뿐이었습니다. 두 번째 출처가 있으면 범위가 크게 좁아집니다."
+  },
+  "nGeoMean": {
+    "message": "가중 기하평균"
+  },
+  "nWeight": {
+    "message": "가중치 $1%"
+  },
+  "nTrendCompare": {
+    "message": "$1 방문과 비교. 이 기기에만 저장됩니다."
+  },
+  "nSparkCap": {
+    "message": "$1: $4회 방문 동안 $2에서 $3"
+  },
+  "nBaseYear": {
+    "message": "기준, $1년 출시"
+  },
+  "nReviewsFinal": {
+    "message": "리뷰 $1개 × 최종"
+  },
+  "nDisagreeRoutes": {
+    "message": "이 두 공개 경험칙은 $1배 차이가 납니다. 평균 대신 둘 다 보여줍니다."
+  },
+  "pillUnits": {
+    "message": "개"
+  },
+  "pillReviews": {
+    "message": "개 평가"
+  },
+  "mReviews": {
+    "message": "평가"
+  },
+  "mPlayers": {
+    "message": "현재 플레이어"
+  },
+  "pillNet": {
+    "message": "순수익"
+  },
+  "pillWishlists": {
+    "message": "위시리스트"
+  },
+  "ariaOpen": {
+    "message": "판매·위시리스트 추정 열기"
+  },
+  "ariaCollapse": {
+    "message": "접기"
+  },
+  "footSettings": {
+    "message": "설정"
+  },
+  "tYesterday": {
+    "message": "어제"
+  },
+  "tDaysAgo": {
+    "message": "$1일 전"
+  },
+  "tHoursAgo": {
+    "message": "$1시간 전"
+  },
+  "tJustNow": {
+    "message": "방금"
+  },
+  "optTitle": {
+    "message": "추정 설정"
+  },
+  "optLede": {
+    "message": "기본값은 공개된 연구에서 가져왔습니다. 자신의 시장을 더 잘 안다면 바꾸세요. 지역 분포는 여러분이 가장 잘 압니다."
+  },
+  "optRevenue": {
+    "message": "수익 산출"
+  },
+  "optDiscount": {
+    "message": "전 기간 평균 할인"
+  },
+  "optDiscountHint": {
+    "message": "게임 수명 동안 정가 미만으로 팔리는 비율."
+  },
+  "optAudience": {
+    "message": "이용자 구성"
+  },
+  "optAudienceHint": {
+    "message": "지역별 가격과 부가세가 실현 가격에 미치는 복합 영향."
+  },
+  "optRefund": {
+    "message": "환불률"
+  },
+  "optRefundHint": {
+    "message": "Valve는 평균값을 공개하지 않으며 게임마다 크게 다르다고 밝힙니다."
+  },
+  "optOverlay": {
+    "message": "오버레이"
+  },
+  "optPosition": {
+    "message": "페이지 내 위치"
+  },
+  "optPositionHint": {
+    "message": "상점 페이지에서 배지가 놓이는 위치."
+  },
+  "optScale": {
+    "message": "인터페이스 크기"
+  },
+  "optScaleHint": {
+    "message": "오버레이 전체를 텍스트와 컨트롤까지 함께 확대·축소합니다."
+  },
+  "optClear": {
+    "message": "캐시 데이터와 로컬 기록"
+  },
+  "optClearHint": {
+    "message": "팔로워 수, 보유자 범위, 방문 스냅샷. 이 기기에만 저장되며 전송되지 않습니다."
+  },
+  "optClearBtn": {
+    "message": "지우기"
+  },
+  "optSave": {
+    "message": "설정 저장"
+  },
+  "optReset": {
+    "message": "기본값으로 초기화"
+  },
+  "optSaved": {
+    "message": "저장됨"
+  },
+  "optPositionSaved": {
+    "message": "위치 저장됨"
+  },
+  "optCleared": {
+    "message": "$1개 항목 삭제됨"
+  },
+  "optNothingToClear": {
+    "message": "지울 항목 없음"
+  },
+  "optSanity": {
+    "message": "이 설정에서 개발자는 개당 정가의 $1 를 가져갑니다. 혼합 지역이면 약 40%, 주로 미국·EU면 약 45%가 일반적입니다. 70%에 가까워지면 공제 항목이 빠진 것입니다."
+  },
+  "posBR": {
+    "message": "오른쪽 아래"
+  },
+  "posBL": {
+    "message": "왼쪽 아래"
+  },
+  "posTR": {
+    "message": "오른쪽 위"
+  },
+  "posTL": {
+    "message": "왼쪽 위"
+  },
+  "pillPlayers": {
+    "message": "게임 중"
+  },
+  "labPillItems": {
+    "message": "펼치기 전에 표시할 값"
+  },
+  "hintPillItems": {
+    "message": "순서는 고정입니다. 데이터가 없는 항목은 생략되므로 대시가 표시되지 않습니다."
+  },
+  "optPillReviews": {
+    "message": "평가"
+  },
+  "optPillUnits": {
+    "message": "판매량"
+  },
+  "optPillNet": {
+    "message": "순수익"
+  },
+  "optPillWishlists": {
+    "message": "위시리스트"
+  },
+  "optPillPlayers": {
+    "message": "현재 플레이어"
+  },
+  "footSteamDB": {
+    "message": "SteamDB"
+  },
+  "footSteamDBHint": {
+    "message": "이 패널이 추정에 사용한 원본 데이터 열기"
+  },
+  "optLanguage": {
+    "message": "언어"
+  },
+  "optLanguageHint": {
+    "message": "오버레이와 이 페이지에 적용됩니다. Steam 자체 문구는 바뀌지 않습니다."
+  },
+  "langAuto": {
+    "message": "브라우저와 동일"
+  },
+  "optResetDone": {
+    "message": "기본값으로 초기화했습니다"
+  },
+  "tipMidpoint": {
+    "message": "결합 중앙값: $1"
+  },
+  "mBoxleiter": {
+    "message": "평가 × 보정 계수"
+  },
+  "mOwnersBand": {
+    "message": "SteamSpy 보유자 구간"
+  },
+  "rRevenueAssumptions": {
+    "message": "판매 구간에 차감 계산 가정까지"
+  },
+  "rFollowerRatio": {
+    "message": "전체 게임 중앙값 배수입니다. 팔로워 배수는 7~20배 범위입니다"
+  },
+  "mAllTimePeak": {
+    "message": "역대 최고"
+  },
+  "mTrend30": {
+    "message": "30일 추세"
+  },
+  "nTrendAvg": {
+    "message": "평균 동시 접속 $1"
+  },
+  "nPp": {
+    "message": "$1%p"
+  },
+  "nRecentVsAll": {
+    "message": "최근 $2개 평가 중 $1이 긍정적입니다. 출시 45일이 지나고 기간 내 평가가 충분해야 Valve가 이 점수를 계산합니다."
+  },
+  "mPeak24h": {
+    "message": "24시간 최고"
+  },
+  "mPositiveAllTime": {
+    "message": "긍정적, 전체 기간"
+  },
+  "mPositiveRecent": {
+    "message": "긍정적, 최근 30일"
+  },
+  "nReviewScope": {
+    "message": "모든 언어와 모든 구매 유형. Steam은 페이지에 표시되는 개수를 언어 설정으로 걸러내므로 그 숫자는 더 작습니다."
+  },
+  "nFromFollowersOnly": {
+    "message": "팔로워 $1명 기준"
+  },
+  "regionAuto": {
+    "message": "리뷰 언어에서 판단"
+  },
+  "optRegionAutoNote": {
+    "message": "게임마다 자체 리뷰가 가리키는 프로필이 적용됩니다. 이 미리보기에는 읽을 게임이 없어 혼합 지역으로 계산합니다."
+  },
+  "mPlaytime": {
+    "message": "총 플레이 시간 / 평균 플레이 시간"
+  },
+  "nCcuRow": {
+    "message": "역대 최고 동시 접속 × $1"
+  },
+  "nCcuLatePeak": {
+    "message": "역대 최고 동시 접속은 출시 $1일 뒤에 나왔습니다. 출시 시점의 정점이 아니므로 첫 주 공식을 적용할 수 없습니다."
+  },
+  "nCcuNoPeakDate": {
+    "message": "날짜가 있는 접속 이력이 없으면 출시 정점과 이후 급등을 구분할 수 없어 첫 주 수치를 표시하지 않습니다."
+  },
+  "nFromFollowersGenre": {
+    "message": "팔로워 $1명 기준 · $2 장르는 팔로워당 평균 $3배"
+  },
+  "nDerivedMark": {
+    "message": "* 효과의 존재는 연구가 확인했지만 크기는 제시하지 않아 저희가 정한 값"
+  },
+  "nRegionalAuto": {
+    "message": "리뷰의 $1 가 Steam이 미국보다 낮게 책정한 시장에서 나왔습니다. 이는 다음으로 판단됩니다: $2"
+  },
+  "nRevenueBand": {
+    "message": "이 구간은 판매량 범위를 금액으로 바꾼 것만이 아닙니다. $1~$2 의 할인과 $3~$4 의 환불률도 포함합니다."
+  },
+  "rWishlistGenre": {
+    "message": "$1 장르 배수, 설문의 7~20배 범위 안"
+  },
+  "mFollowerRatio": {
+    "message": "팔로워 × 공개된 비율"
+  },
+  "mWishlistRank": {
+    "message": "Steam 위시리스트 순위"
+  },
+  "nWishlistRank": {
+    "message": "$2개 중 $1위 · 공개된 게임 상위 $3%"
+  },
+  "nWishlistBelowList": {
+    "message": "Steam 위시리스트 순위에 없음 · 이 순위는 약 $1에서 끝납니다"
+  },
+  "rWishlistRankOnly": {
+    "message": "팔로워 수를 읽을 수 없어 상점 순위가 유일한 방법입니다"
+  },
+  "rWishlistBelowList": {
+    "message": "Steam 위시리스트 순위 아래에 있어 팔로워 비율만 답합니다"
+  },
+  "rWishlistRankPending": {
+    "message": "위시리스트 순위가 아직 도착하지 않아 두 번째 방법이 없습니다"
+  },
+  "rWishlistCeiling": {
+    "message": "팔로워 비율이 이 게임이 들어가지 못한 순위표의 하한보다 많은 위시리스트를 가리킵니다"
+  },
+  "rWishlistAccumulation": {
+    "message": "출시일을 읽을 수 없어 위시리스트를 어디까지 모았는지 알 수 없습니다"
+  },
+  "nDlcExcluded": {
+    "message": "DLC $1개의 매출은 포함하지 않습니다. 공개 데이터로는 알 수 없습니다."
+  },
+  "nCommonRegion": {
+    "message": "모든 방법이 $1~$2 구간을 허용합니다. 여기서 일치란 중앙값 사이의 거리가 아니라 이 겹침을 뜻합니다."
+  },
+  "nNoCommonRegion": {
+    "message": "모든 방법을 만족하는 값이 없습니다. 가장 가까운 구간끼리 $1배 떨어져 있어, 위 구간은 그 전부를 포함합니다."
+  },
+  "rPlaytimeDisagree": {
+    "message": "총 플레이 시간은 이 구간 밖의 값을 시사하지만, 근거가 되는 평균 플레이 시간은 어디에도 공개돼 있지 않습니다"
+  },
+  "nPlaytimeScope": {
+    "message": "실측한 $1 플레이 시간을 가정한 평균 플레이 시간으로 나눈 값입니다. 이 분모가 약점으로, 공개 출처에 없어 리뷰 표본으로 대체합니다."
+  },
+  "sPlaytime": {
+    "message": "총 플레이 시간 교차 검증"
+  },
+  "nPlaytimeDivisor": {
+    "message": "가정한 평균 플레이 시간"
+  },
+  "nHours": {
+    "message": "$1시간"
+  },
+  "rRegionalMeasured": {
+    "message": "이용자 구성은 리뷰 언어에서 읽어낸 값이며 가정이 아닙니다"
+  },
+  "rRegionalAssumed": {
+    "message": "이용자 구성은 기본값입니다. 지역 계수는 0.60~0.88 범위입니다"
+  },
+  "rOwnersNoRecord": {
+    "message": "SteamSpy에 이 게임의 데이터가 없어 두 번째 방법을 쓸 수 없습니다"
+  },
+  "rOwnersTooSmall": {
+    "message": "SteamSpy의 보유자 구간이 너무 작아 신뢰할 수 없어 두 번째 방법을 쓸 수 없습니다"
+  },
+  "wTypeDemo": {
+    "message": "이것은 체험판이며, Steam이 해당 정식 게임을 명시하지 않았습니다. 체험판에는 추정할 판매량이 없습니다."
+  },
+  "wTypeDlc": {
+    "message": "이것은 DLC입니다. 리뷰 배수는 본편 게임에서 측정되었고, DLC 구매자는 이미 게임을 보유하고 있으며 대개 이미 리뷰를 남겼습니다. 따라서 DLC의 판매당 리뷰 비율은 별개이며, 공개된 값이 없습니다."
+  },
+  "wTypeMusic": {
+    "message": "이것은 사운드트랙입니다. 리뷰 배수는 게임에서 측정된 것으로 앨범이 아니며, 앨범용 값은 공개된 바 없습니다."
+  },
+  "wTypeVideo": {
+    "message": "이것은 영상이며 게임이 아닙니다. 판매 추정 방법이 측정된 대상이 여기에는 없습니다."
+  },
+  "wTypeHardware": {
+    "message": "이것은 하드웨어입니다. 수익 배분 대상이 아니므로 수수료 단계가 적용되지 않으며, 기기에 대한 리뷰 배수는 측정된 적이 없습니다."
+  },
+  "wTypeMod": {
+    "message": "이것은 Steam에서 판매되는 게임이 아니라 모드이므로 추정할 것이 없습니다."
+  },
+  "wTypeAdvertising": {
+    "message": "이것은 게임이 아니라 홍보 페이지이므로 추정할 것이 없습니다."
+  },
+  "wUnsupportedType": {
+    "message": "이 상점 페이지는 게임이 아닙니다. 낯선 유형의 페이지라는 사실이 게임용 배수가 적용된다고 볼 근거는 되지 않습니다."
+  },
+  "nViaDemo": {
+    "message": "체험판 페이지를 보고 있습니다. 여기의 모든 수치는 정식 게임 기준입니다."
+  },
+  "nBelongsTo": {
+    "message": "소속:"
+  },
+  "mDemoReviews": {
+    "message": "체험판 리뷰 수"
+  },
+  "nDemoReviews": {
+    "message": "체험판 자체에서 측정한 값입니다. 위의 어떤 수치에도 입력되지 않습니다."
+  }
+}

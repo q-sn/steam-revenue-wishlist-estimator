@@ -1,0 +1,42 @@
+{
+  "_readme": "Games whose developers or publishers disclosed real unit sales publicly. Seeded from the sample Gamalytic published alongside its accuracy benchmark, so our numbers are comparable to theirs. `reportedAt` is when the figure was announced. `snapshot` freezes the estimator inputs as of that date; where it is null the harness falls back to live review counts, which biases results — see the warning the harness prints.",
+  "_schema": {
+    "appId": "Steam app id",
+    "name": "display name",
+    "reportedUnits": "units sold as publicly disclosed",
+    "reportedAt": "ISO date of the disclosure",
+    "snapshot": "optional frozen inputs: { reviews, positivePct, listPrice, releaseYear, isFree, tags }"
+  },
+  "games": [
+    { "appId": 1957990, "name": "Tile Cities", "reportedUnits": 14000, "reportedAt": "2022-07-10", "snapshot": null },
+    { "appId": 1062520, "name": "Dinkum", "reportedUnits": 350000, "reportedAt": "2022-08-17", "snapshot": null },
+    { "appId": 252490, "name": "Rust", "reportedUnits": 12400000, "reportedAt": "2021-12-07", "snapshot": null },
+    { "appId": 413150, "name": "Stardew Valley", "reportedUnits": 13000000, "reportedAt": "2022-05-15", "snapshot": null },
+    { "appId": 4000, "name": "Garry's Mod", "reportedUnits": 20000000, "reportedAt": "2021-09-20", "snapshot": null },
+    { "appId": 280160, "name": "Aragami", "reportedUnits": 320000, "reportedAt": "2019-10-04", "snapshot": null },
+    { "appId": 2171690, "name": "Handshakes", "reportedUnits": 60000, "reportedAt": "2023-02-21", "snapshot": null },
+    { "appId": 1055850, "name": "Inspector Waffles", "reportedUnits": 3500, "reportedAt": "2022-03-23", "snapshot": null },
+    { "appId": 1404560, "name": "Yerba Mate Tycoon", "reportedUnits": 2000, "reportedAt": "2022-06-15", "snapshot": null },
+    { "appId": 1999360, "name": "Placid Plastic Duck Simulator", "reportedUnits": 76300, "reportedAt": "2022-12-07", "snapshot": null },
+    { "appId": 1269950, "name": "Buddy Simulator 1984", "reportedUnits": 75000, "reportedAt": "2022-10-17", "snapshot": null },
+    { "appId": 1284190, "name": "The Planet Crafter", "reportedUnits": 500000, "reportedAt": "2023-03-24", "snapshot": null },
+    { "appId": 1106840, "name": "Hydroneer", "reportedUnits": 500000, "reportedAt": "2022-07-27", "snapshot": null },
+    { "appId": 1121640, "name": "The Wandering Village", "reportedUnits": 224000, "reportedAt": "2023-03-25", "snapshot": null },
+    { "appId": 1326470, "name": "Sons Of The Forest", "reportedUnits": 2000000, "reportedAt": "2023-02-24", "snapshot": null },
+    { "appId": 975370, "name": "Dwarf Fortress", "reportedUnits": 500000, "reportedAt": "2023-01-04", "snapshot": null },
+    { "appId": 1527950, "name": "Wartales", "reportedUnits": 600000, "reportedAt": "2023-04-27", "snapshot": null },
+    { "appId": 1948280, "name": "Stacklands", "reportedUnits": 450000, "reportedAt": "2022-07-10", "snapshot": null },
+    { "appId": 262060, "name": "Darkest Dungeon", "reportedUnits": 1000000, "reportedAt": "2016-11-03", "snapshot": null },
+    { "appId": 1621690, "name": "Core Keeper", "reportedUnits": 1000000, "reportedAt": "2022-06-10", "snapshot": null },
+    { "appId": 892970, "name": "Valheim", "reportedUnits": 10000000, "reportedAt": "2022-04-25", "snapshot": null },
+    { "appId": 1092790, "name": "Inscryption", "reportedUnits": 1000000, "reportedAt": "2022-01-05", "snapshot": null },
+    { "appId": 1282730, "name": "Loop Hero", "reportedUnits": 1000000, "reportedAt": "2021-12-09", "snapshot": null },
+    { "appId": 548430, "name": "Deep Rock Galactic", "reportedUnits": 500000, "reportedAt": "2018-12-31", "snapshot": null },
+    { "appId": 433340, "name": "Slime Rancher", "reportedUnits": 5000000, "reportedAt": "2022-01-13", "snapshot": null },
+    { "appId": 1158310, "name": "Crusader Kings III", "reportedUnits": 2000000, "reportedAt": "2022-03-17", "snapshot": null },
+    { "appId": 1331550, "name": "Big Ambitions", "reportedUnits": 150000, "reportedAt": "2023-03-25", "snapshot": null },
+    { "appId": 602960, "name": "Barotrauma", "reportedUnits": 800000, "reportedAt": "2021-06-04", "snapshot": null },
+    { "appId": 1435790, "name": "Escape Simulator", "reportedUnits": 1000000, "reportedAt": "2022-05-04", "snapshot": null },
+    { "appId": 756800, "name": "Contraband Police", "reportedUnits": 250000, "reportedAt": "2023-04-04", "snapshot": null }
+  ]
+}

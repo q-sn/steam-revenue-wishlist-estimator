@@ -1,0 +1,527 @@
+{
+  "extName": {
+    "message": "Wishlytic — Steam Revenue & Wishlist Estimator"
+  },
+  "extDesc": {
+    "message": "Estimate Steam game sales, revenue and wishlists on any store page. Ranges, not fake precision. Free, no account."
+  },
+  "confReliable": {
+    "message": "Reliable"
+  },
+  "confRough": {
+    "message": "Rough"
+  },
+  "confUnreliable": {
+    "message": "Unreliable"
+  },
+  "confNoData": {
+    "message": "No data"
+  },
+  "legendGood": {
+    "message": "Methods agree and the band is narrow"
+  },
+  "legendFair": {
+    "message": "Usable, but the band is wide or nothing could cross-check it"
+  },
+  "legendLow": {
+    "message": "Methods disagree or a sanity check failed — read the range, not the midpoint"
+  },
+  "legendNone": {
+    "message": "No estimate could be produced"
+  },
+  "rMethodsCombined": {
+    "message": "$1 independent methods combined"
+  },
+  "rSingleMethod": {
+    "message": "Single method, no cross-check available"
+  },
+  "rNoCommonFigure": {
+    "message": "No figure fits every method; the nearest bands are $1x apart"
+  },
+  "rFewReviews": {
+    "message": "Few reviews, so the band is widened"
+  },
+  "rCcuDisagree": {
+    "message": "Player-count cross-check implies a larger launch than the review estimate"
+  },
+  "rBandSpans": {
+    "message": "Band spans $1x"
+  },
+  "rAgree": {
+    "message": "Sources agree within the expected band"
+  },
+  "rNoEstimate": {
+    "message": "No usable estimate"
+  },
+  "mUnits": {
+    "message": "Units sold, lifetime"
+  },
+  "mRevenue": {
+    "message": "Developer net revenue"
+  },
+  "mWishlists": {
+    "message": "Wishlists, pre-launch"
+  },
+  "mFollowers": {
+    "message": "Followers"
+  },
+  "mTrend": {
+    "message": "Your local trend"
+  },
+  "wTooFewReviews": {
+    "message": "Fewer than $1 reviews. A lifetime estimate from this would be noise, so there is no number to show yet."
+  },
+  "wNoReviewData": {
+    "message": "Could not read the review count from this page."
+  },
+  "wNoEstimators": {
+    "message": "No method had enough data to produce an estimate."
+  },
+  "wNoFollowers": {
+    "message": "No follower count available. Some games use a community group that is not keyed to the app ID."
+  },
+  "wFreeToPlay": {
+    "message": "**Free to play.** Revenue comes from in-app purchases and DLC, which no public signal exposes."
+  },
+  "wNoPrice": {
+    "message": "Not enough data to run the revenue waterfall."
+  },
+  "wReleased": {
+    "message": "Wishlists are consumed by purchases at launch while followers persist, so the ratio no longer holds. The balance typically peaks at 2-4x the pre-launch count, then decays."
+  },
+  "sMethods": {
+    "message": "How the methods combined"
+  },
+  "sCcu": {
+    "message": "Player-count cross-check"
+  },
+  "sWeekOne": {
+    "message": "Week-one sales, two routes"
+  },
+  "sMoney": {
+    "message": "Where the money goes"
+  },
+  "sWhy": {
+    "message": "Why this multiplier"
+  },
+  "wfList": {
+    "message": "Units at list price"
+  },
+  "wfDiscount": {
+    "message": "Average lifetime discount ($1%)"
+  },
+  "wfRegional": {
+    "message": "Regional pricing and VAT ($1)"
+  },
+  "wfRefunds": {
+    "message": "Refunds ($1%)"
+  },
+  "wfRoyalty": {
+    "message": "Valve royalty (30/25/20, tiered)"
+  },
+  "wfReaches": {
+    "message": "Reaches the developer"
+  },
+  "wfPerUnit": {
+    "message": "About $1 per unit."
+  },
+  "wfOfList": {
+    "message": "$1 of list"
+  },
+  "regionUsEu": {
+    "message": "Mostly US and EU buyers"
+  },
+  "regionMixed": {
+    "message": "Mixed global audience"
+  },
+  "regionEmerging": {
+    "message": "Heavily CIS, SEA, LATAM, China"
+  },
+  "ctxNone": {
+    "message": "No festival or feature"
+  },
+  "ctxNextFest": {
+    "message": "Appeared in a Steam festival"
+  },
+  "ctxFeatured": {
+    "message": "Festival plus a store feature"
+  },
+  "pathWishlists": {
+    "message": "Wishlists × 0.11"
+  },
+  "pathFollowers": {
+    "message": "Followers × 2.5"
+  },
+  "nFromFollowers": {
+    "message": "From $1 followers · $2"
+  },
+  "nCcuScope": {
+    "message": "This predicts week-one sales, not lifetime units, so it is never averaged into the figure above. It only widens the band when it disagrees."
+  },
+  "nOneMethod": {
+    "message": "Only one method had usable data. A second source would narrow this considerably."
+  },
+  "nGeoMean": {
+    "message": "Weighted geometric mean"
+  },
+  "nWeight": {
+    "message": "weight $1%"
+  },
+  "nTrendCompare": {
+    "message": "Compared with your visit $1. Stored on this device only."
+  },
+  "nSparkCap": {
+    "message": "$1: $2 to $3 over $4 visits"
+  },
+  "nBaseYear": {
+    "message": "Base, released $1"
+  },
+  "nReviewsFinal": {
+    "message": "$1 reviews × final"
+  },
+  "nDisagreeRoutes": {
+    "message": "These published rules disagree by $1x. Both are shown rather than averaged."
+  },
+  "pillUnits": {
+    "message": "units"
+  },
+  "pillReviews": {
+    "message": "reviews"
+  },
+  "mReviews": {
+    "message": "Reviews"
+  },
+  "mPlayers": {
+    "message": "Players right now"
+  },
+  "pillNet": {
+    "message": "net"
+  },
+  "pillWishlists": {
+    "message": "wishlists"
+  },
+  "ariaOpen": {
+    "message": "Open sales and wishlist estimate"
+  },
+  "ariaCollapse": {
+    "message": "Collapse"
+  },
+  "footSettings": {
+    "message": "Settings"
+  },
+  "tYesterday": {
+    "message": "yesterday"
+  },
+  "tDaysAgo": {
+    "message": "$1 days ago"
+  },
+  "tHoursAgo": {
+    "message": "$1h ago"
+  },
+  "tJustNow": {
+    "message": "just now"
+  },
+  "optTitle": {
+    "message": "Estimation settings"
+  },
+  "optLede": {
+    "message": "Defaults come from published studies. Change them if you know your own market better — nobody knows your regional split better than you do."
+  },
+  "optRevenue": {
+    "message": "Revenue waterfall"
+  },
+  "optDiscount": {
+    "message": "Average lifetime discount"
+  },
+  "optDiscountHint": {
+    "message": "How much of the catalogue sells below list over the game's life."
+  },
+  "optAudience": {
+    "message": "Audience mix"
+  },
+  "optAudienceHint": {
+    "message": "Combined effect of regional pricing and VAT on realised price."
+  },
+  "optRefund": {
+    "message": "Refund rate"
+  },
+  "optRefundHint": {
+    "message": "Valve publishes no average and says it varies a lot by game."
+  },
+  "optOverlay": {
+    "message": "Overlay"
+  },
+  "optPosition": {
+    "message": "Position on the page"
+  },
+  "optPositionHint": {
+    "message": "Where the pill sits on a store page."
+  },
+  "optScale": {
+    "message": "Interface size"
+  },
+  "optScaleHint": {
+    "message": "Scales the whole overlay, text and controls together."
+  },
+  "optClear": {
+    "message": "Cached data and local history"
+  },
+  "optClearHint": {
+    "message": "Follower counts, owner bands and your visit snapshots. Stored on this device only, never transmitted."
+  },
+  "optClearBtn": {
+    "message": "Clear"
+  },
+  "optSave": {
+    "message": "Save settings"
+  },
+  "optReset": {
+    "message": "Reset to defaults"
+  },
+  "optSaved": {
+    "message": "Saved"
+  },
+  "optPositionSaved": {
+    "message": "Position saved"
+  },
+  "optCleared": {
+    "message": "Cleared $1 entries"
+  },
+  "optNothingToClear": {
+    "message": "Nothing to clear"
+  },
+  "optSanity": {
+    "message": "With these settings a developer keeps $1 of the list price per unit. Around 40% is typical for a mixed audience and 45% for a mostly US and EU one. Drifting toward 70% means a deduction is missing."
+  },
+  "posBR": {
+    "message": "Bottom right"
+  },
+  "posBL": {
+    "message": "Bottom left"
+  },
+  "posTR": {
+    "message": "Top right"
+  },
+  "posTL": {
+    "message": "Top left"
+  },
+  "pillPlayers": {
+    "message": "in-game"
+  },
+  "labPillItems": {
+    "message": "Figures shown before expanding"
+  },
+  "hintPillItems": {
+    "message": "Order is fixed. An item is skipped when there is no data for it, so nothing shows a dash."
+  },
+  "optPillReviews": {
+    "message": "Reviews"
+  },
+  "optPillUnits": {
+    "message": "Units sold"
+  },
+  "optPillNet": {
+    "message": "Net revenue"
+  },
+  "optPillWishlists": {
+    "message": "Wishlists"
+  },
+  "optPillPlayers": {
+    "message": "Players right now"
+  },
+  "footSteamDB": {
+    "message": "SteamDB"
+  },
+  "footSteamDBHint": {
+    "message": "Open the raw first-party data this panel infers from"
+  },
+  "optLanguage": {
+    "message": "Language"
+  },
+  "optLanguageHint": {
+    "message": "Applies to the overlay and this page. Steam's own text is unaffected."
+  },
+  "langAuto": {
+    "message": "Same as browser"
+  },
+  "optResetDone": {
+    "message": "Reset to defaults"
+  },
+  "tipMidpoint": {
+    "message": "Combined midpoint: $1"
+  },
+  "mBoxleiter": {
+    "message": "Reviews × adjusted multiplier"
+  },
+  "mOwnersBand": {
+    "message": "SteamSpy owner band"
+  },
+  "rRevenueAssumptions": {
+    "message": "Sales band plus the waterfall assumptions"
+  },
+  "rFollowerRatio": {
+    "message": "All-games median multiplier; the follower ratio spans 7x to 20x"
+  },
+  "mAllTimePeak": {
+    "message": "All-time peak"
+  },
+  "mTrend30": {
+    "message": "30-day trend"
+  },
+  "nTrendAvg": {
+    "message": "Averaging $1 concurrent"
+  },
+  "nPp": {
+    "message": "$1 pp"
+  },
+  "nRecentVsAll": {
+    "message": "$1 of $2 recent reviews are positive. Valve withholds this score until a game has been out 45 days with enough reviews in the window."
+  },
+  "mPeak24h": {
+    "message": "24-hour peak"
+  },
+  "mPositiveAllTime": {
+    "message": "Positive, all time"
+  },
+  "mPositiveRecent": {
+    "message": "Positive, last 30 days"
+  },
+  "nReviewScope": {
+    "message": "All languages, every purchase type. Steam filters the count shown on the page by your language settings, so its figure will be lower."
+  },
+  "nFromFollowersOnly": {
+    "message": "From $1 followers"
+  },
+  "regionAuto": {
+    "message": "Read from review languages"
+  },
+  "optRegionAutoNote": {
+    "message": "Each game gets the profile its own reviews point at. This preview has no game to read, so it assumes a mixed audience."
+  },
+  "mPlaytime": {
+    "message": "Player-hours / average playtime"
+  },
+  "nCcuRow": {
+    "message": "All-time peak × $1"
+  },
+  "nCcuLatePeak": {
+    "message": "The all-time player peak came $1 days after launch, so it is not a launch peak and the week-one rule does not apply to it."
+  },
+  "nCcuNoPeakDate": {
+    "message": "Without a dated player history there is no way to tell a launch peak from a later spike, so the week-one figure is withheld."
+  },
+  "nFromFollowersGenre": {
+    "message": "From $1 followers · $2 games average $3x wishlists each"
+  },
+  "nDerivedMark": {
+    "message": "* our own size for an effect the study established but did not measure"
+  },
+  "nRegionalAuto": {
+    "message": "$1 of reviews come from markets Steam prices below US list, which reads as: $2"
+  },
+  "nRevenueBand": {
+    "message": "The band is not just the sales range in money: it also covers discounts of $1 to $2 and refunds of $3 to $4."
+  },
+  "rWishlistGenre": {
+    "message": "Genre multiplier for $1, inside the survey's 7x to 20x range"
+  },
+  "mFollowerRatio": {
+    "message": "Followers × published ratio"
+  },
+  "mWishlistRank": {
+    "message": "Steam wishlist ranking"
+  },
+  "nWishlistRank": {
+    "message": "Ranked #$1 of $2 · top $3% of announced games"
+  },
+  "nWishlistBelowList": {
+    "message": "Not in Steam's wishlist ranking, which ends near $1"
+  },
+  "rWishlistRankOnly": {
+    "message": "No readable follower count, so the store ranking is the only method"
+  },
+  "rWishlistBelowList": {
+    "message": "Below Steam's wishlist ranking entirely, so only the follower ratio answers"
+  },
+  "rWishlistRankPending": {
+    "message": "The wishlist ranking has not arrived, so there is no second method"
+  },
+  "rWishlistCeiling": {
+    "message": "The follower ratio implies more wishlists than the bottom of a ranking this game is not in"
+  },
+  "rWishlistAccumulation": {
+    "message": "No readable release date, so how far into its wishlist accumulation this game is stays unknown"
+  },
+  "nDlcExcluded": {
+    "message": "Excludes revenue from $1 DLC, which no public signal exposes."
+  },
+  "nCommonRegion": {
+    "message": "Every method allows $1 to $2 — that overlap, not the distance between their midpoints, is what agreement means here."
+  },
+  "nNoCommonRegion": {
+    "message": "No figure satisfies every method: the nearest ranges are $1x apart, so the band below covers all of them."
+  },
+  "rPlaytimeDisagree": {
+    "message": "Player-hours imply a figure outside this band, on an average playtime nobody publishes"
+  },
+  "nPlaytimeScope": {
+    "message": "From $1 measured player-hours divided by an assumed average playtime. That divisor is the weak link: no public source reports it, and a review sample stands in for it."
+  },
+  "sPlaytime": {
+    "message": "Player-hours cross-check"
+  },
+  "nPlaytimeDivisor": {
+    "message": "Assumed average playtime"
+  },
+  "nHours": {
+    "message": "$1 h"
+  },
+  "rRegionalMeasured": {
+    "message": "Audience mix read from review languages, not assumed"
+  },
+  "rRegionalAssumed": {
+    "message": "Audience mix is a default; the regional factor spans 0.60 to 0.88"
+  },
+  "rOwnersNoRecord": {
+    "message": "SteamSpy has no data on file for this game, so there is no second method"
+  },
+  "rOwnersTooSmall": {
+    "message": "SteamSpy's owner band is too small to trust, so there is no second method"
+  },
+  "wTypeDemo": {
+    "message": "This is a demo, and Steam names no full game for it. A demo has no sales to estimate."
+  },
+  "wTypeDlc": {
+    "message": "This is DLC. The review multiple was measured on base games, and DLC buyers already own the game and have often already reviewed it, so its reviews-per-sale ratio is its own and nobody has published it."
+  },
+  "wTypeMusic": {
+    "message": "This is a soundtrack. The review multiple was measured on games, not albums, and nobody has published one for them."
+  },
+  "wTypeVideo": {
+    "message": "This is video, not a game. There is nothing here that the sales estimators were measured on."
+  },
+  "wTypeHardware": {
+    "message": "This is hardware. It is not sold under the revenue share, so the royalty step does not apply, and no review multiple has ever been measured for devices."
+  },
+  "wTypeMod": {
+    "message": "This is a mod, not a game sold on Steam, so there is nothing to estimate."
+  },
+  "wTypeAdvertising": {
+    "message": "This is a promotional page rather than a game, so there is nothing to estimate."
+  },
+  "wUnsupportedType": {
+    "message": "This store page is not a game. An unfamiliar kind of page is no reason to assume the game multiple applies to it."
+  },
+  "nViaDemo": {
+    "message": "You are on the demo page. Every figure here is for the full game."
+  },
+  "nBelongsTo": {
+    "message": "Part of"
+  },
+  "mDemoReviews": {
+    "message": "Reviews of the demo"
+  },
+  "nDemoReviews": {
+    "message": "Measured on the demo itself. It is not an input to any figure above."
+  }
+}
