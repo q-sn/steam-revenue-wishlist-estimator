@@ -1533,6 +1533,33 @@ check('the demo page still says whose figures it is showing',
 check('and keeps the demo\u2019s own review count as a measured input',
   /'mDemoReviews'/.test(overlaySrc));
 
+group('The seam between the collector and the core');
+
+// The wishlist announcement leg shipped broken for its whole life because the
+// service worker returned `wishlistSaid` and the collector never forwarded it,
+// so `game.wishlistSaid` was always undefined in a browser. Every test passed:
+// they all build the game object by hand. This checks the seam itself.
+const coreSrc = ['wishlists.js', 'units.js', 'revenue.js', 'index.js', 'pill.js']
+  .map((f) => readFileSync(join(REPO, 'src/core', f), 'utf8')).join('\n');
+
+/** Keys the worker puts in the payload the collector receives. */
+const returned = new Set(
+  [...workerSrc.slice(workerSrc.indexOf('async function fetchExternal'))
+    .matchAll(/^\s{4}(\w+):/gm)].map((m) => m[1])
+);
+/** Keys the core reads off the game object. */
+const consumed = new Set([...coreSrc.matchAll(/\bgame(?:\?)?\.(\w+)/g)].map((m) => m[1]));
+/** Keys the collector actually writes into the game object. */
+const forwarded = new Set([...scrapeSrc.matchAll(/^\s{4}(\w+):/gm)].map((m) => m[1]));
+
+const dropped = [...returned].filter((k) => consumed.has(k) && !forwarded.has(k));
+check('every field the core reads is forwarded by the collector', dropped.length === 0,
+  dropped.length ? `dropped on the floor: ${dropped.join(', ')}` : `${[...returned].filter((k) => consumed.has(k)).length} fields cross the seam`);
+
+check('the announcement reaches the core through the collector',
+  /wishlistSaid: external\?\.wishlistSaid/.test(scrapeSrc),
+  'the leg carrying four fifths of the weight had no wire');
+
 group('Localisation contract');
 
 const desc = indie.confidence.reasons[0];

@@ -319,6 +319,8 @@ async function collect(appId, { useDom = true } = {}) {
     // as a ceiling; null listing means no snapshot, so nothing is known.
     wishlistRank: external?.wishlistRank ?? null,
     wishlistListing: external?.wishlistListing ?? null,
+    // What the studio published about this game, from the same daily job.
+    wishlistSaid: external?.wishlistSaid ?? null,
     owners: external?.owners ?? null,
     // Reviews SteamSpy has on file. Zero against a game Steam says has
     // hundreds means an unprocessed record — see unitsFromOwners.
