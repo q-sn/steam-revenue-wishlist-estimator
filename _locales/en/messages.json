@@ -200,6 +200,9 @@
   "pillWishlists": {
     "message": "wishlists"
   },
+  "pillRank": {
+    "message": "#$1"
+  },
   "ariaOpen": {
     "message": "Open sales and wishlist estimate"
   },
@@ -360,7 +363,7 @@
     "message": "Sales band plus the waterfall assumptions"
   },
   "rFollowerRatio": {
-    "message": "All-games median multiplier; the follower ratio spans 7x to 20x"
+    "message": "All-games median multiplier; the follower ratio spans $1x to $2x"
   },
   "mAllTimePeak": {
     "message": "All-time peak"
@@ -410,9 +413,6 @@
   "nCcuNoPeakDate": {
     "message": "Without a dated player history there is no way to tell a launch peak from a later spike, so the week-one figure is withheld."
   },
-  "nFromFollowersGenre": {
-    "message": "From $1 followers · $2 games average $3x wishlists each"
-  },
   "nDerivedMark": {
     "message": "* our own size for an effect the study established but did not measure"
   },
@@ -423,34 +423,49 @@
     "message": "The band is not just the sales range in money: it also covers discounts of $1 to $2 and refunds of $3 to $4."
   },
   "rWishlistGenre": {
-    "message": "Genre multiplier for $1, inside the survey's 7x to 20x range"
+    "message": "Genre multiplier for $1, inside the measured $2x to $3x range"
   },
   "mFollowerRatio": {
     "message": "Followers × published ratio"
   },
+  "mWishlistSaid": {
+    "message": "The developer said so"
+  },
   "mWishlistRank": {
     "message": "Steam wishlist ranking"
+  },
+  "sWishlistMethods": {
+    "message": "How the wishlist methods combined"
+  },
+  "oMeasuredHere": {
+    "message": "measured here on $1 announced figures"
+  },
+  "oSaidOn": {
+    "message": "announced $1, carried forward at the measured growth rate"
   },
   "nWishlistRank": {
     "message": "Ranked #$1 of $2 · top $3% of announced games"
   },
+  "nWishlistRankOnly": {
+    "message": "Ranked #$1 of $2"
+  },
   "nWishlistBelowList": {
     "message": "Not in Steam's wishlist ranking, which ends near $1"
   },
-  "rWishlistRankOnly": {
-    "message": "No readable follower count, so the store ranking is the only method"
+  "rWishlistSaid": {
+    "message": "The developer published a figure for this game, so the estimate is mostly that number"
+  },
+  "rWishlistRankCurve": {
+    "message": "No published figure for this game, so the estimate is read from its place in Steam's wishlist ranking"
   },
   "rWishlistBelowList": {
     "message": "Below Steam's wishlist ranking entirely, so only the follower ratio answers"
   },
   "rWishlistRankPending": {
-    "message": "The wishlist ranking has not arrived, so there is no second method"
+    "message": "The wishlist ranking has not arrived, so only the follower ratio answers"
   },
   "rWishlistCeiling": {
     "message": "The follower ratio implies more wishlists than the bottom of a ranking this game is not in"
-  },
-  "rWishlistAccumulation": {
-    "message": "No readable release date, so how far into its wishlist accumulation this game is stays unknown"
   },
   "nDlcExcluded": {
     "message": "Excludes revenue from $1 DLC, which no public signal exposes."
@@ -523,5 +538,8 @@
   },
   "nDemoReviews": {
     "message": "Measured on the demo itself. It is not an input to any figure above."
+  },
+  "oRankCurve": {
+    "message": "curve measured here on $1 announcements"
   }
 }

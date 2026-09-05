@@ -1,11 +1,4 @@
-/**
- * Number formatting.
- *
- * Delegated to Intl rather than hand-rolled k/m suffixes: across twelve
- * locales the conventions differ enough that homemade abbreviations look
- * wrong more often than not. German wants "1,2 Mio.", Japanese wants "120万",
- * and neither is reachable by appending a letter.
- */
+/** Locale-aware number formatting, delegated to Intl. */
 
 let locale = 'en';
 
@@ -31,10 +24,7 @@ export function compact(n) {
   return formatter('compact', { notation: 'compact' }).format(n);
 }
 
-/**
- * Compact money. Steam prices are read with cc=us, so the underlying figure is
- * always USD; only its presentation follows the reader's locale.
- */
+/** Compact money. Prices are read with cc=us, so the figure is always USD. */
 export function money(n) {
   if (!Number.isFinite(n)) return '\u2014';
   const sign = n < 0 ? '\u2212' : '';

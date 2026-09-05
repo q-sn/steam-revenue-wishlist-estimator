@@ -20,7 +20,7 @@ This one takes the opposite position on all three.
 | --- | --- |--------------------------------------------------------------------|
 | Units sold, lifetime | Weighted ensemble of an adjusted review multiplier and the SteamSpy owner band | Released games with 10+ reviews                                    |
 | Developer net revenue | Full waterfall: discount → regional and VAT → refunds → tiered royalty | Paid games                                                         |
-| Wishlists, pre-launch | Two legs averaged: followers × 7–20 with the midpoint by genre, and the game's place in Steam's own wishlist ordering read against a published distribution | Unreleased games with a follower count, a ranked position, or both |
+| Wishlists, pre-launch | Three marks, each weighted by the width of its own band: a figure the developer published about this game, carried forward at the measured growth rate; the game's place in Steam's wishlist ordering through a curve measured on announced figures; followers × 9.6–32.8 | Unreleased games with a follower count, a ranked position, a published figure, or any of them |
 | Week-one sales | Two published routes shown side by side, never averaged | Unreleased games                                                   |
 | Player-count cross-check | All-time peak concurrent × 11.4, kept outside the average | Games whose peak was set at launch                                 |
 | Player-hours cross-check | Measured player-hours ÷ an assumed average playtime, kept outside the average | Games with a concurrent-player history                             |
@@ -36,7 +36,7 @@ Every figure comes with a scale showing the low and high end. The width of that 
 
 **Confidence scores the evidence, not the width of the bar.** Every band here is dominated by a fixed published range, so the width barely varies, and a verdict read off it would be a constant: units could never reach the top, revenue would read *unreliable* on every paid game ever released, and wishlists *rough* on every unreleased one. A rating that never varies is a label. The word reports how many independent methods agree and how much of the chain was measured rather than assumed. The width is the bar itself, which is already on screen.
 
-**Wishlists are the softest number here.** Steam publishes no wishlist counts for anyone. Two public signals track them at one remove: the member count of the hidden group you join by following a game, and the store's own ordering of unreleased games by wishlists — positions with no numbers attached. Turning a position into a count needs a published distribution of what games actually launch with, so everything downstream of both signals is inference. What makes it bearable is that there are two of them and they can contradict each other; a single signal would have nothing to check it against.
+**Wishlists are the softest number here.** Steam publishes no wishlist counts for anyone. Three marks answer. One is a fact about the game — a figure its own studio posted on its own store page, carried forward to today — and it exists for about one ranked game in nine. The other two are inference: the store's own ordering of unreleased games by wishlists, positions with no numbers attached, read through a curve fitted to those announced figures; and the member count of the hidden group you join by following a game. Held out of its own fit, the model's median error is 12.3% on a figure posted in the last month and 21.9% on one of any age.
 
 **After release the wishlist estimate is withheld entirely.** Wishlists are consumed by purchases while followers persist, and the total balance typically peaks at 2–4x the pre-launch count before decaying. No stable ratio survives that, so the extension shows the follower count and declines to convert it.
 
@@ -64,39 +64,44 @@ src/core/          pure estimators, no browser APIs — Node imports these uncha
   units.js         adjusted Boxleiter, owner bands, CCU and player-hours cross-checks
   ensemble.js      weighted geometric combination and confidence scoring
   revenue.js       the waterfall and Valve's tiered royalty
-  wishlists.js     the two wishlist legs, and both week-one routes
+  wishlists.js     the three wishlist marks, and both week-one routes
   wishlist-rank.js a place in Steam's wishlist ordering, read as a count
+  wishlist-said.js a figure the developer announced, carried forward to today
   history.js       local snapshot series and visit-to-visit diffs
 src/content/       page scraping and the Shadow DOM overlay
 src/background/    cross-origin fetches, caching, local history
 docs/METHODOLOGY.md  every formula and what it is worth
 .github/workflows/
-  wishlist-ranks.yml      the daily job that snapshots the wishlist ordering
+  wishlist-ranks.yml      the daily job that publishes both wishlist files
 tools/
-  calibrate.mjs           accuracy harness
-  calibrate-playtime.mjs  where the playtime correction is measured
-  calibrate-owners.mjs    what the SteamSpy owner band is worth
-  crawl-wishlist-ranks.mjs   one snapshot of Steam's wishlist ordering
-  harvest-anchors.mjs        wishlist numbers developers announced themselves
-  calibrate-wishlist-rank.mjs  the ordering checked against those numbers
-  smoke.mjs               offline checks
+  calibrate.mjs                 accuracy harness
+  calibrate-wishlist-model.mjs  the whole wishlist model, refit from the archive
+  calibrate-follower-ratio.mjs  where the follower multiplier is measured
+  crawl-wishlist-ranks.mjs      one snapshot of Steam's wishlist ordering
+  harvest-anchors.mjs           wishlist numbers developers announced themselves
+  condense-anchors.mjs          the archive, cut to what a browser needs
+  merge-anchors.mjs             two copies of the archive, unioned on publish
+  build-locales.mjs             _locales/ from tools/locales.source.json
+  smoke.mjs                     offline checks
 ```
 
-The three wishlist-ranking tools run in CI, not on anyone's machine. `data/` is where they write locally and is git-ignored; the published files live on the `data` branch.
+The wishlist-ranking tools run in CI, not on anyone's machine. `data/` is where they write locally and is git-ignored; the published files live on the `data` branch.
 
 The core deliberately has no browser dependencies. That is what lets the calibration harness test the exact code that ships, rather than a reimplementation of it that drifts.
 
 ## Development
 
 ```bash
-node tools/smoke.mjs                # offline checks, run before every commit
-node tools/calibrate.mjs --live     # accuracy against games with disclosed sales
-node tools/calibrate-playtime.mjs   # re-measure the reviewer-playtime correction
-node tools/calibrate-owners.mjs     # re-check SteamSpy against disclosed sales
-node tools/crawl-wishlist-ranks.mjs   # snapshot Steam's wishlist ordering
-node tools/harvest-anchors.mjs        # collect wishlist numbers developers posted
-node tools/calibrate-wishlist-rank.mjs  # check the ordering against those numbers
+npm run smoke                 # offline checks, run before every commit
+npm run calibrate:live        # accuracy against games with disclosed sales
+npm run ranks                 # snapshot Steam's wishlist ordering
+npm run anchors               # collect wishlist numbers developers posted
+npm run condense              # cut the archive to what a browser needs
+npm run check:model           # refit the wishlist model from that archive
+npm run check:ratio           # re-measure the follower multiplier
 ```
+
+`npm run check:model` exits non-zero when a constant in `src/core/constants.js` stops reproducing from the archive, so a drifting fit fails rather than passing quietly.
 
 `test/fixtures.json` holds games whose developers published real unit counts. Live mode compares today's review count against a figure announced in the past, so it is biased toward overestimating and prints a warning saying so. Freezing inputs into the `snapshot` field at announcement time is the correct fix, and pull requests adding snapshots are the single most valuable contribution to this project.
 

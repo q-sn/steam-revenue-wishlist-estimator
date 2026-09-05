@@ -8,7 +8,7 @@ import {
 import { estimateRevenueRange } from './revenue.js';
 import { estimateWishlists, weekOneSales } from './wishlists.js';
 import {
-  combineEstimators, scoreConfidence, scoreRevenueConfidence,
+  combineEstimators, precisionWeight, scoreConfidence, scoreRevenueConfidence,
   scoreWishlistConfidence, worstLevel
 } from './ensemble.js';
 import { APP_TYPES, ENSEMBLE } from './constants.js';
@@ -27,44 +27,14 @@ export {
   regionalFromLanguages, waterfallEnvelope
 } from './revenue.js';
 export { estimateWishlists, weekOneSales, wishlistMultiplierFor } from './wishlists.js';
-export { wishlistsFromRank, invertDistribution, accumulationFactor } from './wishlist-rank.js';
+export { wishlistsFromRank, curveAt } from './wishlist-rank.js';
+export { wishlistsFromAnnouncement } from './wishlist-said.js';
 export {
-  combineEstimators, scoreConfidence, scoreRevenueConfidence,
+  combineEstimators, precisionWeight, scoreConfidence, scoreRevenueConfidence,
   scoreWishlistConfidence, worstLevel
 } from './ensemble.js';
 export { PILL_ITEMS, PILL_DEFAULTS, pillFigures } from './pill.js';
 
-/**
- * Single entry point. Takes a normalised game object, returns everything the
- * overlay needs to render.
- *
- * @param {object} game
- * @param {number} game.appId
- * @param {number} [game.reviews]         total reviews, all languages
- * @param {number} [game.positivePct]     0-100
- * @param {number} [game.listPrice]       list price in USD, before any discount
- * @param {number} [game.price]           price on the page today, in USD
- * @param {number} [game.discountPct]     current discount, 0-100
- * @param {boolean} [game.isFree]
- * @param {boolean} [game.released]
- * @param {number} [game.releaseYear]
- * @param {number} [game.releaseDate]     epoch ms
- * @param {string[]} [game.tags]
- * @param {number} [game.followers]
- * @param {number} [game.allTimePeak]       highest concurrent count on record
- * @param {number} [game.allTimePeakAt]     epoch ms of the month it fell in
- * @param {Array} [game.monthlyHistory]     SteamCharts months, newest first
- * @param {number} [game.reviewerMedianHours] median playtime among reviewers
- * @param {number} [game.reviewerSampleSize]
- * @param {number} [game.steamPurchaseShare] 0-1, bought on Steam vs key
- * @param {{discounted:number, total:number}} [game.languageMix] review counts
- * @param {string|{lo:number,hi:number}} [game.owners]  SteamSpy owner band
- * @param {string} [game.festivalContext]   none | unknown | nextFest | featured
- * @param {number} [game.wishlistRank]      1-based place in Steam's Top Wishlists
- * @param {{listed:number, upcoming:number, at:number}} [game.wishlistListing]
- *        size of that ordering, how many announced games it is drawn from, and
- *        when it was snapshotted
- */
 function buildConfidence(combined, flags, revenue, wishlists) {
   const units = scoreConfidence(combined, flags);
   const money = scoreRevenueConfidence(units, revenue.ok, revenue);
@@ -74,24 +44,17 @@ function buildConfidence(combined, flags, revenue, wishlists) {
     units,
     revenue: money,
     wishlists: wl,
-    /** For surfaces that show several figures at once: the weakest of them. */
+    /** The weakest level among the named figures. */
     overallFor: (keys) => worstLevel(keys.map((k) => ({
       units: units.level, net: money.level, wishlists: wl.level
     })[k])),
-    // Retained so callers that only care about the headline keep working.
+    // Kept for callers that read only the headline.
     level: units.level,
     reasons: units.reasons
   };
 }
 
-/**
- * Everything refuses, and says which kind of page this is.
- *
- * Built through buildConfidence rather than as a hand-written result shape:
- * the refusal has to look exactly like every other refusal to the overlay,
- * and a parallel literal here would drift the first time the real shape gains
- * a field.
- */
+/** A full refusal in the normal result shape, naming the page type. */
 function declineByType(game, appType) {
   const decline = { ok: false, reason: 'unsupported-type', appType };
   return {
@@ -107,28 +70,43 @@ function declineByType(game, appType) {
   };
 }
 
+/**
+ * Single entry point: a normalised game in, everything the overlay renders out.
+ *
+ * @param {object} game
+ * @param {number} game.appId
+ * @param {number} [game.reviews]         total reviews, all languages
+ * @param {number} [game.positivePct]     0-100
+ * @param {number} [game.listPrice]       list price in USD, before any discount
+ * @param {number} [game.price]           price on the page today, in USD
+ * @param {number} [game.discountPct]     current discount, 0-100
+ * @param {number} [game.releaseDate]     epoch ms
+ * @param {number} [game.allTimePeak]       highest concurrent count on record
+ * @param {number} [game.allTimePeakAt]     epoch ms of the month it fell in
+ * @param {Array} [game.monthlyHistory]     SteamCharts months, newest first
+ * @param {number} [game.reviewerMedianHours] median playtime among reviewers
+ * @param {number} [game.steamPurchaseShare] 0-1, bought on Steam vs key
+ * @param {{discounted:number, total:number}} [game.languageMix] review counts
+ * @param {string|{lo:number,hi:number}} [game.owners]  SteamSpy owner band
+ * @param {string} [game.festivalContext]   none | unknown | nextFest | featured
+ * @param {number} [game.wishlistRank]      1-based place in Steam's Top Wishlists
+ * @param {{listed:number, upcoming:number, at:number}} [game.wishlistListing]
+ *        size of that ordering, how many announced games it is drawn from, and
+ *        when it was snapshotted
+ */
 export function estimateAll(game, settings = {}) {
-  // Only base games get numbers; see APP_TYPES for what else Steam serves
-  // from /app/ and why each of those is declined. Absent means game, so a
-  // caller that never looked at the type still gets an estimate.
+  // Absent type means game, so a caller that never read the type still gets
+  // an estimate. See APP_TYPES for what else Steam serves from /app/.
   const appType = game.appType ?? APP_TYPES.estimable;
   if (appType !== APP_TYPES.estimable) return declineByType(game, appType);
 
-  // Lifetime-unit estimators. Both measure the same quantity, so both may be
-  // combined; anything measuring something else stays out of the average and
-  // becomes a cross-check.
+  // Lifetime-unit estimators. Only methods measuring this same quantity may
+  // be averaged; everything else stays a cross-check.
   const boxleiter = estimateUnits(game);
 
   const ownersBand = typeof game.owners === 'string' ? parseOwnersBand(game.owners) : game.owners;
-  // SteamSpy answers for app ids it has never processed, with its own review
-  // tally at zero while Steam reports a real one. That mismatch is the tell,
-  // and it is not a small-game phenomenon: PEAK carried an empty record at
-  // 367,000 Steam reviews, Escape from Tarkov at 63,000.
-  //
-  // The condition is "we have a Steam review count worth estimating from",
-  // which is the test estimateUnits just applied — spelling it out again as a
-  // review threshold made it a second copy of the display gate, which then
-  // moved when that gate moved.
+  // SteamSpy answers for app ids it never processed with its own review tally
+  // at zero while Steam reports a real one. That mismatch is the tell.
   const recordEmpty = game.ownerRecordReviews === 0 && boxleiter.ok;
   const owners = unitsFromOwners(ownersBand, {
     steamPurchaseShare: game.steamPurchaseShare,
@@ -162,34 +140,15 @@ export function estimateAll(game, settings = {}) {
   const combined = combineEstimators(estimators);
   const unitRange = combined.ok ? combined.range : null;
 
-  // Cross-checks never move the number silently. They only widen the band and
-  // lower confidence, so a disagreement stays visible.
+  // Cross-checks only widen the band and lower confidence; they never move
+  // the number.
   const flags = {
     lowSample: boxleiter.lowSample,
-    // Why there is no owner band, when there is not one. "Single method" on
-    // its own leaves the reader to guess whether the game is small, the
-    // source is missing, or we simply did not look.
+    // Why there is no owner band, when there is not one.
     ownersMissing: owners.ok ? null : owners.reason,
     ownersUntrusted: owners.ok && owners.weight === 0
   };
 
-  // Owners are not treated as a ceiling on units, and the reason is worth
-  // stating where the check would otherwise go.
-  //
-  // Owners bound units in principle, so an estimate above the top of the
-  // SteamSpy band looks like a nameable inconsistency. It is not one.
-  // SteamSpy publishes a bucket spanning 2x or more from a profile sample that
-  // collapsed in 2018 and reads low, so its upper edge is the boundary of a
-  // wide guess, not a fact about how many copies exist — and the likeliest
-  // explanation for a breach is that the bucket is low, which the modest
-  // weight it carries already accounts for.
-  //
-  // Such a check would also be redundant. The owner band is one of the
-  // estimators being averaged, so whenever the others clear its top,
-  // `disagreement` has already noticed and said so in a sentence that names
-  // both figures. A ceiling flag would add a second, vaguer sentence about
-  // the same fact, and by forcing the level rather than nudging it would let
-  // that fact decide the verdict twice.
   const ccu = weekOneFromCcu(game.allTimePeak, {
     hadPreorders: game.hadPreorders ?? null,
     peakAt: game.allTimePeakAt ?? null,
@@ -199,11 +158,8 @@ export function estimateAll(game, settings = {}) {
     flags.ccuDisagrees = true;
   }
 
-  // The player-hours route measures lifetime units, the same quantity the
-  // ensemble does, and still stays out of the average: its divisor is an
-  // average playtime no public source reports, and the reviewer sample that
-  // stands in for it samples whoever bought the game most recently. See
-  // PLAYTIME. So it can say the band looks wrong and never move it.
+  // Cross-check only: its divisor is an average playtime no public source
+  // reports. See PLAYTIME.
   if (playtime.ok && unitRange
       && (playtime.range.lo > unitRange.hi || playtime.range.hi < unitRange.lo)) {
     flags.playtimeDisagrees = true;
@@ -228,9 +184,7 @@ export function estimateAll(game, settings = {}) {
           contributors: combined.contributors,
           disagreement: combined.disagreement,
           widened: combined.widened,
-          // Where every method admits the figure could sit, or null when no
-          // such place exists. This is what agreement means for interval
-          // estimates, and what the panel reports.
+          // Overlap of every method's range, or null when there is none.
           common: combined.common,
           gap: combined.gap,
           // Kept so the "why this number" panel can show the multiplier chain.
@@ -248,11 +202,7 @@ export function estimateAll(game, settings = {}) {
     wishlists,
     weekOne,
     crossChecks: { ccu, owners, playtime },
-    // Confidence is per figure, not one verdict for the panel. The three
-    // numbers rest on different evidence: units on the ensemble, revenue on
-    // those units plus a chain of assumptions, wishlists on a separate signal
-    // that exists even when there is no sales estimate at all. A single word
-    // covering all three would be wrong about at least one of them.
+    // Per figure, not one verdict: the three rest on different evidence.
     confidence: buildConfidence(combined, flags, revenue, wishlists),
     generatedAt: Date.now()
   };

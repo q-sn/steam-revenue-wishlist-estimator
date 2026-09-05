@@ -1,11 +1,6 @@
 /**
- * Entry point.
- *
- * Content scripts cannot use static ES imports, so the core is pulled in
- * dynamically from web_accessible_resources. This keeps the estimators as
- * plain ES modules that Node imports unchanged, which is what lets
- * tools/calibrate.mjs test the exact code that ships rather than a
- * reimplementation of it that drifts.
+ * Entry point. Content scripts cannot use static ES imports, so the core is
+ * pulled in dynamically from web_accessible_resources.
  */
 (async () => {
   const appId = Number(location.pathname.match(/\/app\/(\d+)/)?.[1]);
@@ -23,8 +18,8 @@
   let settings = stored.settings ?? {};
   let ui = stored.ui ?? {};
 
-  // Language is resolved before anything renders, otherwise the first paint
-  // would be in the browser's language and then flicker to the chosen one.
+  // Must resolve before the first paint, or it renders in the browser
+  // language and then flickers to the chosen one.
   await initLocale(ui.language ?? 'auto');
   core.setLocale(uiLanguage());
 

@@ -1,17 +1,13 @@
 /**
- * Cross-origin work and persistence.
+ * Cross-origin work and persistence. Every request to steamcommunity.com,
+ * api.steampowered.com, steamspy.com and steamcharts.com goes through here,
+ * as does the local snapshot history.
  *
- * steamcommunity.com, api.steampowered.com, steamspy.com and steamcharts.com
- * are all different origins from the store page, so every request to them goes
- * through here. This worker also owns the local snapshot history, so the
- * content script stays a pure renderer.
- *
- * Note there is no DOM in an MV3 service worker: the follower XML is matched
- * with a regex rather than DOMParser, because the payload is a fixed Valve
- * format and we want exactly one integer out of it.
+ * There is no DOM in an MV3 service worker, so the follower XML is matched
+ * with a regex rather than DOMParser.
  */
 
-import { HISTORY, WISHLIST_RANK } from '../core/constants.js';
+import { HISTORY, WISHLIST_RANK, WISHLIST_SAID } from '../core/constants.js';
 import { parseChartsStats, parseMonthlyHistory, parseRecentTrend, allTimePeakMonth } from '../core/units.js';
 import { appendSnapshot, diffSince } from '../core/history.js';
 
@@ -23,16 +19,12 @@ const lastFetchAt = { default: 0, steamspy: 0, steamcharts: 0 };
 /**
  * One request per bucket at a time, spaced by at least the bucket's gap.
  *
- * The obvious version of this — read the clock, sleep the difference, write
- * the clock back — does not work, because concurrent callers all read the same
- * clock before any of them writes to it, compute the same delay, and fire
- * together. Four tabs opening at once produced four simultaneous SteamSpy
- * requests while looking like it was rate-limiting them. So each bucket keeps
- * a promise chain and callers queue on it.
+ * Each bucket is a promise chain that callers queue on. Sleeping on a shared
+ * timestamp instead does not rate-limit anything: concurrent callers all read
+ * the clock before any of them writes it and then fire together.
  *
- * The queue lives only as long as the worker. MV3 shuts an idle worker down
- * after about thirty seconds, and the gap is a fraction of that, so a request
- * arriving after a restart is not one of a burst anyway.
+ * The queue lives only as long as the worker, which MV3 shuts down after about
+ * thirty seconds idle.
  */
 const queues = { default: Promise.resolve(), steamspy: Promise.resolve(), steamcharts: Promise.resolve() };
 
@@ -60,9 +52,8 @@ function cacheSet(key, value) {
 }
 
 /**
- * Wrap a network read in the same cache-then-fetch-then-fall-back-to-stale
- * pattern. Serving a day-old number beats serving nothing, as long as the
- * staleness is reported upward.
+ * Cache, then fetch, then fall back to the stale copy — with `stale: true` on
+ * the result so callers can report it.
  */
 async function cached(key, bucket, fetcher, ttl = HISTORY.cacheTtlMs) {
   const hit = await cacheGet(key, ttl);
@@ -80,12 +71,8 @@ async function cached(key, bucket, fetcher, ttl = HISTORY.cacheTtlMs) {
 }
 
 /**
- * Follower count.
- *
- * Following a game silently joins a hidden group whose member count is the
- * only public surface for this number. Some titles use a community group that
- * is not keyed to the app ID, in which case there is nothing to read and we
- * return null rather than guessing.
+ * Follower count, read as the member count of the hidden group a follow joins.
+ * Null for titles whose community group is not keyed to the app ID.
  */
 function fetchFollowers(appId) {
   return cached(`followers:${appId}`, 'default', async () => {
@@ -102,11 +89,8 @@ function fetchFollowers(appId) {
 }
 
 /**
- * Owner band and yesterday's peak. Keyless.
- *
- * `average_forever` is not read. SteamSpy still returns the field, and it is
- * zero for every game checked, so the playtime input comes from the reviews
- * endpoint instead — see the review sample in the content script.
+ * Owner band and yesterday's peak. Keyless. `average_forever` is not read: it
+ * is zero for every game checked, so playtime comes from the review sample.
  */
 function fetchSteamSpy(appId) {
   return cached(`steamspy:${appId}`, 'steamspy', async () => {
@@ -120,30 +104,18 @@ function fetchSteamSpy(appId) {
     return {
       owners: json.owners ?? null,
       peakCcu: Number.isFinite(json.ccu) ? json.ccu : null,
-      // SteamSpy's own review tallies, carried only so the core can tell an
-      // empty record from a small game. It answers for every app id it has
-      // heard of, including ones it has never processed, and an unprocessed
-      // record looks exactly like a tiny game: owners '0 .. 20,000', ccu 0,
-      // and these two at zero. PEAK carries 367,000 Steam reviews against an
-      // empty record.
+      // Carried only so the core can tell an unprocessed record from a small
+      // game: SteamSpy answers for every app id it has heard of, and an
+      // unprocessed one reads as owners '0 .. 20,000' with every field zero.
       recordedReviews: (Number(json.positive) || 0) + (Number(json.negative) || 0)
     };
   });
 }
 
 /**
- * Concurrent-player figures and history, scraped from SteamCharts.
- *
- * The only page here that is HTML rather than an API, because no public API
- * exposes the all-time peak or the monthly series. One request carries three
- * things nothing else can supply: the peak, the month it happened in, and the
- * whole history of average concurrents that the player-hours estimator runs
- * on.
- *
- * Cached for a day. The peak barely moves and the history grows a row a month,
- * but the 30-day trend on the same page does move, and a day means one request
- * per game per day rather than one per page view on a site carrying the cost
- * of everything we ask of it.
+ * All-time peak, the month it fell in, and the monthly average-concurrents
+ * series, scraped from SteamCharts. The only HTML page read here — no public
+ * API exposes these. Cached for a day.
  */
 function fetchCharts(appId) {
   return cached(`charts:${appId}`, 'steamcharts', async () => {
@@ -160,9 +132,8 @@ function fetchCharts(appId) {
     return {
       ...(stats ?? {}),
       trend,
-      // Newest first, as the page prints them. Only the fields the estimators
-      // use are kept: the raw table is a hundred-odd rows per game and this
-      // goes into storage.
+      // Newest first, as the page prints them. Trimmed to the fields the
+      // estimators use, since the raw table is ~100 rows per game in storage.
       monthlyHistory: (history?.months ?? []).map((m) => ({
         year: m.year,
         monthIndex: m.monthIndex,
@@ -176,8 +147,7 @@ function fetchCharts(appId) {
 
 /** Live concurrent players straight from Valve. Keyless, short TTL. */
 function fetchCurrentPlayers(appId) {
-  // A live number cached for a day is not a live number, so this one passes
-  // its own TTL rather than inheriting the day-long default.
+  // Passes its own short TTL rather than inheriting the day-long default.
   return cached(`ccu:${appId}`, 'default', async () => {
     const res = await fetch(
       `https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=${appId}`,
@@ -193,17 +163,10 @@ function fetchCurrentPlayers(appId) {
 
 
 /**
- * Steam's Top Wishlists ordering, downloaded as a file.
- *
- * Every other fetch in this worker is per-game and happens because the user
- * opened a page. This one is not: it is one shared snapshot of the whole
- * ordering, built once a day in CI and served to everyone from a CDN. See
+ * Steam's Top Wishlists ordering: one shared snapshot of the whole ordering,
+ * built daily in CI and served from a CDN. The request is identical whatever
+ * game is on screen, so it discloses nothing about browsing. See
  * WISHLIST_RANK.feed for why it is not crawled here.
- *
- * Two properties fall out of that and both matter. The extension makes the
- * same request no matter which game is on screen, so it discloses nothing
- * about browsing; and the load on Valve does not grow with the number of
- * users, because Valve is not the one being asked.
  */
 const RANKS_KEY = 'wishlistRanks';
 const RANKS_ALARM = 'refresh-wishlist-ranks';
@@ -217,8 +180,8 @@ async function downloadRanks() {
       const res = await fetch(url, { credentials: 'omit' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
-      // A payload missing any of these is a half-published file or somebody
-      // else's JSON, and either way the positions in it cannot be trusted.
+      // A payload missing any of these is half-published or somebody else's
+      // JSON; either way its positions cannot be trusted.
       if (!Array.isArray(json?.appids) || !json.appids.length
           || !Number.isFinite(json.listed) || !Number.isFinite(json.upcoming)) {
         throw new Error('malformed ranking payload');
@@ -232,13 +195,9 @@ async function downloadRanks() {
 }
 
 /**
- * The stored snapshot, refreshed when it is older than the publishing cadence.
- *
- * A failed refresh keeps the copy already on disk. Positions drift slowly
- * enough that yesterday's file is a good answer and a missed day is not worth
- * losing the estimate over; WISHLIST_RANK.maxAgeMs is where the core stops
- * accepting one, and that check reads the day the snapshot was built rather
- * than the day it was downloaded.
+ * The stored snapshot, refreshed when older than the publishing cadence. A
+ * failed refresh keeps the copy on disk; WISHLIST_RANK.maxAgeMs is where the
+ * core stops accepting one, measured from the day it was built.
  */
 async function ensureRanks({ force = false } = {}) {
   const store = await chrome.storage.local.get(RANKS_KEY);
@@ -255,22 +214,18 @@ async function ensureRanks({ force = false } = {}) {
   }
 }
 
-// Rebuilt per worker lifetime rather than stored: 5,000-odd entries is a
-// millisecond to index and a second copy in storage to keep in step.
+// Rebuilt per worker lifetime rather than stored.
 let rankIndex = { generatedAt: null, map: null };
 
 function indexOf(payload) {
   if (rankIndex.generatedAt !== payload.generatedAt) {
     const map = new Map();
     payload.appids.forEach((id, i) => {
-      // Zero marks a position held by a package rather than a game. It is in
-      // the file so that index and rank stay the same number, and it is not a
-      // game anyone can look up.
+      // Zero marks a position held by a package rather than a game; it is in
+      // the file so that index and rank stay the same number.
       if (!id) return;
-      // The ordering is live, so a game that moved while the crawl was walking
-      // past it can appear at two positions. Keep the first: a duplicate means
-      // the game was somewhere between them, and the better of two guesses is
-      // the one that does not flatter it.
+      // The ordering is live, so a game that moved during the crawl can appear
+      // twice. Keep the first, which is the less flattering of the two.
       if (!map.has(id)) map.set(id, i + 1);
     });
     rankIndex = { generatedAt: payload.generatedAt, map };
@@ -284,32 +239,88 @@ async function wishlistRankFor(appId) {
 
   const payload = hit.value;
   return {
-    // Absent means the game is below the bottom of the ordering, which is a
-    // fact about the game. The core reads it as a ceiling, not as missing data
-    // — but only when there is a listing to say what the bottom was.
+    // Null means below the bottom of the ordering, which the core reads as a
+    // ceiling rather than as missing data — but only given a listing.
     wishlistRank: indexOf(payload).get(appId) ?? null,
     wishlistListing: {
       listed: payload.listed,
       upcoming: payload.upcoming,
-      // When the store was read, not when we downloaded it. Staleness here is
-      // a question about the store having moved on.
+      // When the store was read, not when it was downloaded.
       at: Date.parse(payload.generatedAt) || hit.at
     }
   };
 }
 
+/**
+ * Wishlist counts developers announced for their own games — another shared
+ * CDN file, ~20 KB for 676 games.
+ *
+ * Kept in its own store entry rather than folded into the ranking: different
+ * steps of the same CI job publish them, so either can be a day behind.
+ */
+const SAID_KEY = 'wishlistSaid';
+const SAID_ALARM = 'refresh-wishlist-said';
+
+async function downloadSaid() {
+  const urls = [WISHLIST_SAID.feed.url, WISHLIST_SAID.feed.fallbackUrl];
+  let lastError = null;
+
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, { credentials: 'omit' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      if (!json?.said || typeof json.said !== 'object' || !Number.isFinite(json.games)) {
+        throw new Error('malformed announcement payload');
+      }
+      return json;
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  throw lastError ?? new Error('no announcement source reachable');
+}
+
+async function ensureSaid({ force = false } = {}) {
+  const store = await chrome.storage.local.get(SAID_KEY);
+  const hit = store[SAID_KEY];
+  if (!force && hit && Date.now() - hit.at < WISHLIST_SAID.feed.refreshMs) return hit;
+
+  try {
+    const value = await downloadSaid();
+    const fresh = { value, at: Date.now() };
+    await chrome.storage.local.set({ [SAID_KEY]: fresh });
+    return fresh;
+  } catch {
+    return hit ?? null;
+  }
+}
+
+/**
+ * No freshness gate, unlike the ranking: an announcement does not go stale,
+ * and its age is carried in the figure's own correction and band width.
+ */
+async function wishlistSaidFor(appId) {
+  const hit = await ensureSaid();
+  const row = hit?.value?.said?.[String(appId)];
+  if (!Array.isArray(row) || !Number.isFinite(row[0]) || typeof row[1] !== 'string') return null;
+  return { wishlists: row[0], announcedAt: row[1] };
+}
+
 /** Everything the estimators need from outside the store page, in one round trip. */
 async function fetchExternal(appId) {
-  const [followers, spy, players, charts, ranks] = await Promise.all([
+  const [followers, spy, players, charts, ranks, said] = await Promise.all([
     fetchFollowers(appId),
     fetchSteamSpy(appId),
     fetchCurrentPlayers(appId),
     fetchCharts(appId),
-    wishlistRankFor(appId)
+    wishlistRankFor(appId),
+    wishlistSaidFor(appId)
   ]);
 
   return {
     ...ranks,
+    wishlistSaid: said,
     followers: followers.value ?? null,
     followersStale: Boolean(followers.stale),
     owners: spy.value?.owners ?? null,
@@ -320,17 +331,13 @@ async function fetchExternal(appId) {
     allTimePeak: charts.value?.allTimePeak ?? null,
     allTimePeakAt: charts.value?.allTimePeakAt ?? null,
     monthlyHistory: charts.value?.monthlyHistory ?? null,
-    // Both this and the peak come from Valve's API by way of SteamCharts, so
-    // for a small game they are exact where a sampled figure is rounded.
+    // From Valve's API by way of SteamCharts, so exact rather than sampled.
     peak24h: charts.value?.peak24h ?? null,
     trend: charts.value?.trend ?? null
   };
 }
 
-/**
- * Record what we saw and report what moved since the last visit.
- * Stored locally and never transmitted.
- */
+/** Record this visit and report what moved since the last one. Local only. */
 async function recordHistory(appId, snapshot) {
   const key = `history:${appId}`;
   const store = await chrome.storage.local.get(key);
@@ -344,20 +351,16 @@ async function recordHistory(appId, snapshot) {
 }
 
 /**
- * Everything this extension has remembered about other people's servers.
- *
- * Kept as one list so that adding a cache means adding a prefix here too. A
- * prefix left off — `charts:` is the largest thing stored — leaves the button
- * clearing everything but that and under-reporting how much it removed.
+ * Every cached key. Adding a cache means adding its prefix here, or the clear
+ * button silently leaves it behind and under-reports what it removed.
  */
 const CACHE_PREFIXES = [
   'followers:', 'steamspy:', 'ccu:', 'charts:',
   'sReviews:', 'sDetails:', 'sLang:', 'sSample:',
   'history:',
-  // Not per-game and not about the user, but it is still somebody's server
-  // cached on this machine, and a button that says it clears everything has
-  // to mean it.
-  RANKS_KEY
+  // Not per-game, but still cached from somebody's server.
+  RANKS_KEY,
+  SAID_KEY
 ];
 
 async function clearAllCaches() {
@@ -371,11 +374,6 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   switch (msg?.type) {
     case 'getExternal':
       fetchExternal(msg.appId).then((data) => sendResponse({ ok: true, ...data }));
-      return true;
-
-    case 'getCurrentPlayers':
-      fetchCurrentPlayers(msg.appId).then((r) =>
-        sendResponse({ ok: r.value != null, players: r.value, ...r }));
       return true;
 
     case 'recordHistory':
@@ -398,20 +396,16 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 
 chrome.action.onClicked.addListener(() => chrome.runtime.openOptionsPage());
 
-/**
- * Keep the ranking snapshot warm.
- *
- * An alarm rather than a fetch on first use, so the first unreleased game of
- * the day is not the one that waits for a 30 KB download. `ensureRanks` is
- * still the gate — the alarm only asks, and asking for something already
- * fresh costs a storage read.
- */
+// Keeps the snapshots warm, so no page view waits on the download.
 //
-// Created only when it is not already there. `alarms.create` with an existing
-// name replaces it and restarts its period, and this file runs every time the
-// worker wakes — which for an extension that answers a message on every store
-// page is constantly. Recreating it unconditionally means an alarm whose timer
-// is reset a few seconds before it would have fired, forever.
+// Created only when absent: `alarms.create` on an existing name restarts its
+// period, and this file runs on every worker wake — which is constantly — so
+// recreating unconditionally would reset the timer before it ever fires.
+chrome.alarms.get(SAID_ALARM).then((existing) => {
+  if (!existing) {
+    chrome.alarms.create(SAID_ALARM, { periodInMinutes: WISHLIST_SAID.feed.refreshMs / 60000 });
+  }
+});
 chrome.alarms.get(RANKS_ALARM).then((existing) => {
   if (!existing) {
     chrome.alarms.create(RANKS_ALARM, { periodInMinutes: WISHLIST_RANK.feed.refreshMs / 60000 });
@@ -419,6 +413,7 @@ chrome.alarms.get(RANKS_ALARM).then((existing) => {
 });
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === RANKS_ALARM) ensureRanks();
+  if (alarm.name === SAID_ALARM) ensureSaid();
 });
-chrome.runtime.onInstalled.addListener(() => ensureRanks({ force: true }));
-chrome.runtime.onStartup.addListener(() => ensureRanks());
+chrome.runtime.onInstalled.addListener(() => { ensureRanks({ force: true }); ensureSaid({ force: true }); });
+chrome.runtime.onStartup.addListener(() => { ensureRanks(); ensureSaid(); });

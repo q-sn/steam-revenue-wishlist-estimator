@@ -200,6 +200,9 @@
   "pillWishlists": {
     "message": "życzeń"
   },
+  "pillRank": {
+    "message": "nr $1"
+  },
   "ariaOpen": {
     "message": "Otwórz szacunek sprzedaży i list życzeń"
   },
@@ -360,7 +363,7 @@
     "message": "Zakres sprzedaży plus założenia kaskady"
   },
   "rFollowerRatio": {
-    "message": "Mnożnik medianowy dla wszystkich gier; mnożnik obserwujących od 7x do 20x"
+    "message": "Mediana mnożnika dla wszystkich gier; współczynnik obserwujących waha się od $1x do $2x"
   },
   "mAllTimePeak": {
     "message": "Szczyt wszech czasów"
@@ -410,9 +413,6 @@
   "nCcuNoPeakDate": {
     "message": "Bez datowanej historii graczy nie da się odróżnić szczytu premierowego od późniejszego skoku, więc liczba z pierwszego tygodnia nie jest pokazywana."
   },
-  "nFromFollowersGenre": {
-    "message": "Na podstawie $1 obserwujących · gry $2 mają średnio $3x życzeń na obserwującego"
-  },
   "nDerivedMark": {
     "message": "* wielkość dobrana przez nas: badanie potwierdza efekt, ale go nie mierzy"
   },
@@ -423,22 +423,40 @@
     "message": "Ten zakres to nie tylko przedział sprzedaży w pieniądzach: obejmuje też rabaty od $1 do $2 i zwroty od $3 do $4."
   },
   "rWishlistGenre": {
-    "message": "Mnożnik gatunkowy dla $1, w zakresie 7x-20x z ankiety"
+    "message": "Mnożnik gatunkowy dla $1, w zmierzonym zakresie $2x-$3x"
   },
   "mFollowerRatio": {
     "message": "Obserwujący × opublikowany współczynnik"
   },
+  "mWishlistSaid": {
+    "message": "Liczba podana przez samego twórcę"
+  },
   "mWishlistRank": {
-    "message": "Ranking list życzeń Steam"
+    "message": "Miejsce w rankingu list życzeń Steam"
+  },
+  "sWishlistMethods": {
+    "message": "Jak połączono metody list życzeń"
+  },
+  "oMeasuredHere": {
+    "message": "zmierzone tutaj na $1 ogłoszonych liczbach"
+  },
+  "oSaidOn": {
+    "message": "ogłoszone $1, przeniesione na dziś zmierzonym tempem wzrostu"
   },
   "nWishlistRank": {
     "message": "Miejsce $1 z $2 · górne $3% zapowiedzianych gier"
   },
+  "nWishlistRankOnly": {
+    "message": "Miejsce $1 z $2"
+  },
   "nWishlistBelowList": {
     "message": "Poza rankingiem list życzeń Steam, który kończy się w okolicy $1"
   },
-  "rWishlistRankOnly": {
-    "message": "Brak odczytywalnej liczby obserwujących, więc ranking sklepu to jedyna metoda"
+  "rWishlistSaid": {
+    "message": "Twórca opublikował liczbę dla tej gry, więc szacunek opiera się głównie na niej"
+  },
+  "rWishlistRankCurve": {
+    "message": "Dla tej gry nie opublikowano liczby, więc szacunek pochodzi z jej pozycji w rankingu list życzeń Steam"
   },
   "rWishlistBelowList": {
     "message": "Poniżej całego rankingu list życzeń Steam, więc odpowiada tylko współczynnik obserwujących"
@@ -448,9 +466,6 @@
   },
   "rWishlistCeiling": {
     "message": "Współczynnik obserwujących wskazuje więcej życzeń niż dół rankingu, w którym tej gry nie ma"
-  },
-  "rWishlistAccumulation": {
-    "message": "Brak czytelnej daty premiery, więc nie wiadomo, ile życzeń gra już zebrała"
   },
   "nDlcExcluded": {
     "message": "Bez przychodu z $1 DLC — żaden publiczny sygnał go nie ujawnia."
@@ -523,5 +538,8 @@
   },
   "nDemoReviews": {
     "message": "Zmierzone na samym demie. Nie wchodzi do żadnej liczby powyżej."
+  },
+  "oRankCurve": {
+    "message": "krzywa zmierzona tutaj na $1 ogłoszeniach"
   }
 }

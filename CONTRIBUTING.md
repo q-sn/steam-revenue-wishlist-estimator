@@ -20,21 +20,24 @@ Do not drop the flag to make a row look better sourced. Do drop it if you find a
 
 ### Measuring one yourself
 
-One coefficient here is measured rather than cited: the reviewer-playtime correction in `PLAYTIME.biasRange`. If you add another, it needs the same treatment — a script in `tools/` that reproduces it from public data, a `SOURCES` entry pointing at that script, and the resulting distribution written into the note.
+Several coefficients here are measured rather than cited: the wishlist model in `WISHLIST_CURVE` and `WISHLIST_SAID`, the follower ratio in `WISHLIST`, and the reviewer-playtime correction in `PLAYTIME.biasRange`. If you add another, it needs the same treatment — a derivation from public data, a `SOURCES` entry naming that data, and the resulting distribution written into the note. A measurement that will be repeated as new data arrives earns a script in `tools/`; a one-off keeps its numbers in the `SOURCES` note.
 
-`tools/calibrate-owners.mjs` is the other half of that idea: it does not set a coefficient, it checks whether a source deserves the weight it has. SteamSpy is the one estimator here with no published accuracy figure, so its behaviour is measured against disclosed sales instead of assumed. Any claim in the docs about how good a source is should have a script behind it.
+`tools/calibrate-wishlist-model.mjs` is what a repeated measurement should look like. It refits every wishlist constant from the raw archive and exits non-zero when a shipped value stops reproducing, so a constant cannot quietly drift away from the data it was measured on.
+
+`SOURCES.OURS_OWNER_QUALITY` is the other half of that idea: it does not set a coefficient, it records whether a source deserves the weight it has. SteamSpy is the one estimator here with no published accuracy figure, so its behaviour was measured against disclosed sales instead of assumed. Any claim in the docs about how good a source is should have a measurement behind it.
 
 Read what that one measures before reasoning your way to a number. "Reviewers play far more than the average owner" is true, and the correction it suggests is wrong by a factor of three.
 
 ### Data the extension does not fetch itself
 
-`src/core/wishlist-rank.js` reads a game's place in Steam's wishlist ordering out of a file, not off the network. The file is built by `.github/workflows/wishlist-ranks.yml`, published to the `data` branch, and downloaded by every installation once a day.
+`src/core/wishlist-rank.js` reads a game's place in Steam's wishlist ordering out of a file, not off the network, and `src/core/wishlist-said.js` reads the archive of developer announcements the same way. Both files are built by `.github/workflows/wishlist-ranks.yml`, published to the `data` branch, and downloaded by every installation once a day.
 
-The rule behind that split is worth stating, because the next signal like it will face the same choice. **Anything whose cost is per-catalogue rather than per-page belongs in CI.** Reading that ordering is fifty requests; a per-page lookup is one. Fifty requests times every user times every day is a load no free endpoint should be asked to carry, and the first consequence of asking is losing the endpoint.
+The rule behind that split is worth stating, because the next signal like it will face the same choice. **Anything whose cost is per-catalogue rather than per-page belongs in CI.** Reading that ordering is 56 requests; a per-page lookup is one. Fifty-odd requests times every user times every day is a load no free endpoint should be asked to carry, and the first consequence of asking is losing the endpoint.
 
 If you add a signal of that shape:
 
 - The crawler must refuse to publish a partial result. Steam signals throttling as HTTP 200 with an empty body, so an incomplete answer looks exactly like a real one and quietly changes every number downstream.
+- Pin the axis it is read on. The ordering is crawled with `ignore_preferences=1` and a fixed region, because Steam's default content preferences hide 415 of the 5,574 positions and hide them unevenly. A default-axis snapshot is a compressed copy of the real ordering, and it would move under a curve fitted to it whenever Valve changed a default.
 - The consumer in `src/core/` must know how old its input is and refuse it past a stated age. A wrong figure reads as authoritatively as a right one.
 - Say what happens when the file is missing. A game absent from a list is not the same fact as a list that never arrived, and conflating them turns "we do not know" into a claim.
 
@@ -63,13 +66,14 @@ Network access belongs in `src/background/`. DOM access belongs in `src/content/
 ## Before you open a pull request
 
 ```bash
-node tools/smoke.mjs
+npm run smoke
 ```
 
-All checks must pass. If you changed a coefficient, also run the calibration harness and say in the PR what happened to the accuracy figure:
+All checks must pass. If you changed a coefficient, also run the harness that covers it and say in the PR what happened to the accuracy figure:
 
 ```bash
-node tools/calibrate.mjs --live
+npm run calibrate:live   # units and revenue, against disclosed sales
+npm run check:model      # the wishlist model, against the announcement archive
 ```
 
 ## The most valuable contribution
@@ -104,7 +108,7 @@ Every snapshot makes the accuracy figure in the README more trustworthy. Nothing
 Everything user-facing lives in `tools/locales.source.json`, one entry per key with all locales inline. Edit that file and run:
 
 ```bash
-node tools/build-locales.mjs
+npm run locales
 ```
 
 Commit both the source table and the regenerated `_locales/`.

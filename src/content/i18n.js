@@ -1,14 +1,10 @@
 /**
- * Message resolution.
- *
- * The core returns descriptors like { key, params, text } rather than finished
- * sentences, so the same estimator can serve twelve languages and still be
- * readable in Node, where chrome.i18n does not exist. This module is the only
- * place that turns a descriptor into words.
+ * Message resolution: the only place a core descriptor { key, params, text }
+ * becomes words.
  *
  * chrome.i18n is locked to the browser UI language and cannot be redirected at
- * runtime, so an explicit language choice is served by loading that locale's
- * table ourselves and substituting positionally, exactly as Chrome would.
+ * runtime, so an explicit language choice loads that locale's table here and
+ * substitutes positionally as Chrome would.
  */
 
 const hasChromeI18n = typeof chrome !== 'undefined' && chrome.i18n?.getMessage;
@@ -60,8 +56,7 @@ export async function initLocale(tag) {
     overrideTable = await res.json();
     activeTag = tag;
   } catch (err) {
-    // A missing table must not blank the interface; fall back to the browser
-    // language rather than rendering bare keys.
+    // A missing table falls back to the browser language, not to bare keys.
     console.warn('[srwe] locale', tag, 'unavailable, using browser language:', err);
   }
   return activeTag ?? uiLanguage();
@@ -79,8 +74,7 @@ export function t(key, params = []) {
 
 /**
  * Resolve a descriptor from the core, falling back to the English wording it
- * carries. A missing translation should degrade to a real sentence, never to
- * a bare key staring at the user.
+ * carries rather than to a bare key.
  */
 export function tr(descriptor) {
   if (descriptor == null) return '';

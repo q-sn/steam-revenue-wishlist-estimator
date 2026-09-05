@@ -200,6 +200,9 @@
   "pillWishlists": {
     "message": "en listas"
   },
+  "pillRank": {
+    "message": "n.º $1"
+  },
   "ariaOpen": {
     "message": "Abrir estimación de ventas y listas de deseos"
   },
@@ -360,7 +363,7 @@
     "message": "Rango de ventas más los supuestos de la cascada"
   },
   "rFollowerRatio": {
-    "message": "Multiplicador mediano de todos los juegos; la proporción por seguidor va de 7x a 20x"
+    "message": "Multiplicador mediano de todos los juegos; la ratio de seguidores va de $1x a $2x"
   },
   "mAllTimePeak": {
     "message": "Pico histórico"
@@ -410,9 +413,6 @@
   "nCcuNoPeakDate": {
     "message": "Sin un historial de jugadores con fechas no hay forma de distinguir un pico de estreno de uno posterior, así que la cifra de la primera semana se omite."
   },
-  "nFromFollowersGenre": {
-    "message": "A partir de $1 seguidores · los juegos de $2 promedian $3x deseos por seguidor"
-  },
   "nDerivedMark": {
     "message": "* magnitud elegida por nosotros: el estudio confirma el efecto pero no lo cuantifica"
   },
@@ -423,22 +423,40 @@
     "message": "El rango no es solo el de ventas en dinero: también cubre descuentos del $1 al $2 y reembolsos del $3 al $4."
   },
   "rWishlistGenre": {
-    "message": "Multiplicador de género para $1, dentro del rango 7x-20x de la encuesta"
+    "message": "Multiplicador de género para $1, dentro del rango medido de $2x a $3x"
   },
   "mFollowerRatio": {
     "message": "Seguidores × ratio publicado"
   },
+  "mWishlistSaid": {
+    "message": "Lo dijo el propio desarrollador"
+  },
   "mWishlistRank": {
-    "message": "Ranking de deseos de Steam"
+    "message": "Puesto en el ranking de listas de deseos de Steam"
+  },
+  "sWishlistMethods": {
+    "message": "Cómo se combinaron los métodos de deseos"
+  },
+  "oMeasuredHere": {
+    "message": "medido aquí sobre $1 cifras anunciadas"
+  },
+  "oSaidOn": {
+    "message": "anunciado el $1, actualizado con la tasa de crecimiento medida"
   },
   "nWishlistRank": {
     "message": "Puesto n.º $1 de $2 · top $3% de los juegos anunciados"
   },
+  "nWishlistRankOnly": {
+    "message": "Puesto n.º $1 de $2"
+  },
   "nWishlistBelowList": {
     "message": "Fuera del ranking de deseos de Steam, que termina cerca de $1"
   },
-  "rWishlistRankOnly": {
-    "message": "Sin recuento de seguidores legible, así que el ranking de la tienda es el único método"
+  "rWishlistSaid": {
+    "message": "El desarrollador publicó una cifra para este juego, así que la estimación se basa sobre todo en ella"
+  },
+  "rWishlistRankCurve": {
+    "message": "No hay cifra publicada para este juego, así que la estimación se lee de su posición en el ranking de listas de deseos de Steam"
   },
   "rWishlistBelowList": {
     "message": "Por debajo de todo el ranking de deseos de Steam, así que solo responde la ratio de seguidores"
@@ -448,9 +466,6 @@
   },
   "rWishlistCeiling": {
     "message": "La ratio de seguidores implica más deseos que el fondo de un ranking en el que este juego no está"
-  },
-  "rWishlistAccumulation": {
-    "message": "Sin fecha de lanzamiento legible, no se sabe qué parte de sus deseos lleva acumulada"
   },
   "nDlcExcluded": {
     "message": "No incluye los ingresos de $1 DLC, que ninguna señal pública revela."
@@ -523,5 +538,8 @@
   },
   "nDemoReviews": {
     "message": "Medido en la propia demo. No es una entrada de ninguna cifra de arriba."
+  },
+  "oRankCurve": {
+    "message": "curva medida aquí sobre $1 anuncios"
   }
 }

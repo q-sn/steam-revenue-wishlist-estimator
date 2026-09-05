@@ -958,6 +958,21 @@
     "pl": "życzeń",
     "it": "desideri"
   },
+  "pillRank": {
+    "_ph": 1,
+    "en": "#$1",
+    "ru": "№$1",
+    "zh_CN": "第 $1 位",
+    "es": "n.º $1",
+    "pt_BR": "nº $1",
+    "de": "Nr. $1",
+    "fr": "n° $1",
+    "ja": "$1 位",
+    "ko": "$1위",
+    "tr": "$1. sıra",
+    "pl": "nr $1",
+    "it": "n. $1"
+  },
   "ariaOpen": {
     "en": "Open sales and wishlist estimate",
     "ru": "Открыть оценку продаж и вишлистов",
@@ -1720,19 +1735,19 @@
     "it": "Intervallo di vendite più le ipotesi della cascata"
   },
   "rFollowerRatio": {
-    "_ph": 0,
-    "en": "All-games median multiplier; the follower ratio spans 7x to 20x",
-    "ru": "Множитель — медиана по всем играм; коэффициент к подписчикам от 7x до 20x",
-    "zh_CN": "采用全体游戏的中位系数；关注者倍率介于 7 至 20 倍",
-    "es": "Multiplicador mediano de todos los juegos; la proporción por seguidor va de 7x a 20x",
-    "pt_BR": "Multiplicador mediano de todos os jogos; a proporção por seguidor vai de 7x a 20x",
-    "de": "Median-Multiplikator über alle Spiele; das Follower-Verhältnis reicht von 7x bis 20x",
-    "fr": "Multiplicateur médian tous jeux confondus ; le ratio par abonné va de 7x à 20x",
-    "ja": "全ゲームの中央値倍率です。フォロワー倍率は 7〜20 倍の幅があります",
-    "ko": "전체 게임 중앙값 배수입니다. 팔로워 배수는 7~20배 범위입니다",
-    "tr": "Tüm oyunların medyan çarpanı; takipçi oranı 7x ile 20x arasında",
-    "pl": "Mnożnik medianowy dla wszystkich gier; mnożnik obserwujących od 7x do 20x",
-    "it": "Moltiplicatore mediano su tutti i giochi; il rapporto per follower va da 7x a 20x"
+    "_ph": 2,
+    "en": "All-games median multiplier; the follower ratio spans $1x to $2x",
+    "ru": "Общая медиана по всем играм; отношение к подписчикам разбросано от $1x до $2x",
+    "zh_CN": "全体游戏的中位系数；关注者比率的跨度为 $1 至 $2 倍",
+    "es": "Multiplicador mediano de todos los juegos; la ratio de seguidores va de $1x a $2x",
+    "pt_BR": "Multiplicador mediano de todos os jogos; a razão de seguidores vai de $1x a $2x",
+    "de": "Median-Multiplikator über alle Spiele; das Follower-Verhältnis reicht von $1x bis $2x",
+    "fr": "Multiplicateur médian tous jeux confondus ; le ratio d'abonnés va de $1x à $2x",
+    "ja": "全ゲームの中央値倍率。フォロワー比率は $1〜$2 倍の幅があります",
+    "ko": "전체 게임 중앙값 배수. 팔로워 비율은 $1~$2배에 걸쳐 있습니다",
+    "tr": "Tüm oyunların medyan çarpanı; takipçi oranı $1x ile $2x arasında değişiyor",
+    "pl": "Mediana mnożnika dla wszystkich gier; współczynnik obserwujących waha się od $1x do $2x",
+    "it": "Moltiplicatore mediano su tutti i giochi; il rapporto follower va da $1x a $2x"
   },
   "mAllTimePeak": {
     "_ph": 0,
@@ -1974,21 +1989,6 @@
     "pl": "Bez datowanej historii graczy nie da się odróżnić szczytu premierowego od późniejszego skoku, więc liczba z pierwszego tygodnia nie jest pokazywana.",
     "it": "Senza uno storico datato dei giocatori non si può distinguere un picco di lancio da uno successivo, quindi la cifra della prima settimana non viene mostrata."
   },
-  "nFromFollowersGenre": {
-    "_ph": 3,
-    "en": "From $1 followers · $2 games average $3x wishlists each",
-    "ru": "По $1 подписчикам · у игр в жанре «$2» в среднем $3x вишлистов на подписчика",
-    "zh_CN": "基于 $1 名关注者 · $2 类游戏平均每位关注者 $3 倍愿望单",
-    "es": "A partir de $1 seguidores · los juegos de $2 promedian $3x deseos por seguidor",
-    "pt_BR": "A partir de $1 seguidores · jogos de $2 têm em média $3x desejos por seguidor",
-    "de": "Aus $1 Followern · $2-Spiele erreichen im Schnitt $3x Wunschlisten je Follower",
-    "fr": "D'après $1 abonnés · les jeux $2 atteignent en moyenne $3x souhaits par abonné",
-    "ja": "フォロワー $1 人から · $2 系のゲームは 1 フォロワーあたり平均 $3 倍",
-    "ko": "팔로워 $1명 기준 · $2 장르는 팔로워당 평균 $3배",
-    "tr": "$1 takipçiye göre · $2 oyunlarında takipçi başına ortalama $3x",
-    "pl": "Na podstawie $1 obserwujących · gry $2 mają średnio $3x życzeń na obserwującego",
-    "it": "Da $1 follower · i giochi $2 hanno in media $3x desideri per follower"
-  },
   "nDerivedMark": {
     "_ph": 0,
     "en": "* our own size for an effect the study established but did not measure",
@@ -2035,19 +2035,19 @@
     "it": "L'intervallo non è solo quello delle vendite in denaro: copre anche sconti dal $1 al $2 e rimborsi dal $3 al $4."
   },
   "rWishlistGenre": {
-    "_ph": 1,
-    "en": "Genre multiplier for $1, inside the survey's 7x to 20x range",
-    "ru": "Жанровый коэффициент для «$1», внутри опросного диапазона 7x–20x",
-    "zh_CN": "$1 类的类型系数，位于调查给出的 7 至 20 倍区间内",
-    "es": "Multiplicador de género para $1, dentro del rango 7x-20x de la encuesta",
-    "pt_BR": "Multiplicador de gênero para $1, dentro da faixa de 7x a 20x da pesquisa",
-    "de": "Genre-Multiplikator für $1, innerhalb der Umfragespanne von 7x bis 20x",
-    "fr": "Multiplicateur de genre pour $1, dans la fourchette 7x-20x de l'enquête",
-    "ja": "$1 のジャンル倍率。調査の 7〜20 倍の範囲内",
-    "ko": "$1 장르 배수, 설문의 7~20배 범위 안",
-    "tr": "$1 için tür çarpanı, ankete göre 7x-20x aralığının içinde",
-    "pl": "Mnożnik gatunkowy dla $1, w zakresie 7x-20x z ankiety",
-    "it": "Moltiplicatore di genere per $1, dentro l'intervallo 7x-20x dell'indagine"
+    "_ph": 3,
+    "en": "Genre multiplier for $1, inside the measured $2x to $3x range",
+    "ru": "Жанровый коэффициент для «$1», внутри измеренного диапазона $2x–$3x",
+    "zh_CN": "$1 类的类型系数，位于实测的 $2 至 $3 倍区间内",
+    "es": "Multiplicador de género para $1, dentro del rango medido de $2x a $3x",
+    "pt_BR": "Multiplicador de gênero para $1, dentro da faixa medida de $2x a $3x",
+    "de": "Genre-Multiplikator für $1, innerhalb der gemessenen Spanne von $2x bis $3x",
+    "fr": "Multiplicateur de genre pour $1, dans la fourchette mesurée de $2x à $3x",
+    "ja": "$1 のジャンル倍率。実測した $2〜$3 倍の範囲内",
+    "ko": "$1 장르 배수, 실측된 $2~$3배 범위 안",
+    "tr": "$1 için tür çarpanı, ölçülen $2x-$3x aralığının içinde",
+    "pl": "Mnożnik gatunkowy dla $1, w zmierzonym zakresie $2x-$3x",
+    "it": "Moltiplicatore di genere per $1, dentro l'intervallo misurato $2x-$3x"
   },
   "mFollowerRatio": {
     "en": "Followers × published ratio",
@@ -2063,19 +2063,76 @@
     "pl": "Obserwujący × opublikowany współczynnik",
     "it": "Follower × rapporto pubblicato"
   },
+  "mWishlistSaid": {
+    "en": "The developer said so",
+    "ru": "Разработчик сам назвал число",
+    "zh_CN": "开发者自己公布的数字",
+    "es": "Lo dijo el propio desarrollador",
+    "pt_BR": "O próprio desenvolvedor informou",
+    "de": "Vom Entwickler selbst genannt",
+    "fr": "Chiffre annoncé par le développeur",
+    "ja": "開発者自身が公表した数字",
+    "ko": "개발자가 직접 밝힌 수치",
+    "tr": "Geliştiricinin kendi açıkladığı sayı",
+    "pl": "Liczba podana przez samego twórcę",
+    "it": "Dichiarato dallo sviluppatore stesso"
+  },
   "mWishlistRank": {
     "en": "Steam wishlist ranking",
-    "ru": "Позиция в вишлист-рейтинге Steam",
-    "zh_CN": "Steam 愿望单排名",
-    "es": "Ranking de deseos de Steam",
-    "pt_BR": "Ranking de desejos da Steam",
-    "de": "Steam-Wunschlisten-Rangliste",
-    "fr": "Classement des souhaits Steam",
-    "ja": "Steam のウィッシュリスト順位",
-    "ko": "Steam 위시리스트 순위",
-    "tr": "Steam istek listesi sıralaması",
-    "pl": "Ranking list życzeń Steam",
-    "it": "Classifica dei desideri di Steam"
+    "ru": "Позиция в рейтинге вишлистов Steam",
+    "zh_CN": "Steam 愿望单排行位次",
+    "es": "Puesto en el ranking de listas de deseos de Steam",
+    "pt_BR": "Posição no ranking de listas de desejos da Steam",
+    "de": "Platz in Steams Wunschlisten-Rangliste",
+    "fr": "Place dans le classement des listes de souhaits Steam",
+    "ja": "Steam ウィッシュリストランキングの順位",
+    "ko": "Steam 위시리스트 랭킹 순위",
+    "tr": "Steam istek listesi sıralamasındaki yer",
+    "pl": "Miejsce w rankingu list życzeń Steam",
+    "it": "Posizione nella classifica delle liste dei desideri di Steam"
+  },
+  "sWishlistMethods": {
+    "en": "How the wishlist methods combined",
+    "ru": "Как объединились методы для вишлистов",
+    "zh_CN": "愿望单方法如何合并",
+    "es": "Cómo se combinaron los métodos de deseos",
+    "pt_BR": "Como os métodos de desejos foram combinados",
+    "de": "Wie die Wunschlisten-Methoden kombiniert wurden",
+    "fr": "Comment les méthodes de souhaits se combinent",
+    "ja": "ウィッシュリストの手法をどう統合したか",
+    "ko": "위시리스트 방법을 어떻게 결합했는가",
+    "tr": "İstek listesi yöntemleri nasıl birleşti",
+    "pl": "Jak połączono metody list życzeń",
+    "it": "Come si combinano i metodi per i desideri"
+  },
+  "oMeasuredHere": {
+    "_ph": 1,
+    "en": "measured here on $1 announced figures",
+    "ru": "измерено здесь по $1 объявленным цифрам",
+    "zh_CN": "基于 $1 个公布数字在此实测",
+    "es": "medido aquí sobre $1 cifras anunciadas",
+    "pt_BR": "medido aqui em $1 números anunciados",
+    "de": "hier an $1 angekündigten Zahlen gemessen",
+    "fr": "mesuré ici sur $1 chiffres annoncés",
+    "ja": "公表された $1 件の数値からここで実測",
+    "ko": "공개된 수치 $1건으로 여기서 실측",
+    "tr": "burada $1 duyurulmuş rakam üzerinde ölçüldü",
+    "pl": "zmierzone tutaj na $1 ogłoszonych liczbach",
+    "it": "misurato qui su $1 cifre annunciate"
+  },
+  "oSaidOn": {
+    "en": "announced $1, carried forward at the measured growth rate",
+    "ru": "объявлено $1, перенесено на сегодня по замеренному темпу роста",
+    "zh_CN": "公布于 $1，按实测增长率推算至今",
+    "es": "anunciado el $1, actualizado con la tasa de crecimiento medida",
+    "pt_BR": "anunciado em $1, atualizado pela taxa de crescimento medida",
+    "de": "am $1 genannt, mit der gemessenen Wachstumsrate fortgeschrieben",
+    "fr": "annoncé le $1, actualisé au taux de croissance mesuré",
+    "ja": "$1 に公表、実測の伸び率で現在まで補正",
+    "ko": "$1에 발표, 측정된 증가율로 현재까지 보정",
+    "tr": "$1 tarihinde açıklandı, ölçülen büyüme hızıyla bugüne taşındı",
+    "pl": "ogłoszone $1, przeniesione na dziś zmierzonym tempem wzrostu",
+    "it": "annunciato il $1, riportato a oggi al tasso di crescita misurato"
   },
   "nWishlistRank": {
     "_ph": 3,
@@ -2092,6 +2149,21 @@
     "pl": "Miejsce $1 z $2 · górne $3% zapowiedzianych gier",
     "it": "Posizione $1 su $2 · top $3% dei giochi annunciati"
   },
+  "nWishlistRankOnly": {
+    "_ph": 2,
+    "en": "Ranked #$1 of $2",
+    "ru": "Место $1 из $2",
+    "zh_CN": "排名第 $1 位（共 $2 位）",
+    "es": "Puesto n.º $1 de $2",
+    "pt_BR": "Posição nº $1 de $2",
+    "de": "Platz $1 von $2",
+    "fr": "$1e sur $2",
+    "ja": "$2 件中 $1 位",
+    "ko": "$2개 중 $1위",
+    "tr": "$2 oyun içinde $1. sıra",
+    "pl": "Miejsce $1 z $2",
+    "it": "Posizione $1 su $2"
+  },
   "nWishlistBelowList": {
     "_ph": 1,
     "en": "Not in Steam's wishlist ranking, which ends near $1",
@@ -2107,19 +2179,34 @@
     "pl": "Poza rankingiem list życzeń Steam, który kończy się w okolicy $1",
     "it": "Fuori dalla classifica dei desideri di Steam, che si ferma intorno a $1"
   },
-  "rWishlistRankOnly": {
-    "en": "No readable follower count, so the store ranking is the only method",
-    "ru": "Счётчик подписчиков недоступен, поэтому рейтинг магазина — единственный метод",
-    "zh_CN": "无法读取关注者数量，因此商店排名是唯一方法",
-    "es": "Sin recuento de seguidores legible, así que el ranking de la tienda es el único método",
-    "pt_BR": "Sem contagem de seguidores legível, então o ranking da loja é o único método",
-    "de": "Keine lesbare Followerzahl, daher ist die Store-Rangliste die einzige Methode",
-    "fr": "Nombre d'abonnés illisible, le classement de la boutique est donc la seule méthode",
-    "ja": "フォロワー数を読み取れないため、ストアの順位が唯一の手法です",
-    "ko": "팔로워 수를 읽을 수 없어 상점 순위가 유일한 방법입니다",
-    "tr": "Okunabilir takipçi sayısı yok, bu yüzden tek yöntem mağaza sıralaması",
-    "pl": "Brak odczytywalnej liczby obserwujących, więc ranking sklepu to jedyna metoda",
-    "it": "Nessun conteggio di follower leggibile, quindi la classifica dello store è l'unico metodo"
+  "rWishlistSaid": {
+    "en": "The developer published a figure for this game, so the estimate is mostly that number",
+    "ru": "Разработчик сам публиковал число по этой игре, поэтому оценка в основном опирается на него",
+    "zh_CN": "开发者公布过这款游戏的数字，因此估算主要基于该数字",
+    "es": "El desarrollador publicó una cifra para este juego, así que la estimación se basa sobre todo en ella",
+    "pt_BR": "O desenvolvedor publicou um número para este jogo, então a estimativa se baseia principalmente nele",
+    "de": "Der Entwickler hat für dieses Spiel eine Zahl veröffentlicht, die Schätzung beruht überwiegend darauf",
+    "fr": "Le développeur a publié un chiffre pour ce jeu : l'estimation repose surtout sur lui",
+    "ja": "開発者がこのゲームの数値を公表しているため、推定はほぼその数値に基づいています",
+    "ko": "개발자가 이 게임의 수치를 공표했으므로 추정치는 대부분 그 수치에 근거합니다",
+    "tr": "Geliştirici bu oyun için bir sayı yayımladı, tahmin büyük ölçüde ona dayanıyor",
+    "pl": "Twórca opublikował liczbę dla tej gry, więc szacunek opiera się głównie na niej",
+    "it": "Lo sviluppatore ha pubblicato una cifra per questo gioco, quindi la stima si basa soprattutto su quella"
+  },
+  "rWishlistRankCurve": {
+    "_ph": 0,
+    "en": "No published figure for this game, so the estimate is read from its place in Steam's wishlist ranking",
+    "ru": "Для этой игры разработчик цифру не публиковал, поэтому оценка считана с её места в вишлист-рейтинге Steam",
+    "zh_CN": "这款游戏没有公开的愿望单数字，因此估算来自它在 Steam 愿望单排行中的位置",
+    "es": "No hay cifra publicada para este juego, así que la estimación se lee de su posición en el ranking de listas de deseos de Steam",
+    "pt_BR": "Não há número publicado para este jogo, então a estimativa vem da sua posição no ranking de listas de desejos da Steam",
+    "de": "Für dieses Spiel wurde keine Zahl veröffentlicht, daher stammt die Schätzung aus seiner Position in Steams Wunschlisten-Rangliste",
+    "fr": "Aucun chiffre publié pour ce jeu : l'estimation vient de sa position dans le classement des listes de souhaits Steam",
+    "ja": "このゲームは公開された数字がないため、Steam のウィッシュリスト順位から推定しています",
+    "ko": "이 게임은 공개된 수치가 없어 Steam 위시리스트 순위에서 추정했습니다",
+    "tr": "Bu oyun için yayımlanmış bir sayı yok; tahmin, Steam istek listesi sıralamasındaki yerinden okundu",
+    "pl": "Dla tej gry nie opublikowano liczby, więc szacunek pochodzi z jej pozycji w rankingu list życzeń Steam",
+    "it": "Per questo gioco non c'è una cifra pubblicata, quindi la stima viene dalla sua posizione nella classifica delle liste dei desideri di Steam"
   },
   "rWishlistBelowList": {
     "en": "Below Steam's wishlist ranking entirely, so only the follower ratio answers",
@@ -2136,8 +2223,8 @@
     "it": "Al di sotto dell'intera classifica dei desideri di Steam, quindi risponde solo il rapporto follower"
   },
   "rWishlistRankPending": {
-    "en": "The wishlist ranking has not arrived, so there is no second method",
-    "ru": "Вишлист-рейтинг ещё не загружен, поэтому второго метода нет",
+    "en": "The wishlist ranking has not arrived, so only the follower ratio answers",
+    "ru": "Вишлист-рейтинг не загружен, поэтому отвечает только отношение к подписчикам",
     "zh_CN": "愿望单排名尚未下载，因此没有第二种方法",
     "es": "El ranking de deseos aún no ha llegado, así que no hay un segundo método",
     "pt_BR": "O ranking de desejos ainda não chegou, então não há um segundo método",
@@ -2162,20 +2249,6 @@
     "tr": "Takipçi oranı, bu oyunun yer almadığı sıralamanın en altından daha fazla istek listesi ima ediyor",
     "pl": "Współczynnik obserwujących wskazuje więcej życzeń niż dół rankingu, w którym tej gry nie ma",
     "it": "Il rapporto follower implica più desideri del fondo di una classifica in cui questo gioco non compare"
-  },
-  "rWishlistAccumulation": {
-    "en": "No readable release date, so how far into its wishlist accumulation this game is stays unknown",
-    "ru": "Дата выхода нечитаема, поэтому неизвестно, какую часть вишлистов игра уже набрала",
-    "zh_CN": "无法读取发售日期，因此不知道该游戏已累积了多少愿望单",
-    "es": "Sin fecha de lanzamiento legible, no se sabe qué parte de sus deseos lleva acumulada",
-    "pt_BR": "Sem data de lançamento legível, não se sabe quanto de seus desejos o jogo já acumulou",
-    "de": "Kein lesbares Erscheinungsdatum, daher bleibt offen, wie weit die Wunschlisten-Ansammlung fortgeschritten ist",
-    "fr": "Date de sortie illisible : impossible de savoir où en est l'accumulation des souhaits",
-    "ja": "発売日が読み取れないため、ウィッシュリストの積み上がり具合が不明です",
-    "ko": "출시일을 읽을 수 없어 위시리스트를 어디까지 모았는지 알 수 없습니다",
-    "tr": "Okunabilir çıkış tarihi yok, bu yüzden istek listesi birikiminin ne kadarına ulaşıldığı bilinmiyor",
-    "pl": "Brak czytelnej daty premiery, więc nie wiadomo, ile życzeń gra już zebrała",
-    "it": "Nessuna data di uscita leggibile, quindi non si sa a che punto sia l'accumulo dei desideri"
   },
   "nDlcExcluded": {
     "_ph": 1,
@@ -2536,5 +2609,19 @@
     "tr": "Demonun kendisinde ölçüldü. Yukarıdaki hiçbir sayıya girdi değildir.",
     "pl": "Zmierzone na samym demie. Nie wchodzi do żadnej liczby powyżej.",
     "it": "Misurato sulla demo stessa. Non entra in nessuna cifra sopra."
+  },
+  "oRankCurve": {
+    "en": "curve measured here on $1 announcements",
+    "ru": "кривая, измеренная здесь по $1 анонсам",
+    "zh_CN": "基于 $1 条公告在此拟合的曲线",
+    "es": "curva medida aquí sobre $1 anuncios",
+    "pt_BR": "curva medida aqui em $1 anúncios",
+    "de": "hier an $1 Ankündigungen gemessene Kurve",
+    "fr": "courbe mesurée ici sur $1 annonces",
+    "ja": "$1 件の公表値からここで測ったカーブ",
+    "ko": "$1건의 공표 수치로 여기서 측정한 곡선",
+    "tr": "$1 duyuru üzerinde burada ölçülen eğri",
+    "pl": "krzywa zmierzona tutaj na $1 ogłoszeniach",
+    "it": "curva misurata qui su $1 annunci"
   }
 }

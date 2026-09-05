@@ -14,11 +14,9 @@
  * If we land under ~50% we are not beating a plain multiplier and should fix
  * the coefficients before shipping, not after.
  *
- * This scores the review-multiple leg on its own, because that is the only
- * leg a frozen snapshot can carry: the owner band and the player-hours route
- * both need state as it was on the disclosure date, which means recording it
- * then. `tools/calibrate-playtime.mjs` reconstructs one of those from
- * SteamCharts history and is the model for doing the same here.
+ * Scores the review-multiple leg only. The owner band and the player-hours
+ * route need state as it stood on the disclosure date, which a frozen snapshot
+ * does not carry.
  *
  *   node tools/calibrate.mjs            # frozen snapshots only
  *   node tools/calibrate.mjs --live     # fetch current review counts

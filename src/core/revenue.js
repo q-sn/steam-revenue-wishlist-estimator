@@ -4,11 +4,8 @@ import {
 } from './constants.js';
 
 /**
- * Valve's royalty, marginal and per app.
- *
- * The order matters and is the single most common mistake in every free Steam
- * revenue tool: the 30% is charged on adjusted gross, i.e. after VAT, refunds
- * and chargebacks — not on the sticker price.
+ * Valve's royalty, marginal and per app. Takes adjusted gross — i.e. after
+ * VAT, refunds and chargebacks — not the sticker price.
  */
 export function steamRoyalty(adjustedGross) {
   let remaining = Math.max(adjustedGross, 0);
@@ -61,13 +58,8 @@ function neighbourProfile(key, step) {
 }
 
 /**
- * Resolve the settings a waterfall runs on.
- *
- * `regionalProfile: 'auto'` means "read it off the language mix", which is the
- * default: asking someone to declare their own audience split is asking them
- * to guess, and the reviews API measures the same thing. An explicit choice
- * always wins, because a developer looking at their own game knows better
- * than a proxy does.
+ * Resolve the settings a waterfall runs on. `regionalProfile: 'auto'` reads
+ * the profile off the language mix; an explicit choice wins.
  */
 export function resolveSettings(partial = {}, { languageMix = null } = {}) {
   const merged = { ...REVENUE_DEFAULTS, ...partial };
@@ -91,29 +83,21 @@ export function resolveSettings(partial = {}, { languageMix = null } = {}) {
     regionalFactor: profile.factor,
     regionalKey,
     regionalLabel: profile.label,
-    // Both survive a second pass over already-resolved settings, so the panel
-    // can still say the profile was read off the language mix even after the
-    // envelope has pinned it to a concrete key.
+    // Both survive a second pass over already-resolved settings, after the
+    // envelope has pinned `regionalProfile` to a concrete key.
     regionalAuto: merged.regionalAuto ?? merged.regionalProfile === 'auto',
     regionalDerivedFrom: derivedFrom ?? merged.regionalDerivedFrom ?? null
   };
 }
 
 /**
- * Turn a unit count into money, one deduction at a time.
- *
- * Returns the whole waterfall rather than just the total, because the steps
- * are the useful part: most developers are surprised by which line hurts most,
- * and a single "net revenue" figure hides that entirely.
- *
- * `listPrice` is the list price, not the price on the page today. Feeding it
- * a sale price double-counts the discount, once in the price and again in the
- * average-discount step below it.
+ * Turn a unit count into money, returning every deduction step as well as the
+ * total. `listPrice` must be the list price, not today's price: a sale price
+ * double-counts the discount against the average-discount step below it.
  */
 export function estimateRevenue(units, listPrice, settingsIn = {}, context = {}) {
-  // `resolveSettings` is idempotent: everything that produces settings pins a
-  // concrete `regionalProfile`, so resolving twice cannot quietly re-derive
-  // the profile from a language mix this call was never given.
+  // Idempotent: everything producing settings pins a concrete
+  // `regionalProfile`, so a second resolve cannot re-derive it.
   const s = resolveSettings(settingsIn, context);
 
   if (!Number.isFinite(units) || !Number.isFinite(listPrice) || listPrice <= 0) {
@@ -169,9 +153,9 @@ export function estimateRevenue(units, listPrice, settingsIn = {}, context = {})
     royalty,
     net,
     netPerUnit: units > 0 ? net / units : 0,
-    // Around 0.40 on the shipped defaults and 0.45 for a US/EU-weighted
-    // audience, which are the two scenarios IMMUTABLE_NET_2026 works through.
-    // Drifting toward 0.70 means a deduction was skipped somewhere.
+    // Fraction of list gross kept. Around 0.40 on the shipped defaults, 0.45
+    // for a US/EU audience — the two scenarios in IMMUTABLE_NET_2026. Near
+    // 0.70 means a deduction was skipped.
     takeHomeRatio: listGross > 0 ? net / listGross : 0,
     settings: s
   };
@@ -181,16 +165,9 @@ export function estimateRevenue(units, listPrice, settingsIn = {}, context = {})
  * The waterfall's own uncertainty, as a pessimistic and an optimistic variant
  * of the resolved settings.
  *
- * The sliders on the options page say where the midpoint of each assumption
- * sits. They do not make it certain, and until this existed the revenue band
- * was the unit band wearing a different unit — exactly as wide as the sales
- * estimate, when it rests on that estimate plus a chain of assumptions with
- * ranges of their own.
- *
- * The spans are anchored on the published figures and carried as offsets from
- * them, so a developer who moves a slider keeps their own midpoint and still
- * gets the published width around it. On the defaults these land exactly on
- * the sourced 10-30% discount and 6-13% refund ranges.
+ * Spans are carried as offsets from the published figures, so a moved slider
+ * keeps its own midpoint and still gets the published width around it. On the
+ * defaults they land on the sourced 10-30% discount and 6-13% refund ranges.
  */
 export function waterfallEnvelope(settings) {
   const dSpan = (REVENUE_UNCERTAINTY.avgDiscount.hi - REVENUE_UNCERTAINTY.avgDiscount.lo) / 2;
@@ -203,8 +180,7 @@ export function waterfallEnvelope(settings) {
       ...settings,
       avgDiscount: Math.min(Math.max(settings.avgDiscount + direction * dSpan, 0), 0.9),
       refundRate: Math.min(Math.max(settings.refundRate + direction * rSpan, 0), 0.5),
-      // Pinned, not left on 'auto', so resolving these settings again is a
-      // no-op rather than a second read of the language mix.
+      // Pinned rather than left on 'auto', so a second resolve is a no-op.
       regionalProfile: key,
       regionalKey: key,
       regionalFactor: REGIONAL_PROFILES[key].factor,
@@ -212,19 +188,14 @@ export function waterfallEnvelope(settings) {
     };
   };
 
-  // +1 walks every assumption the wrong way at once, which is the honest read
-  // of a low end: these are correlated, not independent. A game selling
-  // heavily into low-price markets discounts harder and refunds more.
+  // +1 moves every assumption the wrong way at once: they are correlated, not
+  // independent.
   return { low: shift(1), mid: shift(0), high: shift(-1) };
 }
 
 /**
- * Apply the waterfall across a unit range and its own assumption range.
- *
- * The low end is the low unit count under the pessimistic waterfall and the
- * high end is the high count under the optimistic one, so the band the reader
- * sees covers both sources of doubt rather than just the one that happens to
- * be easier to compute.
+ * Apply the waterfall across a unit range and its own assumption range: low
+ * units under the pessimistic waterfall, high units under the optimistic one.
  */
 export function estimateRevenueRange(unitRange, listPrice, settingsIn = {}, context = {}) {
   if (!unitRange) return { ok: false, reason: 'no-units' };
@@ -245,8 +216,7 @@ export function estimateRevenueRange(unitRange, listPrice, settingsIn = {}, cont
     netPerUnit: mid.netPerUnit,
     takeHomeRatio: mid.takeHomeRatio,
     takeHomeBand: { lo: lo.takeHomeRatio, mid: mid.takeHomeRatio, hi: hi.takeHomeRatio },
-    // What the band is made of, so the panel can say why it is this wide
-    // instead of leaving the reader to assume it came from the sales estimate.
+    // What the band is made of, for the panel's "why this wide" note.
     envelope: {
       avgDiscount: { lo: envelope.high.avgDiscount, hi: envelope.low.avgDiscount },
       refundRate: { lo: envelope.high.refundRate, hi: envelope.low.refundRate },

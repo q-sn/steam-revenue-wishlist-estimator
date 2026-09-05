@@ -2,7 +2,7 @@
 
 How every number in this extension is produced, and what each one is worth.
 
-Almost nothing here is original research. It is an implementation of published work by Jake Birkett, Simon Carless at GameDiscoverCo, Karl Kontus at Video Game Insights, and the Gamalytic team. Full citations with links live in [`src/core/constants.js`](../src/core/constants.js). The one figure measured here rather than cited is the reviewer-playtime correction, and [`tools/calibrate-playtime.mjs`](../tools/calibrate-playtime.mjs) reproduces it.
+Almost nothing here is original research. It is an implementation of published work by Jake Birkett, Simon Carless at GameDiscoverCo, Karl Kontus at Video Game Insights, and the Gamalytic team. Full citations with links live in [`src/core/constants.js`](../src/core/constants.js). The figures measured here rather than cited are the wishlist model, the announcement floor, the growth term, the follower ratio, the reviewer-playtime correction and the quality of the SteamSpy owner band; each has a `SOURCES.OURS_*` entry recording how.
 
 ## Why estimates exist at all
 
@@ -74,7 +74,7 @@ The second half is the average playtime of everyone who owns the game, and we ca
 
 **The quantity needed is a mean.** Total hours divided by owners is a mean by definition, and playtime distributions have a long enough tail that the mean sits far above any median — 96.7 against 41.7 hours on that same sample.
 
-A correction for all this was measured, and it does not transfer. `tools/calibrate-playtime.mjs` compares playtime-at-review in the 90 days before each disclosure against the true average at that date, over 26 games: min 0.50x, median 1.09x, max 2.07x. That is a coherent measurement, and the estimator applies it to a different quantity at an arbitrary game age. The measurement's own numbers say why it fails — the correction falls with a game's age, 0.50x for Stardew Valley at six years and 0.55x for Garry's Mod at fifteen, and one global constant papers over that so thoroughly that its middle-80% band does not contain either game.
+A correction for all this was measured, and it does not transfer. It compares playtime-at-review in the 90 days before each disclosure against the true average at that date, over 26 games: min 0.50x, median 1.09x, max 2.07x. That is a coherent measurement, and the estimator applies it to a different quantity at an arbitrary game age. The measurement's own numbers say why it fails — the correction falls with a game's age, 0.50x for Stardew Valley at six years and 0.55x for Garry's Mod at fifteen, and one global constant papers over that so thoroughly that its middle-80% band does not contain either game.
 
 Alternative specifications do no better. None of four tried on five games was consistently closer, and the only yardstick available is whether the answer matches the other two estimators — which is fitting an independent method to the ones it exists to be independent of.
 
@@ -96,7 +96,7 @@ Weight scales with size — zero below 20,000 owners, rising to 0.8 above 200,00
 
 It is the only leg here with no published accuracy figure. SteamSpy states its method — extrapolation from a sample of public profiles at 98% confidence — and that the April 2018 privacy change cost it most of its sample, but nobody has published a post-2018 error rate for it. So it is measured here, the same way the playtime correction is.
 
-`tools/calibrate-owners.mjs` compares SteamSpy's bucket today against the units the developer disclosed, for each of the 30 games in `test/fixtures.json`. Owners can only ever exceed units sold, and a mean of 4.5 years has passed since those announcements, so the current bucket should comfortably contain or exceed every figure. What comes back:
+SteamSpy's bucket was compared against the units the developer disclosed, for each of the 30 games in `test/fixtures.json`. Owners can only ever exceed units sold, and a mean of 4.5 years has passed since those announcements, so the current bucket should comfortably contain or exceed every figure. What comes back:
 
 | disclosed size | n | min | median | max |
 | --- | --- | --- | --- | --- |
@@ -210,89 +210,119 @@ Everything that describes the game reads `initial`. Only the deep-discount adjus
 
 ## Wishlists
 
-Steam publishes no wishlist counts for anybody. Two public signals track them at one remove, and this figure is the average of what both say.
+Steam publishes no wishlist counts for anybody. Three marks answer: a figure the developer published about this game, the game's place in Steam's wishlist ordering, and its follower count. Each one's say is computed from the width of its own band rather than set by hand — inverse variance in logs, `1 / ln(hi/lo)^2`, normalised across whichever marks answered.
 
 **Wishlists cannot be derived from reviews at any multiplier.** A review is a function of a purchase that already happened; a wishlist is a function of intent. There is no coefficient connecting them. This is why most tools show no wishlist figure at all.
 
-### Followers, and the published ratio
+### One fit behind two of the marks
+
+Turning a position into a count and carrying an old announcement forward to today are the same estimation problem, and they are estimated together — one median (L1) regression over 1,051 posts across 648 ranked games:
+
+```
+log(wishlists) = log a - b*log(rank + q) - alpha*log(1 + age/90) - rungk*gap
+```
+
+`a` = 503,667,749, `b` = 1.31652, `q` = 84.699, `alpha` = 0.35859, `rungk` = 0.15942. `age` is the age of the post in days. `gap` is the log-distance from an announced figure to the next rung on the ladder studios post at, and is zero for off-ladder figures such as "114,000". `tools/calibrate-wishlist-model.mjs` refits all of it from the raw archive and exits non-zero if a shipped constant stops reproducing.
+
+`alpha` is one constant read by both marks, so the curve and the carry-forward cannot disagree about how fast a game grows.
+
+**Held-out accuracy**, over 5×10 folds split by game so that no game appears on both sides of a split: median absolute error **12.3%** on posts under 30 days old, 14.7% under 90, 19.4% under a year, 21.9% at any age. The band **0.695–1.294** is the p10 and p90 of that out-of-sample residual, and it covers 76% of anchors.
+
+### What the developer said, which outranks everything else here
+
+676 games have a wishlist figure their own studio published on their own store page, 648 of them ranked when the model was fitted — roughly one ranked game in nine. On the day it is posted such a figure carries **0.75** of the weight, because its band runs 0.858x to 1.351x of the announced figure against the curve's 0.695x to 1.294x. That share is not a constant: the announcement band widens with the age of the post, so the same figure four years later carries **0.04** and the curve decides instead. A fixed weight would have given a four-year-old floor the same vote as a fresh one, and did — it pushed the band to 10.2x and graded the answer red, so a game with a stale announcement scored worse than a game with none at all.
+
+Two measured corrections turn a post into today's count.
+
+**It is a floor.** A studio posts on crossing a round number, so "500,000" means at least that. The correction is **1.039x** at the centre, estimated inside the joint fit as `rungk` 0.15942 against a mean rung gap of 0.2393 in logs. It is also checked from outside the fit: off-ladder figures such as "114,000" are not milestone crossings, and their median residual sits 1.06x above on-ladder figures at the same ranks — 1.03x within sixty days, 1.16x over all ages.
+
+The model this replaced applied 1.21x here. Its shape was fine and that multiplier was not: cross-validated, the old curve scored 15.4% median error with it against 14.0% without it. At rank 80 it read 636,596 for a game whose developer had announced 500,000 the day before.
+
+**It was true when it was posted.** Wishlists only grow before release, so the age term carries the figure forward: ×(1 + age/90)^0.35859, which is 1.28x at ninety days and 1.79x at a year. `tau` = 90 days is pinned rather than fitted, because it trades against `alpha` along a ridge — 90 sits inside the bootstrap interval of 48–170 and leaves `alpha` sharply identified. Three routes sharing no estimator agree on the exponent: 0.3586 from the joint fit, 0.3604 from a curve fitted on thirty-day anchors alone and profiled against older posts, 0.3639 from a p50 pinball fit on the cross-validated residual.
+
+**Growth is not a percent per day.** The figure this replaced was 0.0687% a day, and an intermediate analysis of studios that announced twice read 0.697% a day. That second one is a regression through the origin; the same regression with an intercept reads 0.119% a day on an intercept of 1.75x. The intercept is the milestone ladder: a studio posts when it crosses a rung, so the *size* of a leg is set by the ladder and only its *duration* by growth, and the apparent deceleration with leg length is a roughly constant numerator over a growing denominator. Deceleration is real, but it is a property of the level, which is what the age term measures.
+
+There is no age at which an announcement stops being used. An old one is weaker evidence, not absent evidence, and the widening band says so where a cutoff would be a rule the reader cannot see.
+
+The rest goes to the two inference marks — beside a fresh announcement, about 0.20 to the curve and 0.05 to the follower ratio. They are there because they can contradict. A game that announced 500,000 whose follower count implies 5,000 has a wrong reading somewhere, and the band widens to show it rather than averaging it away. It works in both directions: for 14% of games with a published figure the curve alone sits below that figure, which is a thing a position in an ordering cannot know.
+
+### The store's own wishlist ordering
+
+Steam publishes an ordering of unreleased games by wishlists at `store.steampowered.com/search/?filter=popularwishlist` — positions, no numbers, and no documentation of what the ordering weighs. Released games are not in it.
+
+What it sorts by is measured, not assumed. Rank against announced count gives a Kendall tau of 0.91 and a Spearman of −0.95 on fresh anchors. Regressing log(rank) on log(announced) plus log(appid) leaves page age insignificant at t = −0.09 to −0.84: once the count is known, how long a page has existed is worth nothing, so the ordering is on the balance rather than on how fast wishlists arrive. It is also region-invariant — 0 order inversions across us, de, jp and br — which makes regional and content-preference differences pure deletions from one global order.
+
+**The axis is pinned.** The crawler sends `ignore_preferences=1` and fixes the region. Steam's default anonymous content preferences hide 415 of the 5,574 positions, and hide them unevenly: 1.4% of the first 500 against 12.4% of ranks 3,001–3,500. A default-axis snapshot is the real ordering compressed by up to 1.08x, and it would move under the curve every time Valve changed a default.
+
+**The list is not truncated.** `total_count` is a genuine 5,574, and archived snapshots show it growing: 3,462 in June 2025, 4,122 in January 2026.
+
+**One expression answers for every position, and there is no rank at which anything changes.** `q` = 84.699 is the head offset — the top of a ranked list is crowded, so rank 1 and rank 20 are not 20x apart in wishlists. With it, rank 1 reads 1.44 million. The same data through a straight line in log-log, which has no upper bound, read 147 million there and had to be switched off above a rank to stay usable.
+
+### Absence from the ordering is a ceiling
+
+The ordering held 5,574 games out of 15,343 with an announced store page when this was written — the top 36%. A game that is not in it is not unmeasurable: it sits below every ranked position, which bounds it from above at about 5,800 wishlists, the curve's reading at the last rank.
+
+That bound is reported as a bound. It has no midpoint, it never joins the average, and the only thing it can do is contradict the follower leg — which it does, loudly, when a game with 4,000 followers is missing from a list whose last position reads under 6,000. One of the two inputs is then wrong, and the reader is told so rather than shown their mean.
+
+There is a difference between "below the list" and "we have no list", and the two are never conflated. Not knowing where the ordering ends bounds nothing.
+
+### Why the ranking is a file and not a request
+
+Reading the ordering costs 56 requests, one per page of 100. Doing that inside the extension would multiply by every installation — tens of thousands of daily requests against an undocumented store endpoint, which Valve would be right to close, taking the feature with it.
+
+So `.github/workflows/wishlist-ranks.yml` reads it once a day on one runner and commits the result to this repository's `data` branch, next to the archive of developer announcements, and the extension downloads those two files from a CDN once a day. The load on Valve does not grow with the number of users. And the extension makes the same request whichever game is on screen, so unlike every per-game lookup here it discloses nothing about what anyone is browsing.
+
+A short crawl is never published. A truncated ordering does not look broken downstream — it looks like a store where fewer games are wishlisted, which moves every position and inflates every estimate — so the crawler refuses to write a file below 97% of the total the store itself reports, and yesterday's snapshot stays. Steam signals throttling as HTTP 200 with an empty body rather than 429, which is exactly the failure a status check sails past.
+
+### Where the announcements come from
+
+`tools/harvest-anchors.mjs` reads the figures out of `ISteamNews` and pairs each with the position that game held on the day.
+
+Contamination is filtered positionally: the 60 characters before the number and the 90 characters after the word "wishlists" are read separately rather than as one window spanning both. A single window lets a goal word near the number rescue a target, and an achievement word near the word rescue a goal — which is how "all the way to -30% for 1,000,000 wishlists! To get to the next tier" was recorded as an achieved 1,000,000 for a game at rank 99. Measured against 1,102 hand labels the positional rule scores **99.4% precision and 99.1% recall**, against 97.0% precision unfiltered.
+
+`tools/condense-anchors.mjs` cuts the archive to what a browser needs and drops two further classes: any figure whose quote appears under more than one app id, which is one post cross-published to several game hubs, and every figure for a game but the largest, tie-broken to the most recent. That is the set the model is fitted on. `tools/merge-anchors.mjs` unions it with the published copy at publish time.
+
+Nothing in `src/` changes automatically from any of this. If the mapping stops reproducing, `tools/calibrate-wishlist-model.mjs` exits non-zero, and the fix is a refit or an honest paragraph here.
+
+### Followers, and the ratio we measured
 
 Following a game silently joins a mostly hidden group, and Steamworks documentation confirms the member count of that group is the only place the number surfaces.
 
-Followers to wishlists, from GameDiscoverCo's survey of 125+ unreleased games: range 7–20x, average 12.37x, median 12x. An earlier 2021 survey of 113 games found a range of 5–14x and a median of 9.6x — the ratio rose roughly 25% in two years as Steam added more pre-release showcases.
+The multiplier applied to it used to be GameDiscoverCo's: median 12x, range 7–20x, from a June 2023 survey of 125+ developers who volunteered their own figures. It is now **16.2x, range 9.6–32.8x**, measured here.
+
+The survey was not a constant of the platform. The same survey run in February 2021 on 113 games gave a median of 9.6x, so the ratio had moved 25% in two years, and three more years had passed since. Both vintages also asked developers to volunteer, and a studio with a flattering ratio answers more readily.
+
+Measuring it needed nothing that was not already here. Every anchor collected for the ranking check is a wishlist figure a studio published on its own store page, and follower counts are public, so the multiplier is one division per game with no survey in between and nobody choosing whether to answer. `tools/calibrate-follower-ratio.mjs` reproduces it.
+
+Over 83 games that announced a figure within thirty days:
+
+| | min | p10 | median | p90 | max |
+| --- | --- | --- | --- | --- | --- |
+| Followers to wishlists | 4.5x | 9.6x | **16.2x** | 32.8x | 79.7x |
+
+It holds still when the sample is cut different ways — 16.6x at fourteen days (n=38) against 15.3x at ninety (n=200), 15.7x for ranks 201–1000 and 15.3x below rank 3000. Follower counts in the sample run from 132 to 12,036, so this is measured on small and mid-size games rather than on the head of the chart.
+
+**It does not vary with game size.** A 60-game re-measurement puts the slope of ln(ratio) on ln(wishlists) at +0.073 with a standard error of 0.049, which is indistinguishable from flat. One ratio for every game is what the data supports.
+
+**There is now an outside check.** GameDiscoverCo measured 16.1x in May 2026 on 600+ games from their own data rather than from a survey — a different population read by a different method, landing within 1% of this. It is `SOURCES.GDC_FOLLOWERS_2026`.
+
+**Read it as a floor.** Two biases push it down and neither pushes back. An announcement is a threshold crossing, so "500,000 wishlists!" means at least that much. And follower counts are read today against a figure that was true when it was posted, so every denominator is a little high. That the median falls as the window widens — 16.6x at fourteen days, 15.3x at ninety — is that second bias becoming visible, which is also why the tightest window is the one quoted.
+
+p10 and p90 rather than min and max, the same choice `PLAYTIME.biasRange` makes: one game at 79.7x should not set the width of every band. Part of that width is this measurement's own noise, which a survey does not have, so treat 9.6–32.8x as an upper bound on how much games really differ.
 
 ### Genre, which is readable
 
-The same 2023 survey publishes per-tag multipliers alongside that range: 4X strategy 7.5x, turn-based strategy 9.0x, survival 9.5x, story-rich 13.2x, relaxing 15.7x, puzzle 15.9x. Strategy audiences follow closely and wishlist sparingly; puzzle and relaxing audiences do the opposite.
+The 2023 survey publishes per-tag multipliers alongside its range: 4X strategy 7.5x, turn-based strategy 9.0x, survival 9.5x, story-rich 13.2x, relaxing 15.7x, puzzle 15.9x. Strategy audiences follow closely and wishlist sparingly; puzzle and relaxing audiences do the opposite.
 
-That is the same survey at the same vintage, so the figures go in as absolute multipliers rather than as a shape to renormalise, and they replace the 12x median as the midpoint when a game's tags match. One tag only, picked the same way as the genre adjustment above — a game tagged Puzzle, Indie and Relaxing is scored on whichever of the three Steam ranks highest, not on whichever row sits first in our table.
+Those figures were measured around the survey's own 12x median, and dropping them in beside a 16.2x level would invert the effect — a game tagged Puzzle would score 15.9x against a general 16.2x, so detecting the survey's most wishlist-heavy genre would *lower* the estimate. What the survey measured is how far each genre sits from its own median, so that is what carries over: puzzle at 15.9/12 = 1.33x of the level, or 21.5x today.
 
-Genre moves this ratio 2.1x across its span, against 1.35x for the festival factors below, and unlike promotion history it is written on the store page. The midpoint is clamped into the published 7–20x band, and the band itself does not narrow: the survey publishes a multiplier per tag and one range for every game, so narrowing on a genre would claim a precision it never measured.
+One tag only, picked the same way as the genre adjustment for units — a game tagged Puzzle, Indie and Relaxing is scored on whichever of the three Steam ranks highest, not on whichever row sits first in our table. Genre moves this ratio 2.1x across its span, against 1.35x for the festival factors below, and unlike promotion history it is written on the store page.
 
 ### Promotion history, which is not
 
 Promotion history is never inferred from the store page. Two signals look usable and neither is: a demo is not festival participation, and searching the page for festival wording only matches while the festival is actually running, so a game that took part last year reads as though it never did. The extension therefore always treats the history as unknown and uses the overall survey median. The context can still be supplied by a caller.
 
-The multipliers it would apply come from the 2021 survey, published against an overall median of 9.6x: no festival 7.77x, a Steam festival 10x, a festival plus a store feature 10.45x. Using those directly alongside the 2023 median would invert the effect — a game known to have been in a festival would score 10x while a game nothing is known about scores 12x, so a festival would *lower* the estimate. What the 2021 survey measured is how far each group sits from its own median, so that is what carries over: 0.81x, 1.04x and 1.09x of the median, which against 12x gives 9.7x, 12.5x and 13.1x.
-
-### The store's own wishlist ranking
-
-The second leg shares nothing with the first. Steam publishes an ordering of unreleased games by wishlists at `store.steampowered.com/search/?filter=popularwishlist` — positions, no numbers, and no documentation of what the ordering weighs. Released games are not in it.
-
-On one method, wishlists would be the only figure here whose band could never be contradicted: as wide as one survey's published range and no wider. Two legs that sometimes conflict say more than either midpoint does, and the confidence apparatus this project runs on — do the bands overlap, how far apart are their nearest edges — applies to this number as well.
-
-### From a position to a number
-
-A rank is not a count. Rank 340 is not 340 of anything, and no arithmetic on a position produces a quantity. What produces one is a distribution: knowing what share of games launch above 100,000 wishlists makes "top 2% of announced games" mean something.
-
-Video Game Insights publishes that distribution for games launched in the twelve months to July 2025 — under 1,000 wishlists 29%, 1,000–10,000 37%, 10,000–50,000 23%, 50,000–100,000 5%, above 100,000 6% — and breaks its own top band down further into 253 games at 100k–500k, 26 at 500k–1M and 22 above 1M. The estimator reads a rank as a percentile of announced games and inverts that distribution.
-
-That top breakdown matters more than it looks. Without it the first band runs from 100,000 to the largest game of the year, giving every title in the top 900 the same answer inside a 43x band — an estimate coarser than the data it rests on.
-
-**The band is the published band.** The source distinguishes six levels; a game landing between two of its edges is reported as sitting between them. The midpoint inside is interpolated; the edges are not. Narrowing around that midpoint would claim a resolution nobody measured.
-
-### Why not a curve fitted to announced numbers
-
-The obvious alternative is fitting `wishlists = a × rank^-b` to games whose developers announced their totals. It fails on paper, for a reason no amount of data fixes.
-
-Wishlist counts are heavy-tailed: steep at the head, flat through the body. One power law cannot follow that shape. Fitting a single curve to a realistic distribution with *perfect* anchors and no noise at all still misses by 2.3x at the top of the ordering and 4.8x at the bottom — a tenfold swing of systematic error across the range, entirely from the shape being wrong. Anchor noise adds about 1.5x on top of that, which is the smaller problem by far.
-
-Inverting a published distribution has no shape to get wrong, because the shape is measured. It also has no free parameters, which means there is nothing in this estimator that could be quietly tuned until it agreed with the follower leg it exists to be independent of.
-
-### Absence from the ordering is a ceiling
-
-The ordering held 5,154 games out of 14,375 with an announced store page when this was written — the top 36%. A game that is not in it is not unmeasurable: it sits below every ranked position, which bounds it from above at roughly 10,000 wishlists.
-
-That bound is reported as a bound. It has no midpoint, it never joins the average, and the only thing it can do is contradict the follower leg — which it does, loudly, when a game with 4,000 followers is missing from a list that stops at ten thousand. One of the two inputs is then wrong, and the reader is told so rather than shown their mean.
-
-There is a difference between "below the list" and "we have no list", and the two are never conflated. Not knowing where the ordering ends bounds nothing.
-
-### How far into its accumulation
-
-The distribution is of wishlists *at launch*. Every game in the ordering is pre-launch and therefore holds some fraction of its eventual total, while the figure on screen is meant to be today's.
-
-VGI publishes that curve too, indexed so launch day is 100%: 71% at seventeen weeks out, rising to 94% a week before release. Seventeen weeks is where the published data stops and where this stops with it. A game announced for two years out is far below the bottom of that table, and extrapolating to find out how far would put the largest uncertainty in the chain behind a confident-looking number — so outside the window the band spans the whole published range instead, and the note says the release date could not be read.
-
-The curve was measured on the top 50 games by launch wishlists, which is a real limitation. A game that will launch with 15,000 wishlists is unlikely to accumulate them on the same schedule as one that will launch with a million. Direction from the source, width carrying the doubt.
-
-### Why the ranking is a file and not a request
-
-Reading the ordering costs 50-odd requests. Doing that inside the extension would multiply by every installation — tens of thousands of daily requests against an undocumented store endpoint, which Valve would be right to close, taking the feature with it.
-
-So `.github/workflows/wishlist-ranks.yml` reads it once a day on one runner and commits the result to this repository's `data` branch, and the extension downloads that file: about 17 KB gzipped, once a day, from a CDN. The load on Valve is 53 requests a day however many people install this.
-
-Two properties follow, and the second matters more than the first. The cost does not grow with users. And the extension makes the same request whichever game is on screen, so unlike every per-game lookup here it discloses nothing about what anyone is browsing.
-
-A short crawl is never published. A truncated ordering does not look broken downstream — it looks like a store where fewer games are wishlisted, which moves every percentile and inflates every estimate — so the crawler refuses to write a file below 97% of the total the store itself reports, and yesterday's snapshot stays. Steam signals throttling as HTTP 200 with an empty body rather than 429, which is exactly the failure a status check sails past.
-
-### Checking it against real numbers
-
-Developers announce these figures themselves, on their own store pages, every time they cross a round one. `tools/harvest-anchors.mjs` reads those announcements out of `ISteamNews` and pairs each with the position that game held on the day. Across a sample of 300 ranked games, 18% had posted at least one — about 900 across the whole ordering — thinning from roughly a quarter at the head to one in twenty-five near the bottom, but never running out.
-
-An announcement is one-sided evidence and `tools/calibrate-wishlist-rank.mjs` treats it as such: a studio posting "100,000 wishlists" has just crossed 100,000, so the true figure is at or a little above the number. On the first 56 disclosures collected, those paired with a rank read within a fortnight came out at a median of 1.19x the announced figure, with every announced figure inside the model's band. A median a little above 1x is the expected shape of that bias, not an error.
-
-Nothing in `src/` changes automatically from this. There is no fudge factor fitted to whichever games happened to post — if the mapping turns out to be off, the fix is a better distribution or an honest paragraph here.
-
-The check that matters most is not accuracy but the unstated assumption underneath: **nobody outside Valve knows what this ordering sorts by.** If it weighted recent additions rather than the balance, rank would not be a function of the count at all. A high share of games sitting demonstrably above a ceiling the model claims would be the tell, and that share is what the report leads with.
+The multipliers it would apply come from the 2021 survey, published against an overall median of 9.6x: no festival 7.77x, a Steam festival 10x, a festival plus a store feature 10.45x. Those carry over as each group's distance from its own median — 0.81x, 1.04x and 1.09x — for the same reason the genre rows do.
 
 **Only valid before release.** Afterwards wishlists are consumed by purchases while followers persist, and the total balance typically peaks at 2–4x the pre-launch count before decaying. No stable ratio survives that, so the extension shows the follower count and declines to convert it. The store ordering agrees: it holds no released games either.
 
@@ -300,10 +330,10 @@ The check that matters most is not accuracy but the unstated assumption undernea
 
 Two published routes lead to the same quantity:
 
-- **Via wishlists.** Followers × 12 → wishlists, then × 0.11 → week-one sales. GameDiscoverCo's analysis puts the median at 0.11x the launch wishlist balance, around 15% for games with 25,000+ wishlists and 10% for games priced above $10. Net effect: followers × 1.32.
+- **Via wishlists.** Followers × 16.2 → wishlists, then × 0.11 → week-one sales. GameDiscoverCo's analysis puts the median at 0.11x the launch wishlist balance, around 15% for games with 25,000+ wishlists and 10% for games priced above $10. Net effect: followers × 1.78.
 - **Direct.** Jake Birkett's rule of thumb, followers × 2.5.
 
-These disagree by roughly 1.9x. The gap is explainable — the direct rule is older and wishlist conversion has fallen since — but it is the cleanest demonstration available that two respected heuristics, composed, produce a 2x spread.
+These disagree by roughly 1.4x, and did so by 1.9x before the follower ratio was re-measured. Two respected heuristics, composed, still land a long way apart.
 
 The extension shows both and labels the disagreement. There is deliberately no midpoint anywhere in the result: the point of showing two answers is that nobody knows which is right, and anything called `mid` eventually gets rendered as though somebody did.
 
@@ -362,13 +392,13 @@ Each figure is scored separately, because the three rest on different evidence a
 
 ### What the scale reads
 
-None of the three scales is driven by the width of the band, because **width does not vary here**. Every band in this project is dominated by a fixed published range: the review multiplier spans 20-55x on its own, the follower-to-wishlist ratio is 7-20x for every game ever surveyed, and the revenue band is the unit band pushed through an envelope. Measured across 22 real games the unit spreads came out bimodal — eighteen between 2.23x and 2.64x, four above 7x, nothing in between.
+None of the three scales is driven by the width of the band, because **width does not vary here**. Every band in this project is dominated by a fixed published range: the review multiplier spans 20-55x on its own, the follower-to-wishlist ratio is 9.6-32.8x for every game, and the revenue band is the unit band pushed through an envelope. Measured across 22 real games the unit spreads came out bimodal — eighteen between 2.23x and 2.64x, four above 7x, nothing in between.
 
 Reading a level off that quantity would have three consequences:
 
 - **Units** could never reach the top. The threshold sits at 2.2x and two overlapping published bands cannot combine below about 2.23x.
 - **Revenue** is capped one step below units, so with the top of the units scale out of reach it would be a *constant*: every paid game on Steam reading "unreliable", forever.
-- **Wishlists** would be scored on a range that is 7-20x by construction, so every unreleased game would read "rough". Also a constant.
+- **Wishlists** would be scored on a range that is 9.6-32.8x by construction, so every unreleased game would read "rough". Also a constant.
 
 A rating that never varies is a label. So each scale reads whatever actually differs between games, and width serves only as a ceiling.
 
@@ -384,9 +414,23 @@ A rating that never varies is a label. So each scale reads whatever actually dif
 - **Neutral** — a single method, a thin sample, a cross-check objecting, or a near miss between bands
 - **Red** — a gap of more than 1.86x between the nearest band edges, or a band wider than 3.5x whatever the evidence looks like
 
-The width thresholds are 2.2x and 3.5x. Widening them to 2.75x and 5.1x would move 18 of 22 games into *reliable* by relabelling rather than by learning anything, which is the argument for width being a ceiling rather than the level itself.
+The width thresholds are 2.2x and 3.5x for units. Widening them to 2.75x and 5.1x would move 18 of 22 games into *reliable* by relabelling rather than by learning anything, which is the argument for width being a ceiling rather than the level itself.
 
 A single source caps at the neutral level rather than dropping to red. Having one method is the normal case for unreleased and small games; red should mean something is wrong, not that a second opinion was unavailable. An unknown promotion history costs nothing, because it is unknown on every game and a penalty applied every time is not a penalty.
+
+#### Wishlists are scored separately, and on different facts
+
+Width cannot grade a wishlist estimate, because it barely varies. Measured over the whole ordering it is 1.86x with the ranking alone, 2.11x with a follower count as well, and 2.27x to 2.31x where a stale announcement is on file. Width says which marks answered, not how good the evidence was, so it is kept only as a ceiling on the grade: 2.0x and 3.5x.
+
+What grades the estimate is what kind of number it is.
+
+- **Green** — most of the answer is a figure the developer published. That holds while the figure is under about a month old, which is where its share of the weight crosses a half and also where the held-out error is 12.3% rather than 14.7%. Two independent things landing on the same month is the reason the threshold is not a chosen number: it is `share > 0.5`, and the month falls out of it.
+- **Neutral** — the answer is read off the store ranking. Held out, that curve lands within 25% for 73% of games and within 50% for 95%. This is the normal case and covers 97% of ranked games.
+- **Red** — the marks contradict past 1.86x between their nearest edges, the follower ratio breaks the ceiling set by absence from the ordering, or the ranking cannot answer at all and only the follower ratio is left. The follower ratio is the weakest mark on file — 37% of games within 30% against the curve's 73% — so a game resting on it alone is at the bottom of the scale.
+
+**Counting methods is not evidence and no longer scores.** The previous scale gave a step up for having more than one mark answer. With the published table gone the two remaining inference marks are rank and follower count, and those correlate at -0.96 in logs — a game high in the ordering has many followers for the same reason it has many wishlists. Under the old rule the narrower answer scored worse than the wider one: the ranking alone gave a 1.86x band graded neutral, and adding the less accurate follower leg widened it to 2.11x and graded it green.
+
+**An unrecognised genre** used to cost a step and no longer does: the survey covers six tags, and marking a game down for falling outside somebody else's table penalised most games for a gap in the source rather than for anything about the estimate.
 
 The collapsed row shows several figures at once, so its single word reports the weakest of the ones on display.
 
@@ -413,6 +457,7 @@ And charging one fact twice: a conflict widens the band, so measuring the spread
 | Followers | `steamcommunity.com` group member count | 1 request, cached a day |
 | Owner band | SteamSpy | 1 request, cached a day |
 | Place in Steam's wishlist ordering | A file built daily in CI, served from a CDN | 1 request a day, shared by every user and every game |
+| Wishlist figures developers announced | A second file from the same daily job | 1 request a day, shared by every user and every game |
 | Live players | Valve's `GetNumberOfCurrentPlayers` | 1 request, cached three minutes |
 | 24-hour peak, all-time peak and its month, monthly history, 30-day trend | SteamCharts page | 1 request, cached a day |
 
@@ -446,9 +491,15 @@ Valve withholds the recent score until a game has been available for 45 days and
 - DLC and in-app purchase revenue is not estimated. The DLC count is shown so the reader knows how much is missing.
 - Early Access price changes are not modelled; the current list price is used throughout. No free source publishes price history, which is also why the average lifetime discount is an assumption rather than a measurement.
 - Games whose community group is not keyed to the app ID return no follower count. The store ranking still answers for those, but only while the game is high enough to be ranked at all.
-- Nobody outside Valve knows what the wishlist ordering sorts by. It is presented as most-wishlisted and behaves like it, but if the ordering weights recent additions rather than the standing balance, rank is not a function of the count and this whole leg is measuring something adjacent to what it claims. `tools/calibrate-wishlist-rank.mjs` is built to catch that, and it needs months of daily snapshots before it can.
-- The distribution the ranking is inverted through describes games *at launch*, from a different population than the one currently on the ordering — VGI counts games that launched with 20+ reviews, the ordering counts everything with an announced page. The two agree suspiciously well at the point where the ordering stops, near the 10,000-wishlist mark, which is reassuring but is not a proof.
-- The pre-launch accumulation curve was measured on the 50 biggest games of a year and is applied to everyone. It also stops at seventeen weeks, and most unreleased pages carry a quarter or a year rather than a date, so most of the time the correction is a published range widening the band rather than a factor narrowing it.
+- The follower coefficient is fitted against the figure a studio published, which is a floor from the day of the post, while the curve and the announcement mark both target today's count. Measured on 60 games with a tagged genre and a readable follower count, the observed ratio against today's count is 20.2x where the shipped level is 16.2x, so the follower mark reads about a quarter low beside the other two. The level is left where it is because it has the only outside corroboration in this section — GameDiscoverCo measured 16.1x on 600+ games, independently — and moving it on 60 games would trade a checked number for an unchecked one. Re-deriving it needs `tools/calibrate-follower-ratio.mjs` run against today's count rather than the raw announcement, on a pass whose dropout stays under 15%.
+- The genre table earns its place but its spread is overstated. Giving each variant its own best-fit level so only the shape is judged, the six tags lift accuracy from 37% of games within 30% to 45%, and the ordering reproduces on games the survey never saw. Halving the exponent scores better still, 48%, which matches the measured slope of 0.58 on the survey's own multipliers — but the gap is inside the noise of 60 games, so the table ships at full strength until a larger sample settles it.
+- One follower ratio is applied to every game. That is what the data supports — the slope of ln(ratio) on ln(wishlists) is +0.073 with a standard error of 0.049 over 60 games — but it means the leg carries no information about a particular game beyond its follower count.
+- **Rank alone cannot do better than about 1.20x.** Among games whose ranks differ by under 5%, the median pair of recent developer self-reports disagrees by 1.20x. Two games at the same position really do hold different counts, that gap is the floor on any function of rank alone, and it is most of the band's width.
+- The ordering could be sorted by any quantity proportional to wishlists — follower count, for one — and no amount of this data separates those. What is settled is that it is not sorted by velocity and not sorted per region.
+- The curve, the follower coefficient and the floor correction are all measured on the same archive of announcements, so a bias in what studios choose to announce moves all three the same way. There is a measured reason to expect one: at equal rank, games that announced a milestone carry 85% of the followers of games that did not, so the follower coefficient measured on announcers reads roughly 1.10–1.18x high. `GDC_FOLLOWERS_2026` is the first outside reading able to catch that, and at 16.1x against our 16.2x it does not.
+- The developer's own figure covers roughly one ranked game in nine, so for the rest the estimate is still entirely inference. The archive grows daily and that share grows with it, but slowly: 118 of the 1,102 posts on file were written in the last thirty days.
+- The two inference marks are not independent. Rank and follower count correlate at −0.96 in logs, 0.68 to 0.89 after the level is removed, and both are fitted to the same archive besides, so their agreement is not evidence. The follower leg earns its place by answering where the ranking cannot, and by being the only mark that reads something about the game rather than about its position.
+- `tau` = 90 days in the age term is pinned rather than fitted. It trades against `alpha` along a ridge, and the bootstrap interval on it spans 48 to 170 days.
 - The ranking is a daily snapshot, so a game that moved sharply in the last day is scored where it was. A snapshot older than three days is refused outright rather than used.
 - DLC and soundtrack sales are real and are not estimated, because the reviews-per-sale ratio for them has never been published and the base-game multiple does not transfer. This is a gap in the sources, not in the plumbing: the figures would be easy to print and impossible to defend.
 - On a demo page the figures describe the parent game, which is a different app from the one in the address bar. The panel says so, but a reader skimming will still be looking at one page and reading another page's numbers.

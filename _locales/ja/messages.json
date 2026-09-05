@@ -200,6 +200,9 @@
   "pillWishlists": {
     "message": "WL"
   },
+  "pillRank": {
+    "message": "$1 位"
+  },
   "ariaOpen": {
     "message": "売上とウィッシュリストの推定を開く"
   },
@@ -360,7 +363,7 @@
     "message": "販売本数の幅に加えて控除計算の前提"
   },
   "rFollowerRatio": {
-    "message": "全ゲームの中央値倍率です。フォロワー倍率は 7〜20 倍の幅があります"
+    "message": "全ゲームの中央値倍率。フォロワー比率は $1〜$2 倍の幅があります"
   },
   "mAllTimePeak": {
     "message": "歴代ピーク"
@@ -410,9 +413,6 @@
   "nCcuNoPeakDate": {
     "message": "日付のある同時接続履歴がないと、ローンチのピークと後の急増を区別できないため、初週の数値は表示しません。"
   },
-  "nFromFollowersGenre": {
-    "message": "フォロワー $1 人から · $2 系のゲームは 1 フォロワーあたり平均 $3 倍"
-  },
   "nDerivedMark": {
     "message": "* 効果の存在は研究が示しているが数値は示していないため、大きさは当方の判断"
   },
@@ -423,22 +423,40 @@
     "message": "この幅は売上レンジを金額にしただけのものではありません。$1〜$2 の割引と $3〜$4 の返金率も含んでいます。"
   },
   "rWishlistGenre": {
-    "message": "$1 のジャンル倍率。調査の 7〜20 倍の範囲内"
+    "message": "$1 のジャンル倍率。実測した $2〜$3 倍の範囲内"
   },
   "mFollowerRatio": {
     "message": "フォロワー × 公表比率"
   },
+  "mWishlistSaid": {
+    "message": "開発者自身が公表した数字"
+  },
   "mWishlistRank": {
-    "message": "Steam のウィッシュリスト順位"
+    "message": "Steam ウィッシュリストランキングの順位"
+  },
+  "sWishlistMethods": {
+    "message": "ウィッシュリストの手法をどう統合したか"
+  },
+  "oMeasuredHere": {
+    "message": "公表された $1 件の数値からここで実測"
+  },
+  "oSaidOn": {
+    "message": "$1 に公表、実測の伸び率で現在まで補正"
   },
   "nWishlistRank": {
     "message": "$2 件中 $1 位 · 発表済みタイトルの上位 $3%"
   },
+  "nWishlistRankOnly": {
+    "message": "$2 件中 $1 位"
+  },
   "nWishlistBelowList": {
     "message": "Steam のウィッシュリスト順位に入っておらず、その下限は約 $1"
   },
-  "rWishlistRankOnly": {
-    "message": "フォロワー数を読み取れないため、ストアの順位が唯一の手法です"
+  "rWishlistSaid": {
+    "message": "開発者がこのゲームの数値を公表しているため、推定はほぼその数値に基づいています"
+  },
+  "rWishlistRankCurve": {
+    "message": "このゲームは公開された数字がないため、Steam のウィッシュリスト順位から推定しています"
   },
   "rWishlistBelowList": {
     "message": "Steam のウィッシュリスト順位の圏外なので、答えるのはフォロワー比率だけです"
@@ -448,9 +466,6 @@
   },
   "rWishlistCeiling": {
     "message": "フォロワー比率は、この作品が入っていない順位表の下限より多いウィッシュリスト数を示しています"
-  },
-  "rWishlistAccumulation": {
-    "message": "発売日が読み取れないため、ウィッシュリストの積み上がり具合が不明です"
   },
   "nDlcExcluded": {
     "message": "DLC $1 本の収益は含みません。公開データでは分かりません。"
@@ -523,5 +538,8 @@
   },
   "nDemoReviews": {
     "message": "体験版そのものの実測値です。上のどの数値にも入力されていません。"
+  },
+  "oRankCurve": {
+    "message": "$1 件の公表値からここで測ったカーブ"
   }
 }
