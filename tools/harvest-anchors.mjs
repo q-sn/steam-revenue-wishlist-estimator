@@ -1,33 +1,23 @@
 #!/usr/bin/env node
 /**
- * Collects real wishlist numbers from the places developers publish them.
+ * Collects wishlist numbers developers announce on their own store pages.
  *
- * Steam's ranking is ordinal and the distribution it is inverted through is
- * somebody else's dataset, so the mapping in src/core/wishlist-rank.js needs
- * something to be checked against. The check is games where the actual figure
- * is known — and developers announce it themselves, on their own store page,
- * every time they cross a round number:
- *
- *   "100,000 Wishlists - Thank You!"
- *   "over the hill has just hit 1,000,000 wishlists on Steam"
- *
- * Those posts come back from ISteamNews, which needs no key. Measured over a
- * sample of 300 ranked games, 18% of them have posted at least one such
- * number, which extrapolates to roughly 900 across the whole ordering. The
- * yield falls with rank — about a quarter of the top of the list against one
- * in twenty-five near the bottom — but it does not run out, so the check has
- * coverage everywhere the estimate does.
+ * Reads each ranked app's announcements from ISteamNews, which needs no key,
+ * and records milestone posts — "100,000 Wishlists - Thank You!" — against the
+ * position the game held that day.
  *
  *   node tools/harvest-anchors.mjs
  *   node tools/harvest-anchors.mjs --max-apps 300
  *   node tools/harvest-anchors.mjs --ranks data/wishlist-ranks.json
+ *   node tools/harvest-anchors.mjs --deadline 75
  *
- * Output is appended to data/wishlist-anchors.ndjson, one JSON object a line,
- * deduplicated on the app and the announcement. Appending rather than
- * rewriting is the whole design: a disclosure is only a usable anchor when
- * the rank was read near the day it was made, and running daily is what
- * produces same-day pairs. Retrofitting an old announcement to today's rank
- * pairs a number from March with a position from September.
+ * Rows are appended to data/wishlist-anchors.ndjson as they are found, one
+ * JSON object a line, deduplicated on app + announcement. Running daily is
+ * what produces same-day pairs: a disclosure is only a usable anchor when the
+ * rank was read near the day it was made.
+ *
+ *   --deadline <min>     stop cleanly and exit 0 when the budget runs out
+ *   --max-refusals <n>   abort when this many apps in a row are refused
  */
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
@@ -45,8 +35,13 @@ const OUT = valueOf('--out', 'data/wishlist-anchors.ndjson');
 const MAX_APPS = Number(valueOf('--max-apps', Infinity));
 const DELAY_MS = Number(valueOf('--delay', 180));
 const NEWS_ITEMS = Number(valueOf('--news-items', 50));
+const DEADLINE_MIN = Number(valueOf('--deadline', Infinity));
+const MAX_REFUSALS = Number(valueOf('--max-refusals', 25));
+const MAX_ATTEMPTS = 4;
+const MAX_BACKOFF_MS = 60_000;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const jitter = (ms) => Math.round(ms * (0.75 + Math.random() * 0.5));
 
 /**
  * A count immediately before the word "wishlist".
@@ -57,16 +52,38 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
  * that the pattern costs more than the handful of "wishlists: 50,000" posts
  * it would catch.
  */
-const COUNT = String.raw`(\d{1,3}(?:[,.  ]\d{3})+|\d+(?:[.,]\d+)?\s*[kKmM]\b|\d{4,})`;
+const COUNT = String.raw`(\d{1,3}(?:[,.\u00a0\u202f\u2009 ]\d{3})+|\d+(?:[.,]\d+)?\s*[kKmM]\b|\d{4,})`;
 const MILESTONE = new RegExp(COUNT + String.raw`\s*\+?\s*(?:steam\s+)?wishlists?`, 'gi');
 
 /**
- * Most mentions of "wishlist" on a store page are a request, not a report:
- * "wishlist us now", "add to your wishlist". A number near one of those is
- * usually a price, a date or a player count. Requiring a word that reports an
- * achievement is what separates the two.
+ * A number before the word "wishlist" is only evidence if the sentence says the
+ * game reached it. These read the 60 characters before the number and the 90
+ * after the word, rather than one window around both, because a window lets a
+ * goal word anywhere nearby rescue a target and an achievement word anywhere
+ * nearby rescue a goal. Positional testing raises precision from 97.0% to
+ * 99.9% against 1,102 hand labels, at the cost of 1.8% of good rows.
  */
-const ACHIEVEMENT = /\b(hit|hits|reach|reached|reaching|passed|surpass|surpassed|crossed|milestone|thank|thanks|celebrat|achiev|now at|we(?:'ve| have)|just got|over)\b/i;
+const ACHIEVED = /\b(?:hits?|reach\w*|passe?[ds]?|surpass\w*|cross\w*|exceed\w*|smash\w*|gather\w*|collect\w*|amassed|received|milestone|thanks?|thank you|celebrat\w*|achiev\w*|blasted|broke|broken|climbed|now (?:at|has|have|sitting)|(?:we|they)(?:'re| are) (?:now )?at|we(?:'ve| have)|got|over|more than|almost|nearly|approach\w*|nearing|added to|wishlisted|of you|sitting at|currently at|up to|already)\b/i;
+
+/** A figure the studio wants to reach. "help us reach 100,000 wishlists". */
+const GOAL = /\b(?:help (?:us|me|them)(?: to)? (?:reach|hit|get|gather|smash)|let'?s (?:hit|reach|get)|we(?:'ll| will) hit|road to|on the (?:road|way) to|to the next|all the way to|if we (?:hit|reach|get)|once we (?:hit|reach)|when we (?:hit|reach)|aim(?:ing)? for|toward|hoping to (?:hit|reach)|hope to (?:hit|reach)|next (?:milestone|goal|tier|target)|(?:goal|target|dream|plan)\b[^.!?]{0,40}\bto (?:hit|reach|get to))\b|\b(?:goal|target)s?\b[^.!?]{0,18}$/i;
+
+/** Rescues a goal that was met: "we've reached our target of 10,000". */
+const GOAL_MET = /\b(?:reach\w*|hit|passed|achieved|smashed|beat|exceeded|surpassed|cleared|met)\s+(?:our|the|my|its|a\s+\w+)?\s*(?:goal|target)\b/i;
+const GOAL_TRAIL = /\b(?:reaching (?:this|that) goal|if we (?:hit|reach)|once we (?:hit|reach)|will unlock|to unlock|help us (?:reach|hit|get))\b/i;
+
+/** A gain over a period rather than a total. "35,000 wishlists over the weekend". */
+const DELTA_LEAD = /\bgained\s+another\s+$|\bduring (?:the|our|this) (?:festival|event|fest|showcase|sale)\b[^.!?]{0,45}$/i;
+const DELTA_TRAIL = /^\W{0,3}(?:over the weekend|during (?:the|our|this) \w+|in (?:one|a|the last|the past)\s+(?:week|weekend|day|month))\b/i;
+
+/** Separates "we hit 100k wishlists over the weekend" from "35,000 wishlists over the weekend". */
+const TOTAL_VERB = /\b(?:hits?|reach\w*|passe?[ds]?|surpass\w*|cross\w*|exceed\w*|smash\w*|broke|climbed|milestone)\b/i;
+
+/** Not this store's balance. "200k wishlists across Steam and consoles". */
+const PLATFORM = /\bacross (?:all )?(?:platforms|steam and|consoles)|\bon steam and (?:epic|gog|consoles?|xbox|playstation)|\b(?:combined|multi-?platform)\s+(?:total|wishlists?)/i;
+
+/** A larger figure elsewhere in the post makes the matched one a retrospective. */
+const ANY_FIGURE = new RegExp(COUNT + String.raw`\s*\+?\s*(?:steam\s+)?(?:wishlists?|wishlist mark|mark\b|now\b)`, 'gi');
 
 const stripHtml = (html) => String(html ?? '')
   .replace(/<[^>]+>/g, ' ')
@@ -81,7 +98,7 @@ function parseCount(raw) {
   const scale = text.endsWith('m') ? 1_000_000 : text.endsWith('k') ? 1_000 : 1;
   const digits = text.replace(/[km]$/, '').trim();
   const value = scale === 1
-    ? Number(digits.replace(/[,.  ]/g, ''))
+    ? Number(digits.replace(/[,.\u00a0\u202f\u2009 ]/g, ''))
     : Number(digits.replace(/,/g, '.'));
   return Number.isFinite(value) ? Math.round(value * scale) : null;
 }
@@ -102,10 +119,31 @@ function milestonesIn(item) {
     // giveaway, and above ten million nobody has been.
     if (value == null || value < 1_000 || value > 10_000_000) continue;
 
-    const around = text.slice(Math.max(0, match.index - 90), match.index + 90);
-    if (!ACHIEVEMENT.test(around)) continue;
+    const lead = text.slice(Math.max(0, match.index - 60), match.index);
+    const end = match.index + match[0].length;
+    const trail = text.slice(end, end + 90);
+    const claimsTotal = TOTAL_VERB.test(lead.slice(-22));
 
-    out.push({ wishlists: value, round: isRound(value), quoted: around.trim() });
+    if (GOAL.test(lead) && !GOAL_MET.test(lead)) continue;
+    if (GOAL_TRAIL.test(trail)) continue;
+    if (DELTA_LEAD.test(lead)) continue;
+    if (/\+\s*$/.test(lead) && !claimsTotal) continue;
+    if (DELTA_TRAIL.test(trail) && !claimsTotal) continue;
+    if (PLATFORM.test(text)) continue;
+    if (!ACHIEVED.test(lead) && !ACHIEVED.test(trail)) continue;
+
+    // A retrospective: "we hit 10,000 wishlists (18,000 now)". The larger
+    // figure is today's, and this one describes the past.
+    const larger = [...text.matchAll(ANY_FIGURE)]
+      .map((m) => parseCount(m[1]))
+      .some((v) => v != null && v > value);
+    if (larger) continue;
+
+    out.push({
+      wishlists: value,
+      round: isRound(value),
+      quoted: text.slice(Math.max(0, match.index - 90), match.index + 90).trim()
+    });
   }
 
   // One figure per post. A milestone announcement repeats its own number in
@@ -115,17 +153,49 @@ function milestonesIn(item) {
   return byValue.size === 1 ? [...byValue.values()] : [];
 }
 
+/** How many 429s the run has seen. Reported at the end. */
+let rateLimited = 0;
+
+/** `Retry-After` in ms — seconds or an HTTP date — or null if absent. */
+function retryAfterMs(res) {
+  const raw = res.headers.get('retry-after');
+  if (!raw) return null;
+  const seconds = Number(raw);
+  if (Number.isFinite(seconds)) return Math.min(Math.max(seconds, 0) * 1000, MAX_BACKOFF_MS);
+  const at = Date.parse(raw);
+  return Number.isFinite(at) ? Math.min(Math.max(at - Date.now(), 0), MAX_BACKOFF_MS) : null;
+}
+
+/**
+ * A game's announcements: an array on success, null when every attempt was
+ * refused. 429 backs off exponentially with jitter, or by `Retry-After`.
+ *
+ * An empty array is returned as-is and is not trusted: Steam soft-throttles
+ * with HTTP 200 and no items, which is indistinguishable from a game that has
+ * never posted. main() re-checks empty apps in a second pass.
+ */
 async function newsFor(appid) {
   const url = `https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=${appid}`
     + `&count=${NEWS_ITEMS}&maxlength=8000`;
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return [];
-    const json = await res.json();
-    return json?.appnews?.newsitems ?? [];
-  } catch {
-    return [];
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    let wait = DELAY_MS * attempt * 3;
+    try {
+      const res = await fetch(url);
+      if (res.status === 429) {
+        rateLimited++;
+        wait = retryAfterMs(res) ?? jitter(Math.min(1_000 * 2 ** attempt, MAX_BACKOFF_MS));
+      } else if (res.ok) {
+        const json = await res.json();
+        const items = json?.appnews?.newsitems;
+        if (Array.isArray(items)) return { items };
+      } else {
+        wait = jitter(wait);
+      }
+    } catch { /* network flake, handled as a refusal */ }
+    if (attempt < MAX_ATTEMPTS) await sleep(wait);
   }
+  return { items: null };
 }
 
 async function existingKeys(path) {
@@ -151,50 +221,135 @@ async function main() {
   await mkdir(dirname(out), { recursive: true });
   const seen = await existingKeys(out);
 
-  const apps = ranks.appids.slice(0, Number.isFinite(MAX_APPS) ? MAX_APPS : undefined);
-  const fresh = [];
-  let scanned = 0;
+  const apps = ranks.appids.slice(0, Number.isFinite(MAX_APPS) ? MAX_APPS : undefined)
+    .filter(Boolean);
 
-  for (const appid of apps) {
-    scanned++;
-    for (const item of await newsFor(appid)) {
+  const startedAt = Date.now();
+  const deadlineAt = Number.isFinite(DEADLINE_MIN) ? startedAt + DEADLINE_MIN * 60_000 : Infinity;
+  const outOfTime = () => Date.now() >= deadlineAt;
+  const minutesIn = () => ((Date.now() - startedAt) / 60_000).toFixed(1);
+
+  let found = 0;
+  let sameDay = 0;
+  let scanned = 0;
+  let refused = 0;
+  let inARow = 0;
+  let stopped = null;
+  const emptyApps = [];
+
+  /** Extracts one app's anchors and appends them straight away. */
+  const record = async (appid, items) => {
+    const rows = [];
+    for (const item of items) {
       const announcedAt = new Date(item.date * 1000).toISOString().slice(0, 10);
-      for (const found of milestonesIn(item)) {
-        const key = `${appid}:${announcedAt}:${found.wishlists}`;
+      for (const hit of milestonesIn(item)) {
+        const key = `${appid}:${announcedAt}:${hit.wishlists}`;
         if (seen.has(key)) continue;
         seen.add(key);
-        fresh.push({
+        rows.push({
           appid,
-          // Today's position. Only comparable with a figure announced near
-          // today; tools/calibrate-wishlist-rank.mjs is where that is enforced.
+          // Today's position, recorded for reference. The model re-attaches
+          // ranks by appid against one snapshot rather than trusting this.
           rank: rankOf.get(appid) ?? null,
           rankAt,
           announcedAt,
-          wishlists: found.wishlists,
-          round: found.round,
+          wishlists: hit.wishlists,
+          round: hit.round,
           listed: ranks.listed,
           upcoming: ranks.upcoming,
           url: item.url ?? null,
-          quoted: found.quoted.slice(0, 200)
+          quoted: hit.quoted.slice(0, 200)
         });
       }
     }
+    if (!rows.length) return;
+    // Appended per app, so a timeout kill costs the rest of the scan and not
+    // the part already done.
+    await writeFile(out, rows.map((r) => JSON.stringify(r)).join('\n') + '\n', { flag: 'a' });
+    found += rows.length;
+    sameDay += rows.filter((r) => r.announcedAt === rankAt).length;
+  };
+
+  for (const appid of apps) {
+    if (outOfTime()) { stopped = 'deadline'; break; }
+    scanned++;
+    const { items } = await newsFor(appid);
+
+    if (items == null) {
+      refused++;
+      if (++inARow >= MAX_REFUSALS) { stopped = 'refusals'; break; }
+      await sleep(DELAY_MS);
+      continue;
+    }
+    inARow = 0;
+    if (items.length) await record(appid, items);
+    else emptyApps.push(appid);
+
     if (scanned % 250 === 0) {
-      process.stderr.write(`  ${scanned}/${apps.length} scanned, ${fresh.length} new\n`);
+      process.stderr.write(`  ${scanned}/${apps.length} scanned, ${found} new`
+        + `${refused ? `, ${refused} refused` : ''}, ${minutesIn()} min\n`);
     }
     await sleep(DELAY_MS);
   }
 
-  if (fresh.length) {
-    const body = fresh.map((row) => JSON.stringify(row)).join('\n') + '\n';
-    await writeFile(out, body, { flag: 'a' });
+  // Second pass over the apps that answered with no announcements. The gap is
+  // the length of the scan, which is long enough to have left any throttle
+  // window: an app still empty here has genuinely never posted.
+  let silent = 0;
+  let recovered = 0;
+  let rechecked = 0;
+  if (stopped !== 'refusals') {
+    for (const appid of emptyApps) {
+      if (outOfTime()) { stopped ??= 'deadline'; break; }
+      rechecked++;
+      const { items } = await newsFor(appid);
+      if (items == null) refused++;
+      else if (items.length) { recovered++; await record(appid, items); }
+      else silent++;
+      await sleep(DELAY_MS);
+    }
   }
 
-  const sameDay = fresh.filter((r) => r.announcedAt === r.rankAt).length;
   process.stderr.write(
-    `${scanned} games scanned, ${fresh.length} new disclosures, ${sameDay} of them announced today `
-    + `(those are the ones that pair cleanly with a rank) -> ${OUT}\n`
+    `${scanned} of ${apps.length} games scanned in ${minutesIn()} min, ${found} new disclosures, `
+    + `${sameDay} of them announced today (those pair cleanly with a rank) -> ${OUT}\n`
   );
+
+  if (emptyApps.length) {
+    process.stderr.write(
+      `${emptyApps.length} games answered with no announcements; ${rechecked} rechecked, `
+      + `${silent} still silent, ${recovered} answered the second time`
+      + `${recovered ? ' (the first read was throttled)' : ''}\n`
+    );
+  }
+
+  if (stopped === 'deadline') {
+    process.stderr.write(
+      `deadline of ${DEADLINE_MIN} min reached: reached app ${scanned} of ${apps.length}, `
+      + `${apps.length - scanned} skipped, ${emptyApps.length - rechecked} left unrechecked. `
+      + `Everything found is already on disk; tomorrow's run continues.\n`
+    );
+  }
+
+  // A refused game contributes nothing, which is exactly what a game with no
+  // announcements contributes, so this has to be said out loud.
+  if (refused) {
+    const share = (refused / Math.max(scanned, 1)) * 100;
+    process.stderr.write(
+      `${refused} games (${share.toFixed(1)}%) never answered after ${MAX_ATTEMPTS} attempts`
+      + `${rateLimited ? `, ${rateLimited} responses were 429` : ''}. `
+      + `${share > 5 ? 'That is a throttled run: raise --delay and repeat it.' : 'Small enough to be ordinary failures.'}\n`
+    );
+  }
+
+  if (stopped === 'refusals') {
+    process.stderr.write(
+      `ABORTED: ${MAX_REFUSALS} refusals in a row at app ${scanned} of ${apps.length}. `
+      + `Steam is refusing this run rather than throttling it; the ${found} disclosures `
+      + `found before that are on disk.\n`
+    );
+    process.exitCode = 1;
+  }
 }
 
 main().catch((err) => {

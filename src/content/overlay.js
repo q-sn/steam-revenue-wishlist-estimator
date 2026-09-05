@@ -7,28 +7,12 @@ import { t, tr, humanise } from './i18n.js';
 
 const HOST_ID = 'srwe-overlay-host';
 
-/**
- * List separator. A pipe reads as a divider between peers, where an interpunct
- * reads as part of the sentence, and these are peers.
- */
+/** Divider between peer figures in the collapsed row. */
 const SEPARATOR_CHAR = '|';
-/** Between peer figures in the collapsed row: a divider between equals. */
-const SEPARATOR = ` ${SEPARATOR_CHAR} `;
-/**
- * Inside a sentence: the clauses belong together, so they get a joiner.
- *
- * Always an element, never a bare text node. At body weight the interpunct
- * disappears between two pieces of text, and its spacing has to be tuned in
- * one place rather than baked into a dozen strings.
- */
+/** Joiner between clauses of one sentence. Always an element, never text. */
 const clauseSep = () => el('span', 'sep', '\u00b7');
 
-/**
- * Confidence is spelled out rather than coded into a coloured dot.
- *
- * A 7px circle asks the reader to memorise a legend before the interface means
- * anything. A word carries the same colour and needs no key.
- */
+/** Message keys for the confidence word and its tooltip legend. */
 const CONFIDENCE_WORD = {
   good: 'confReliable',
   fair: 'confRough',
@@ -72,54 +56,40 @@ const CSS = `
 
 .conf { font-weight: 600; white-space: nowrap; }
 .conf.good { color: #4ec9a5; }
-/* Amber is the caution colour and nothing else. Blue is the accent, so it
-   cannot also mean "treat this with suspicion". */
 .conf.fair { color: #ffb02e; }
 .conf.low  { color: #e8654f; }
 .conf.none { color: #7c8698; }
-/* Confidence drops to a quiet second line, freeing the bottom-right corner
-   for the wordmark. The figures are what a glance is for; the caveat belongs
-   underneath them, not competing with them. */
 .pill-meta {
   display: flex; align-items: baseline; justify-content: flex-end; gap: 10px;
   font-size: 10.5px; line-height: 1.2; 
 }
 .pill-brand { color: #454e60; font-size: 9px; white-space: nowrap; font-weight: 900; opacity: 0.6; text-transform: uppercase; font-style: italic; }
-/* The build that produced the figures, in the corner opposite the wordmark.
-   Same ink as the mark it belongs to: an identifier to quote in a bug report,
-   not something the glance is meant to land on. */
 .pill-version { color: #454e60; font-size: 9px; white-space: nowrap; font-weight: 700; opacity: 0.6; font-variant-numeric: tabular-nums; }
 
 /* Figures stack: the reading on top, the verdict for that reading below it. */
 .pill-fig { display: flex; flex-direction: column; gap: 1px; }
 .pill-fig-sub { font-size: 9px; font-weight: 600; line-height: 1.1; }
 .pill-sep { align-self: center; }
-/* Applied to any figure with a verdict beneath it, not just units: shrinking
-   one cell and not its neighbours would make the row look broken. */
+/* Any figure with a verdict beneath it, so cells shrink together. */
 .pill-fig:has(.pill-fig-sub) > span:first-child { font-size: 11px; }
 
 .pill-figures { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .pill-figures b { font-weight: 600; }
-/* A pipe is a taller, heavier glyph than the interpunct it replaced, so it is
-   dimmed to stay a divider rather than becoming another mark to read. */
+.pill-fig-rank { color: #7c8698; font-weight: 600; }
 .pill-sep { color: #39414f; font-weight: 400; }
-/* Steam's own review bands and its own colours for them. The boundary is 70%,
-   not 80%: below it a game wears the yellow "Mixed" warning label, above it
-   the blue "Mostly Positive" one. Borrowing both the thresholds and the
-   palette means the count reads the same here as on the page behind it. */
+/* Steam's own review bands and colours, so the count reads the same here as
+   on the page behind it. The boundary is 70% ("Mixed" below, "Mostly
+   Positive" above), not 80%. */
 .rev-positive,  .rev-positive b  { color: #66c0f4; }
 .rev-mixed,     .rev-mixed b     { color: #b9a074; }
 .rev-negative,  .rev-negative b  { color: #a34c25; }
-/* Steam's own in-game green: the figure should look like the state it names. */
+/* Steam's in-game green, primary light steel and discount lime. */
 .fig-players,   .fig-players b   { color: #7cc53f; }
 .fig-wishlists, .fig-wishlists b { color: #66c0f4; }
-/* Steam's own primary light steel for the headline count, and its discount
-   lime for money: both borrowed from the store so the figures feel native. */
 .fig-units,     .fig-units b     { color: #c7d5e0; }
 .fig-revenue,   .fig-revenue b   { color: #beee11; }
 
-/* Emphasis inside notes. A note is mostly scaffolding; these mark the one or
-   two words in it that actually carry the information. */
+/* Emphasis inside notes. */
 .hl { color: #c9d1e0; }
 .hl-accent   { color: #66c0f4; }
 .hl-players  { color: #7cc53f; }
@@ -127,7 +97,7 @@ const CSS = `
 .hl-mixed    { color: #b9a074; }
 .hl-negative { color: #a34c25; }
 .hl-revenue  { color: #beee11; }
-/* Direction of travel, in the colours SteamCharts uses for the same thing. */
+/* Direction of travel, in SteamCharts' colours. */
 .trend-up   { color: #4ec9a5; }
 .trend-down { color: #e8654f; }
 .trend-flat { color: #7c8698; }
@@ -135,17 +105,14 @@ const CSS = `
 
 .panel {
   width: 356px; overflow-y: auto;
-  /* Frosted glass over the store page. The saturation bump keeps Steam's
-     artwork from turning grey once it is blurred. */
+  /* The saturation bump keeps Steam's artwork from greying out under blur. */
   background: rgba(16, 19, 26, .78);
   backdrop-filter: blur(18px) saturate(135%);
   -webkit-backdrop-filter: blur(18px) saturate(135%);
   /* The root is zoomed, so viewport units here render multiplied by that
-     factor. Dividing keeps the panel inside the screen instead of sliding
-     off the top once the content grows. */
+     factor; dividing keeps the panel on screen as content grows. */
   max-height: calc((100vh - 32px) / var(--zoom, 1));
-  /* Reaching the end of this list should stop, not hand the wheel to the
-     store page underneath. */
+  /* Do not hand the wheel to the store page at the end of the list. */
   overscroll-behavior: contain;
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,.18) transparent;
@@ -165,10 +132,8 @@ const CSS = `
 
 .head { display: flex; align-items: center; gap: 10px; padding: 13px 14px 11px; border-bottom: 1px solid rgba(255,255,255,.09); }
 .head-text { flex: 1; min-width: 0; }
-/* A flex row on the baseline. As inline text the three parts sat at three
-   different font sizes, and vertical-align could only guess where to put the
-   dot between them. It also means a long game name truncates on its own
-   instead of swallowing the separator and the link with it. */
+/* A baseline flex row, so a long game name truncates on its own instead of
+   swallowing the separator and the link with it. */
 .title {
   display: flex; align-items: baseline; min-width: 0;
   font-size: 13px; font-weight: 600;
@@ -177,11 +142,7 @@ const CSS = `
   color: #dfe4ee; min-width: 0;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-/* Same size as the text it divides, so the glyph lands exactly where the
-   typeface intends relative to the letters on either side. The weight is what
-   makes it visible, not the size. */
-/* Shared by every clause joiner in the interface, so a divider looks the same
-   wherever it appears. */
+/* Shared by every clause joiner in the interface. */
 .sep { color: #6b7688; font-weight: 700; margin: 0 7px; }
 .title-sep { flex: none; }
 .title-link { flex: none; color: #7c8698; text-decoration: none; font-weight: 400; font-size: 12px; }
@@ -189,15 +150,13 @@ const CSS = `
 .title-link:focus-visible { outline: 2px solid #67c1f5; outline-offset: 2px; }
 .conf-tag { font-size: 10.5px; font-weight: 600; color: #4b5568; }
 .verdict { margin-top: 3px; font-size: 12px; }
-.verdict .conf { }
 .verdict-why { color: #8b95a8; }
 .subtitle { font-size: 11.5px; color: #7c8698; margin-top: 2px; }
 .subtitle a, .note a { color: #67c1f5; text-decoration: none; }
 .subtitle a:hover, .note a:hover { text-decoration: underline; }
 .subtitle a:focus-visible, .note a:focus-visible { outline: 2px solid #67c1f5; outline-offset: 2px; }
 .close {
-  /* The head centres its text, but the dismiss control belongs in the
-     corner, where a close button is looked for. */
+  /* The head centres its text; the close button belongs in the corner. */
   align-self: flex-start;
   background: none; border: none; color: #6f7889; cursor: pointer;
   font-size: 26px; line-height: 1; padding: 4px 10px; margin: -4px -8px -4px 0;
@@ -216,15 +175,14 @@ const CSS = `
 .delta.up { color: #4ec9a5; }
 .delta.down { color: #e8654f; }
 
-/* The scale is the hero: bar width reads as uncertainty before any number does. */
+/* Bar width reads as uncertainty. */
 .scale { position: relative; height: 22px; }
 .track { position: absolute; top: 7px; left: 0; right: 0; height: 4px; background: #1e2431; border-radius: 2px; }
 .band { position: absolute; top: 7px; left: 0; right: 0; height: 4px; border-radius: 2px;
         background: linear-gradient(90deg, #2c5f80, #67c1f5, #2c5f80); }
 .band.wide { background: linear-gradient(90deg, #6b2a1f, #e8654f, #6b2a1f); }
 .marker { position: absolute; top: 3px; width: 3px; height: 12px; background: #cfeaff; border-radius: 1px; transform: translateX(-1.5px); }
-/* A 2px mark is impossible to hover, so it sits inside a target big enough to
-   hit without aiming: full row height and wide enough for an imprecise mouse. */
+/* A 2px mark is impossible to hover, so it sits in a larger hit target. */
 .tick-hit {
   position: absolute; top: -4px; width: 26px; height: 26px;
   transform: translateX(-13px); cursor: help;
@@ -236,8 +194,8 @@ const CSS = `
 .tick-hit:hover .tick, .tick-hit:focus-visible .tick { opacity: 1; height: 16px; margin-top: 5px; }
 .marker { cursor: help; }
 
-/* Anchored to the viewport rather than to the row, because the panel scrolls
-   and a scroll container clips its children on both axes. */
+/* Anchored to the viewport: the panel scrolls, and a scroll container clips
+   its children on both axes. */
 .tip {
   position: fixed; left: 0; top: 0;
   background: #05070b; color: #dfe4ee; border: 1px solid #2b3242;
@@ -313,17 +271,13 @@ function svgEl(tag, attrs = {}) {
   return n;
 }
 
-/**
- * The wordmark shown in the corner of the collapsed pill. Deliberately quiet:
- * it should be legible on a stream without competing with the figures.
- */
+/** The wordmark shown in the corner of the collapsed pill. */
 const BRAND = 'Wishlytic';
 
 /**
- * The shipped version, taken from the manifest so it cannot drift from the
- * build the reader is actually running. Empty outside the extension — the
- * overlay is also read in Node by the smoke tests, where chrome does not
- * exist — and both places that show it fall back to showing nothing.
+ * The shipped version, from the manifest. Empty outside the extension, where
+ * chrome does not exist (the smoke tests import this in Node); both display
+ * sites fall back to showing nothing.
  */
 const VERSION = typeof chrome !== 'undefined' && chrome.runtime?.getManifest
   ? `v${chrome.runtime.getManifest().version}`
@@ -345,9 +299,9 @@ function toneHighlight(tone) {
 }
 
 /**
- * Emphasise one substring inside an already-translated sentence.
- * Word order differs by language, so the marker is located rather than
- * assumed to sit at the front.
+ * Emphasise one substring inside an already-translated sentence. The marker is
+ * located rather than assumed to be at the front: word order differs by
+ * language. Returns the sentence unchanged when the marker is absent.
  */
 function splitAround(sentence, marker, className) {
   const at = sentence.indexOf(marker);
@@ -369,8 +323,6 @@ function sentimentClass(positivePct) {
 
 /** The small verdict that sits beside a metric name, with its reasons. */
 function confidenceTag(conf, withSeparator = false) {
-  // Nothing to report is not a verdict. Printing "no data" beside a figure
-  // that is right there says less than saying nothing.
   if (!conf || conf.level === 'none') return document.createDocumentFragment();
   const wrap = el('span', 'conf-tag');
   if (withSeparator) wrap.append(clauseSep());
@@ -388,14 +340,9 @@ function confidenceWord(level) {
 }
 
 /**
- * Tooltips live in a layer outside the panel.
- *
- * The panel scrolls, and a scroll container clips on both axes, so a tooltip
- * rendered inside a row gets cut off at the panel edge exactly when it has
- * something to say. Anchoring it to the viewport instead sidesteps that.
- *
- * The root carries a CSS zoom, which multiplies the coordinates of fixed
- * descendants while getBoundingClientRect keeps reporting real viewport
+ * Tooltips live in a layer outside the panel, since a scroll container would
+ * clip them. The root carries a CSS zoom, which multiplies the coordinates of
+ * fixed descendants while getBoundingClientRect still reports real viewport
  * pixels, so the measured rect is divided back down before use.
  */
 let tipLayer = null;
@@ -443,9 +390,8 @@ function makeTipLayer(root, zoom) {
 }
 
 /**
- * A labelled range scale, optionally with tick marks showing where each
- * individual estimator landed. Seeing two ticks far apart inside one band is
- * the clearest possible signal that the midpoint is doing a lot of work.
+ * A labelled range scale, optionally with a tick mark for where each
+ * individual estimator landed.
  */
 function scale(range, fmt, { ticks = [], wide = false } = {}) {
   const wrap = el('div', 'scale');
@@ -456,16 +402,16 @@ function scale(range, fmt, { ticks = [], wide = false } = {}) {
 
   wrap.append(el('div', `band${wide ? ' wide' : ''}`));
 
-  // Each tick is where one estimator landed on its own. Two ticks far apart
-  // inside a single band is the clearest possible sign that the midpoint is
-  // doing a lot of work, but only if you can find out what they are.
   for (const tick of ticks) {
     if (!Number.isFinite(tick.value)) continue;
     const hit = el('div', 'tick-hit');
     hit.style.left = `${posOf(tick.value) * 100}%`;
     hit.append(el('div', 'tick'));
 
-    const text = `${tr(tick.label)}: ${fmt(tick.value)}`;
+    // The tooltip names where the method's coefficient came from.
+    const text = tick.origin
+      ? `${tr(tick.label)}: ${fmt(tick.value)} \u2014 ${tr(tick.origin)}`
+      : `${tr(tick.label)}: ${fmt(tick.value)}`;
     hit.tabIndex = 0;
     hit.setAttribute('role', 'img');
     hit.setAttribute('aria-label', text);
@@ -503,9 +449,6 @@ function metric(name, range, fmt, opts = {}) {
   const box = el('div', 'metric');
   const head = el('div', 'metric-head');
   const nameCell = el('span', 'metric-name', name);
-  // The verdict belongs to the figure it describes. One word for the whole
-  // panel would have to be wrong about at least one of three numbers that
-  // rest on different evidence.
   if (opts.confidence) nameCell.append(confidenceTag(opts.confidence, true));
   head.append(nameCell);
 
@@ -519,18 +462,11 @@ function metric(name, range, fmt, opts = {}) {
 
   box.append(head, scale(range, fmt, { ticks: opts.ticks, wide: opts.wide }));
   if (opts.note) box.append(noteNode(opts.note, opts.noteWarn));
-  // Reasons sit under the figure they are about, and only there: repeating
-  // them in the panel header means reading the same sentence twice on the way
-  // to the number it describes.
   for (const reason of opts.reasons ?? []) box.append(reasonNode(reason, 'note warn'));
   return box;
 }
 
-/**
- * Notes take either a string or an array of pieces, so a sentence can carry
- * emphasis on the words that matter without every call site building DOM.
- * A piece is a plain string, or [text, className].
- */
+/** Append note pieces, each either a plain string or [text, className]. */
 function appendPieces(target, pieces) {
   for (const piece of Array.isArray(pieces) ? pieces : [pieces]) {
     if (piece == null) continue;
@@ -545,15 +481,15 @@ function noteNode(note, warn = false) {
 }
 
 /**
- * Turn a translated sentence into nodes, emphasising the parts that carry the
- * information: any `**marked**` span, plus every substitution value, since a
- * reason like "methods disagree by 5.4x" is really about the 5.4.
+ * Turn a translated sentence into note pieces, emphasising any `**marked**`
+ * span plus each value in `emphasise`.
  */
 function richText(sentence, emphasise = []) {
   const pieces = [];
   let rest = String(sentence);
 
   // Explicit markers first, so a translator can emphasise a fixed phrase.
+  // The dynamic values are then split out of whichever plain piece holds them.
   const marked = rest.split(/\*\*(.+?)\*\*/s);
   for (let i = 0; i < marked.length; i++) {
     if (i % 2 === 1) pieces.push([marked[i], 'em']);
@@ -562,7 +498,6 @@ function richText(sentence, emphasise = []) {
 
   if (!emphasise.length) return pieces;
 
-  // Then the dynamic values, split out of whichever plain piece holds them.
   return pieces.flatMap((piece) => {
     if (Array.isArray(piece)) return [piece];
     let out = [piece];
@@ -580,9 +515,7 @@ function richText(sentence, emphasise = []) {
 
 /** A translated descriptor rendered with its substitutions emphasised. */
 function reasonNode(descriptor, className = 'subtitle') {
-  // Only a reason that actually caused a downgrade gets its number picked out.
-  // Bolding the figure in "band spans 2.4x" or "2 methods combined" makes
-  // routine description look like an alarm.
+  // Only a reason that caused a downgrade gets its number emphasised.
   const alarming = (descriptor?.severity ?? 0) >= 2;
   const params = (alarming && descriptor?.params) || [];
   const box = el('div', className);
@@ -605,15 +538,13 @@ function joinPieces(groups) {
 }
 
 /**
- * A measured fact, not an estimate: no scale, no error bars. Facts and
- * inferences must not look alike, so anything without uncertainty is rendered
- * without the bar that represents uncertainty.
+ * A measured fact: no scale, no error bars, no confidence verdict — those are
+ * reserved for estimates, so the two never look alike.
  */
 function fact(name, value, fmt, note, delta, valueClass) {
   const box = el('div', 'metric');
   const head = el('div', 'metric-head');
   head.append(el('span', 'metric-name', name));
-  // Facts carry no verdict: they are measured, not inferred.
 
   const right = el('div', 'metric-right');
   const badge = delta != null ? deltaBadge(delta, fmt) : null;
@@ -640,12 +571,8 @@ function subFact(label, value, valueClass, badge) {
 }
 
 /**
- * A statement about the page, with no figure and no label.
- *
- * Distinct from `unavailable`, which says "this number is missing and here is
- * why". On a soundtrack or a controller there is no missing number: heading
- * the sentence with "Units sold —" would invent the expectation it then
- * has to deny.
+ * A statement about the page, with no figure and no label. Distinct from
+ * `unavailable`, which labels a figure that is missing.
  */
 function notice(text) {
   const box = el('div', 'metric');
@@ -719,37 +646,28 @@ const CONTEXT_KEY = {
 const asPieces = (value) => (Array.isArray(value) ? value : [value]);
 
 /**
- * What the wishlist figure was read from, in one line.
- *
- * Both signals get named when both answered, because the number is their
- * average and a caption that mentions one of them describes a different
- * estimate than the one on screen. When the ranking has nothing to say, the
- * reason it has nothing to say is itself worth a clause: absence from the
- * ordering is a ceiling, and a reader who knows the list stops around ten
- * thousand knows more than one who is told nothing.
+ * What the wishlist figure was read from, in one line. Names both signals when
+ * both answered, since the figure is their average.
  */
 function wishlistNote(w) {
   const pieces = [];
 
   if (w.followers != null && w.multiplier != null) {
+    // The genre multiplier is disclosed in the confidence reasons, not here:
+    // a coefficient in the headline is a number the reader cannot act on.
     const sentence = w.contextKey !== 'unknown'
       ? t('nFromFollowers', [integer(w.followers), t(CONTEXT_KEY[w.contextKey])])
-      : w.genre
-        ? t('nFromFollowersGenre', [
-            integer(w.followers), w.genre.label, w.genre.multiplier.toFixed(1)
-          ])
-        : t('nFromFollowersOnly', [integer(w.followers)]);
+      : t('nFromFollowersOnly', [integer(w.followers)]);
     pieces.push(...asPieces(splitAround(sentence, integer(w.followers), 'hl-accent')));
   }
 
   if (w.rank) {
     if (pieces.length) pieces.push(' · ');
     const rank = integer(w.rank.rank);
-    pieces.push(...asPieces(splitAround(
-      t('nWishlistRank', [rank, integer(w.rank.listed), (w.rank.percentile * 100).toFixed(1)]),
-      rank,
-      'hl-accent'
-    )));
+    const sentence = w.rank.announcedShare != null
+      ? t('nWishlistRank', [rank, integer(w.rank.listed), (w.rank.announcedShare * 100).toFixed(1)])
+      : t('nWishlistRankOnly', [rank, integer(w.rank.listed)]);
+    pieces.push(...asPieces(splitAround(sentence, rank, 'hl-accent')));
   } else if (w.ceiling != null) {
     if (pieces.length) pieces.push(' · ');
     pieces.push(t('nWishlistBelowList', [compact(w.ceiling)]));
@@ -759,11 +677,8 @@ function wishlistNote(w) {
 }
 
 /**
- * Why the player-count cross-check is not showing.
- *
- * Only the cases where something is knowably absent. `no-ccu` is not here: a
- * game with no concurrent players on record needs no explanation for the
- * absence of a figure derived from them.
+ * Why the player-count cross-check is not showing. Only the knowably-absent
+ * cases; `no-ccu` is deliberately not among them.
  */
 const CCU_SKIP_KEY = {
   'peak-not-at-launch': 'nCcuLatePeak',
@@ -771,19 +686,14 @@ const CCU_SKIP_KEY = {
 };
 
 /**
- * A refusal that names a threshold takes it from the constant, so lowering the
- * gate cannot leave a stale number sitting in twelve translations.
+ * Thresholds quoted in a refusal come from the constant, so lowering a gate
+ * cannot leave a stale number in twelve translations.
  */
 const REASON_PARAMS = {
   'too-few-reviews': () => [integer(REVIEW_GATES.MIN_REVIEWS)]
 };
 
-/**
- * Why this kind of store page gets no estimate. One sentence each, because
- * they are declined for genuinely different reasons — see APP_TYPES — and a
- * single "not supported" would flatten the one distinction that matters to a
- * reader: whether the figure is impossible or merely unmeasured.
- */
+/** Why this kind of store page gets no estimate — see APP_TYPES. */
 const TYPE_KEY = {
   demo: 'wTypeDemo',
   dlc: 'wTypeDlc',
@@ -838,8 +748,8 @@ export function renderOverlay(result, opts = {}) {
   shadow.append(style);
 
   const root = el('div', `root ${position}`);
-  // One knob scales text, padding, controls and the scale bars together, so
-  // nothing drifts out of proportion at larger sizes.
+  // Scales text, padding, controls and bars together. `--zoom` mirrors it for
+  // the rules that have to divide viewport units back down.
   root.style.zoom = String(uiScale);
   root.style.setProperty('--zoom', String(uiScale));
   shadow.append(root);
@@ -879,9 +789,7 @@ export function renderOverlay(result, opts = {}) {
     const FORMATTERS = { compact, money, integer };
     const items = pillFigures(result, pillConfig);
 
-    // A verdict belongs under the figure it judges. One word for the row
-    // would have to describe three numbers that rest on different evidence,
-    // and measured facts like the review count take no verdict at all.
+    // Which figures carry a verdict; measured facts take none.
     const CONF_FOR = { units: 'units', net: 'revenue', wishlists: 'wishlists' };
 
     for (const item of items) {
@@ -893,11 +801,15 @@ export function renderOverlay(result, opts = {}) {
         el('b', null, (FORMATTERS[item.format] ?? compact)(item.value)),
         document.createTextNode(' ' + t(item.labelKey))
       );
+      // Qualifies the figure rather than being one, so it sits inside the same
+      // cell and keeps the separator meaning "next reading".
+      if (item.suffix) {
+        line.append(el('span', 'pill-fig-rank', ' ' + t(item.suffix.key, [integer(item.suffix.value)])));
+      }
       cell.append(line);
 
       // Estimates carry a verdict underneath; measured figures carry their
-      // direction of travel. Either way the second line says something about
-      // the number above it rather than repeating it.
+      // direction of travel.
       const conf = confidence[CONF_FOR[item.key]];
       if (conf && conf.level !== 'none') {
         cell.append(el('span', `pill-fig-sub conf ${conf.level}`,
@@ -925,15 +837,8 @@ export function renderOverlay(result, opts = {}) {
   }
 
   /**
-   * Reviews are measured, not inferred, so they render without a scale: the
-   * band is what distinguishes an estimate from a fact, and putting one under
-   * a known number would make the whole visual language meaningless.
-   */
-  /**
-   * Change in positive share, in percentage points.
-   *
-   * Shared by the collapsed row and the panel: two views of one figure that
-   * disagreed would be worse than showing it once.
+   * Change in positive share, in percentage points. Shared by the collapsed
+   * row and the panel so the two cannot disagree.
    */
   function reviewTrendPp() {
     const rt = game.reviewTrend;
@@ -948,36 +853,23 @@ export function renderOverlay(result, opts = {}) {
 
     const rt = game.reviewTrend;
 
-    // Which lifetime share to pair with the recent one.
-    //
-    // The page's own rows are preferred when they cover the same population.
-    // They do not on every game: Steam scopes the lifetime row to the reader's
-    // language while leaving the recent row across all of them, which is how
-    // Apex Legends ends up showing English-only 76% beside an all-language
-    // recent score. Where that happens our own all-language share is used
-    // instead — still comparable with the recent figure, because both count
-    // every language.
+    // Which lifetime share to pair with the recent one: the page's own row
+    // when it covers the same population, otherwise our all-language share —
+    // see comparableScopes.
     const fromPage = rt && Number.isFinite(rt.recentPct) && comparableScopes(rt, game.reviews);
     const lifetimePct = fromPage ? rt.allPct : game.positivePct;
     const pp = reviewTrendPp();
 
-    // No caption between the count and the shares: floating there it read as a
-    // heading for the percentages rather than a qualifier on the number above
-    // it. What it said now hangs off the count itself.
     const box = fact(t('mReviews'), game.reviews, integer, null,
       delta?.reviews, sentimentClass(lifetimePct));
     box.title = t('nReviewScope');
 
-    // Both shares get their own row in the value column, so they line up with
-    // each other and with every other figure in the panel.
     if (Number.isFinite(lifetimePct)) {
       box.append(subFact(t('mPositiveAllTime'), `${Math.round(lifetimePct)}%`,
         sentimentClass(lifetimePct)));
     }
 
     if (rt && Number.isFinite(rt.recentPct)) {
-      // The delta always comes from the two numbers printed above and below
-      // it, so it can be checked by eye.
       const badge = deltaBadgeFor(pp);
       const row = subFact(t('mPositiveRecent'), `${rt.recentPct}%`,
         sentimentClass(rt.recentPct), badge);
@@ -990,11 +882,7 @@ export function renderOverlay(result, opts = {}) {
     return box;
   }
 
-  /**
-   * Live and yesterday's peak player counts. Both are measured, so neither
-   * gets a scale. The note explains when the derived week-one figure is
-   * withheld, because a missing cross-check should say why it is missing.
-   */
+  /** Live, 24-hour and all-time peak player counts. All measured. */
   function playersFact() {
     const now = game.currentPlayers;
     const peak = game.peak24h;
@@ -1004,9 +892,7 @@ export function renderOverlay(result, opts = {}) {
     const hasPeak = Number.isFinite(peak) && peak > 0;
     const hasAllTime = Number.isFinite(allTime) && allTime > 0;
 
-    // A zero never becomes the headline. An unreleased game has nobody
-    // playing by definition, and "Players right now: 0" states that as though
-    // it were a finding.
+    // A zero never becomes the headline.
     if (!hasLive && !hasPeak && !hasAllTime) return document.createDocumentFragment();
 
     const headline = hasLive
@@ -1018,8 +904,7 @@ export function renderOverlay(result, opts = {}) {
     const box = fact(headline.label, headline.value, integer, null, null, 'fig-players');
 
     // Rows below the headline, skipping whichever figure is already up there.
-    // A zero peak beside live players is kept: for a small game "nobody
-    // peaked in 24 hours" is a reading, not a gap.
+    // A zero peak beside live players is a reading, so it is kept.
     if (hasLive && Number.isFinite(peak)) {
       box.append(subFact(t('mPeak24h'), integer(peak), 'hl-players'));
     }
@@ -1050,8 +935,6 @@ export function renderOverlay(result, opts = {}) {
 
     const head = el('div', 'head');
     const ht = el('div', 'head-text');
-    // SteamDB sits with the title because it points at the same subject: the
-    // raw first-party record for this game, one click from our reading of it.
     const title = el('div', 'title');
     title.append(el('span', 'title-name', game.name || `App ${game.appId}`));
     title.append(el('span', 'sep title-sep', '\u00b7'));
@@ -1063,15 +946,11 @@ export function renderOverlay(result, opts = {}) {
     title.append(dbLink);
     ht.append(title);
 
-    // The title, the SteamDB link and every figure below refer to the full
-    // game, because that is what was collected. Saying so is not optional:
-    // the reader is looking at a demo page and would otherwise reasonably
-    // read the numbers as the demo's.
+    // On a demo the title, the link and every figure below describe the full
+    // game, so the panel says so.
     if (game.viaDemo) {
       ht.append(el('div', 'subtitle', t('nViaDemo')));
     } else if (game.fullGameId && game.fullGameName) {
-      // A declined type that belongs to something. Naming the game turns a
-      // dead end into one click.
       const sub = el('div', 'subtitle');
       sub.append(document.createTextNode(t('nBelongsTo') + ' '));
       sub.append(storeLink(game.fullGameId, game.fullGameName));
@@ -1088,25 +967,16 @@ export function renderOverlay(result, opts = {}) {
     head.append(close);
     panel.append(head);
 
-    // A page that is not a game gets the one fact that applies to it. The
-    // three metric rows would otherwise carry the same sentence three times,
-    // and the measured-input rows below them would describe a soundtrack or a
-    // controller as though it were a game with a slow launch.
+    // A page that is not a game gets one sentence and nothing else.
     if (units.reason === 'unsupported-type') {
       panel.append(notice(reasonText(units, 'wUnsupportedType')));
       panel.append(footNode());
       return panel;
     }
 
-    // Order: the answer first, then the evidence behind it. Estimates lead
-    // because they are what the panel is for; the measured inputs follow so a
-    // reader can check the working without wading through it to reach the
-    // conclusion.
-    //
-    // Before release there are no sales, so units, revenue and reviews are not
-    // withheld figures to be explained — they are categories that do not exist
-    // yet. Rendering three "no data" rows for them describes our plumbing
-    // rather than the game.
+    // Estimates first, then the measured inputs behind them. Units, revenue
+    // and reviews are skipped entirely before release rather than rendered as
+    // three "no data" rows.
     if (game.released) {
       if (units.ok) {
         const ticks = (units.contributors ?? []).map((c) => ({ label: c.label, value: c.range.mid }));
@@ -1116,8 +986,8 @@ export function renderOverlay(result, opts = {}) {
           ticks: ticks.length > 1 ? ticks : [],
           wide: units.widened,
           delta: delta?.units,
-          // Only the reasons that cost something. The purely descriptive ones
-          // stay in the verdict tooltip rather than crowding the figure.
+          // Only the reasons that cost something; the descriptive ones stay in
+          // the verdict tooltip.
           reasons: (confidence.units.reasons ?? []).filter((r) => (r.severity ?? 0) >= 1)
         }));
       } else {
@@ -1133,21 +1003,16 @@ export function renderOverlay(result, opts = {}) {
     }
 
     if (wishlists.ok) {
-      // Two legs put two marks on the scale, the same way the unit estimate
-      // does. Seeing how far apart the follower ratio and the store ranking
-      // landed before they were averaged is the point of having both.
       const wishlistTicks = (wishlists.contributors ?? [])
-        .map((c) => ({ label: c.label, value: c.range.mid }));
+        .map((c) => ({ label: c.label, value: c.range.mid, origin: c.origin }));
 
       panel.append(metric(t('mWishlists'), wishlists.range, compact, {
         valueClass: 'fig-wishlists',
         confidence: confidence.wishlists,
         ticks: wishlistTicks.length > 1 ? wishlistTicks : [],
         wide: wishlists.widened,
-        // A follower delta pushed through the follower ratio, so it only
-        // exists while that leg does. On a game with no readable follower
-        // count the ranking answers alone and there is nothing to compare
-        // against the last visit.
+        // A follower delta pushed through the follower ratio, so it exists
+        // only while that leg does.
         delta: delta?.followers != null && wishlists.multiplier != null
           ? delta.followers * wishlists.multiplier
           : null,
@@ -1155,13 +1020,11 @@ export function renderOverlay(result, opts = {}) {
         reasons: (confidence.wishlists.reasons ?? []).filter((r) => (r.severity ?? 0) >= 1)
       }));
     } else if (wishlists.reason === 'released' && wishlists.followers != null) {
-      // The game shipped, so there is no honest wishlist figure. The follower
-      // count is real public data though, so show that rather than a dash.
+      // Shipped, so there is no wishlist figure; the follower count is real.
       panel.append(fact(t('mFollowers'), wishlists.followers, integer, t('wReleased'), delta?.followers));
     } else if (wishlists.ceiling != null) {
-      // No follower count and not in the ordering. There is no estimate, but
-      // "below roughly this many" is a real answer and a better one than a
-      // dash — it is the only case where absence from a list is the finding.
+      // No follower count and not in the ordering: no estimate, but "below
+      // roughly this many" is still an answer.
       panel.append(unavailable(
         t('mWishlists'),
         t('nWishlistBelowList', [compact(wishlists.ceiling)])
@@ -1170,11 +1033,34 @@ export function renderOverlay(result, opts = {}) {
       panel.append(unavailable(t('mWishlists'), reasonText(wishlists, 'wNoFollowers')));
     }
 
+    if (wishlists.ok && wishlists.contributors?.length) {
+      panel.append(collapsible(t('sWishlistMethods'), (body) => {
+        for (const c of wishlists.contributors) {
+          body.append(row(tr(c.label), compact(c.range.mid), {
+            sub: [
+              t('nWeight', [(c.share * 100).toFixed(0)]),
+              ['\u00b7', 'sep'],
+              `${compact(c.range.lo)}\u2013${compact(c.range.hi)}`,
+              ...(c.origin ? [['\u00b7', 'sep'], tr(c.origin)] : [])
+            ]
+          }));
+        }
+        body.append(row(t('nGeoMean'), compact(wishlists.range.mid), { total: true }));
+        if (wishlists.contributors.length === 1) body.append(el('div', 'note', t('nOneMethod')));
+
+        if (wishlists.common) {
+          body.append(noteNode(t('nCommonRegion',
+            [compact(wishlists.common.lo), compact(wishlists.common.hi)])));
+        } else if (wishlists.contributors.length > 1) {
+          body.append(noteNode(t('nNoCommonRegion', [wishlists.gap.toFixed(1)]), true));
+        }
+      }));
+    }
+
     if (game.released) panel.append(reviewsFact());
     panel.append(playersFact());
 
-    // Measured, and about the demo rather than the game — so it sits with the
-    // inputs and carries no verdict.
+    // About the demo rather than the game, so it sits with the inputs.
     if (game.viaDemo?.reviews != null) {
       panel.append(fact(t('mDemoReviews'), game.viaDemo.reviews, integer, t('nDemoReviews')));
     }
@@ -1209,11 +1095,8 @@ export function renderOverlay(result, opts = {}) {
         body.append(row(t('nGeoMean'), compact(units.range.mid), { total: true }));
         if (units.contributors.length === 1) body.append(el('div', 'note', t('nOneMethod')));
 
-        // Where the methods actually agree, which is the useful thing to know
-        // when their midpoints sit far apart. A source that answers in wide
-        // buckets has a midpoint pinned to a bucket edge rather than to the
-        // game, so the overlap between the bands says more than the distance
-        // between their centres does.
+        // Where the bands overlap, which says more than the distance between
+        // their midpoints when one source answers in wide buckets.
         if (units.common) {
           body.append(noteNode(t('nCommonRegion',
             [compact(units.common.lo), compact(units.common.hi)])));
@@ -1223,15 +1106,12 @@ export function renderOverlay(result, opts = {}) {
       }));
     }
 
-    // The player-count cross-check, or the reason there isn't one. A missing
-    // cross-check that says nothing reads as a feature we forgot to build;
-    // "the peak came two years after launch, so the rule does not apply" is
-    // the more useful half of the answer.
+    // The player-count cross-check, or the reason there isn't one.
     const ccu = crossChecks?.ccu;
     if (ccu?.ok) {
       panel.append(collapsible(t('sCcu'), (body) => {
-        // The multiplier is whichever one actually ran \u2014 it changes with
-        // pre-order history \u2014 so it comes from the result, not from a string.
+        // From the result, not a fixed string: the multiplier changes with
+        // pre-order history.
         body.append(row(t('nCcuRow', [String(ccu.multiplier)]), compact(ccu.range.mid),
           { sub: `${compact(ccu.range.lo)}\u2013${compact(ccu.range.hi)}` }));
         body.append(el('div', 'note', t('nCcuScope')));
@@ -1246,9 +1126,7 @@ export function renderOverlay(result, opts = {}) {
       }));
     }
 
-    // The player-hours route. A cross-check rather than a leg of the average,
-    // because the hours are measured and the divisor is not — so it is shown
-    // with the divisor named, which is the only honest way to show it.
+    // The player-hours route: a cross-check, shown with its divisor named.
     const pt = crossChecks?.playtime;
     if (pt?.ok) {
       panel.append(collapsible(t('sPlaytime'), (body) => {
@@ -1292,9 +1170,8 @@ export function renderOverlay(result, opts = {}) {
           'hl-revenue'
         )));
 
-        // Where the regional factor came from. An audience split read off the
-        // review languages is a measurement the reader can check against
-        // their own knowledge of the game; a dropdown default is not.
+        // Where the regional factor came from, when it was read off the
+        // review languages rather than chosen in the dropdown.
         const s = revenue.settings;
         if (s?.regionalAuto && s.regionalDerivedFrom?.ok) {
           body.append(noteNode(t('nRegionalAuto', [
@@ -1303,9 +1180,7 @@ export function renderOverlay(result, opts = {}) {
           ])));
         }
 
-        // The band around the revenue figure is not the sales band converted
-        // into money — the waterfall's own assumptions widen it — so it says
-        // which ones and by how much.
+        // Which waterfall assumptions widened the band beyond the sales one.
         const env = revenue.envelope;
         if (env) {
           body.append(noteNode(t('nRevenueBand', [
@@ -1314,9 +1189,7 @@ export function renderOverlay(result, opts = {}) {
           ])));
         }
 
-        // What the figure leaves out, counted. "DLC is not estimated" is a
-        // caveat; "this excludes 11 DLC" tells the reader how much of the
-        // game's income the number might be missing.
+        // How many DLC the figure leaves out.
         if (game.dlcCount > 0) {
           body.append(noteNode(t('nDlcExcluded', [String(game.dlcCount)])));
         }
@@ -1328,10 +1201,8 @@ export function renderOverlay(result, opts = {}) {
         const b = units.boxleiter;
         body.append(row(t('nBaseYear', [game.releaseYear ?? '?']),
           `${b.baseYearBand.lo}\u2013${b.baseYearBand.hi}\u00d7`));
-        // Adjustments whose size we chose ourselves are marked. The study
-        // behind them established that the effect exists and left the
-        // magnitude for later, and a reader auditing the chain deserves to
-        // know which links are measured and which are our judgement.
+        // `derived` marks an adjustment whose magnitude was chosen here rather
+        // than measured by the study behind it.
         let anyDerived = false;
         for (const a of b.applied) {
           if (a.derived) anyDerived = true;
@@ -1365,11 +1236,7 @@ export function renderOverlay(result, opts = {}) {
     cog.addEventListener('keydown', (e) => { if (e.key === 'Enter') onOpenOptions?.(); });
     foot.append(cog);
 
-    // The wordmark, with the build that drew these numbers beside it. A reader
-    // reporting a figure that looks wrong can say which version produced it
-    // without going hunting through chrome://extensions. Separated by a gap
-    // rather than a glyph: two labels that are already distinct in weight and
-    // colour do not need a mark between them to be read as two things.
+    // The wordmark, with the build that drew these numbers beside it.
     const mark = el('span', 'foot-brand');
     mark.append(el('span', 'pill-brand', BRAND));
     if (VERSION) mark.append(el('span', 'pill-version', VERSION));
@@ -1385,16 +1252,12 @@ export function renderOverlay(result, opts = {}) {
   /**
    * Dismiss on a press outside the panel.
    *
-   * pointerdown rather than click, for two reasons. The press that opens the
-   * pill fires pointerdown while still collapsed, so the handler returns
-   * before the click expands it — no stopPropagation needed anywhere. And a
-   * text selection that starts inside the panel and ends outside it begins
-   * with a press on the panel, so dragging out does not close what you are
-   * reading from.
+   * pointerdown, not click: the press that opens the pill fires while still
+   * collapsed, so this returns before the click expands it, and a selection
+   * dragged out of the panel starts on the panel and so does not dismiss it.
    *
-   * composedPath is what makes the boundary test work: everything the overlay
-   * draws lives in a shadow root, and the path is the only view that crosses
-   * it reliably.
+   * composedPath is required for the boundary test — the overlay lives in a
+   * shadow root, and nothing else crosses it reliably.
    */
   const onPointerDown = (e) => {
     if (!expanded) return;

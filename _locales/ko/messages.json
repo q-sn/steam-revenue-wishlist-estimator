@@ -200,6 +200,9 @@
   "pillWishlists": {
     "message": "위시리스트"
   },
+  "pillRank": {
+    "message": "$1위"
+  },
   "ariaOpen": {
     "message": "판매·위시리스트 추정 열기"
   },
@@ -360,7 +363,7 @@
     "message": "판매 구간에 차감 계산 가정까지"
   },
   "rFollowerRatio": {
-    "message": "전체 게임 중앙값 배수입니다. 팔로워 배수는 7~20배 범위입니다"
+    "message": "전체 게임 중앙값 배수. 팔로워 비율은 $1~$2배에 걸쳐 있습니다"
   },
   "mAllTimePeak": {
     "message": "역대 최고"
@@ -410,9 +413,6 @@
   "nCcuNoPeakDate": {
     "message": "날짜가 있는 접속 이력이 없으면 출시 정점과 이후 급등을 구분할 수 없어 첫 주 수치를 표시하지 않습니다."
   },
-  "nFromFollowersGenre": {
-    "message": "팔로워 $1명 기준 · $2 장르는 팔로워당 평균 $3배"
-  },
   "nDerivedMark": {
     "message": "* 효과의 존재는 연구가 확인했지만 크기는 제시하지 않아 저희가 정한 값"
   },
@@ -423,22 +423,40 @@
     "message": "이 구간은 판매량 범위를 금액으로 바꾼 것만이 아닙니다. $1~$2 의 할인과 $3~$4 의 환불률도 포함합니다."
   },
   "rWishlistGenre": {
-    "message": "$1 장르 배수, 설문의 7~20배 범위 안"
+    "message": "$1 장르 배수, 실측된 $2~$3배 범위 안"
   },
   "mFollowerRatio": {
     "message": "팔로워 × 공개된 비율"
   },
+  "mWishlistSaid": {
+    "message": "개발자가 직접 밝힌 수치"
+  },
   "mWishlistRank": {
-    "message": "Steam 위시리스트 순위"
+    "message": "Steam 위시리스트 랭킹 순위"
+  },
+  "sWishlistMethods": {
+    "message": "위시리스트 방법을 어떻게 결합했는가"
+  },
+  "oMeasuredHere": {
+    "message": "공개된 수치 $1건으로 여기서 실측"
+  },
+  "oSaidOn": {
+    "message": "$1에 발표, 측정된 증가율로 현재까지 보정"
   },
   "nWishlistRank": {
     "message": "$2개 중 $1위 · 공개된 게임 상위 $3%"
   },
+  "nWishlistRankOnly": {
+    "message": "$2개 중 $1위"
+  },
   "nWishlistBelowList": {
     "message": "Steam 위시리스트 순위에 없음 · 이 순위는 약 $1에서 끝납니다"
   },
-  "rWishlistRankOnly": {
-    "message": "팔로워 수를 읽을 수 없어 상점 순위가 유일한 방법입니다"
+  "rWishlistSaid": {
+    "message": "개발자가 이 게임의 수치를 공표했으므로 추정치는 대부분 그 수치에 근거합니다"
+  },
+  "rWishlistRankCurve": {
+    "message": "이 게임은 공개된 수치가 없어 Steam 위시리스트 순위에서 추정했습니다"
   },
   "rWishlistBelowList": {
     "message": "Steam 위시리스트 순위 아래에 있어 팔로워 비율만 답합니다"
@@ -448,9 +466,6 @@
   },
   "rWishlistCeiling": {
     "message": "팔로워 비율이 이 게임이 들어가지 못한 순위표의 하한보다 많은 위시리스트를 가리킵니다"
-  },
-  "rWishlistAccumulation": {
-    "message": "출시일을 읽을 수 없어 위시리스트를 어디까지 모았는지 알 수 없습니다"
   },
   "nDlcExcluded": {
     "message": "DLC $1개의 매출은 포함하지 않습니다. 공개 데이터로는 알 수 없습니다."
@@ -523,5 +538,8 @@
   },
   "nDemoReviews": {
     "message": "체험판 자체에서 측정한 값입니다. 위의 어떤 수치에도 입력되지 않습니다."
+  },
+  "oRankCurve": {
+    "message": "$1건의 공표 수치로 여기서 측정한 곡선"
   }
 }

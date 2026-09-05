@@ -33,15 +33,7 @@ const els = {
   saved: $('saved')
 };
 
-/**
- * Audience profile, with "read it from the reviews" as the first option and
- * the default.
- *
- * Asking a developer to classify their own buyers is asking them to guess at
- * something the review languages already measure. The manual choices stay
- * because somebody looking at their own Steamworks numbers knows better than
- * a proxy does \u2014 but they should not be the only way to answer.
- */
+/** Audience profile, with "read it from the reviews" first and as default. */
 {
   const auto = document.createElement('option');
   auto.value = 'auto';
@@ -93,12 +85,8 @@ const readUi = () => ({
 });
 
 /**
- * Live sanity check, and the most useful number on this page: it says
- * immediately whether the settings still describe reality.
- *
- * The two figures it quotes are the worked scenarios in the source behind the
- * waterfall \u2014 around 40% of list kept on a mixed audience, around 45% on a
- * US/EU-weighted one.
+ * Live sanity check: what share of list price these settings keep. The sourced
+ * scenarios are around 40% on a mixed audience, 45% on a US/EU-weighted one.
  */
 function refresh() {
   const s = readSettings();
@@ -107,12 +95,13 @@ function refresh() {
   els.scaleOut.textContent = `${els.scale.value}%`;
 
   // With no game in front of it, 'auto' has no review languages to read and
-  // falls back to the mixed profile \u2014 which is what the note underneath says.
+  // falls back to the mixed profile.
   const probe = estimateRevenue(1000, 20, s);
   els.sanity.replaceChildren();
   const marker = probe.ok ? pct(probe.takeHomeRatio) : '\u2014';
   const text = t('optSanity', [marker]);
-  // The percentage is the point of the sentence, so it gets emphasis.
+  // Located rather than assumed to be at the front: word order differs by
+  // language.
   const at = text.indexOf(marker);
   if (at === -1) {
     els.sanity.append(document.createTextNode(text));
@@ -141,8 +130,7 @@ for (const el of [els.avgDiscount, els.refundRate, els.regionalProfile, els.scal
   el.addEventListener('input', refresh);
 }
 
-// Overlay preferences apply immediately: the point of a size slider is seeing
-// the result, and making someone press Save to check a font size is hostile.
+// Overlay preferences apply immediately, without waiting for Save.
 for (const el of [els.position, els.scale, els.language, ...pillBoxes()]) {
   el.addEventListener('change', async () => {
     await chrome.storage.local.set({ ui: readUi() });
@@ -155,11 +143,8 @@ $('save').addEventListener('click', async () => {
   flash(t('optSaved'));
 });
 
-// Reset has to persist, not merely refill the form: a form-only reset leaves
-// the overlay on the previous values and reopening this page brings them
-// straight back. It is scoped to what Save covers, because wiping someone's
-// language or overlay position from a button labelled "reset to defaults"
-// would be a surprise.
+// Reset must persist, not merely refill the form, or the overlay keeps the
+// previous values. Scoped to what Save covers, so it leaves the ui key alone.
 $('reset').addEventListener('click', async () => {
   const defaults = { ...REVENUE_DEFAULTS };
   applySettings(defaults);

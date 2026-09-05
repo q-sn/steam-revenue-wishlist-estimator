@@ -1,17 +1,7 @@
 /**
- * Every magic number in this project lives here, with the study it came from.
- *
- * Rule for contributors: no coefficient without a `source`. If you cannot cite
- * where a number came from, it does not belong in an estimator that claims to
- * be honest about its uncertainty.
- *
- * A second rule follows from the first. Some published findings give a
- * direction but no magnitude — "MMOs have higher multiples", "cheaper games
- * sell more copies per review" — and the number we pick to express that
- * direction is ours, not the study's. Those rows carry `derived: true`. It is
- * the difference between "the survey measured this" and "the survey measured
- * that this exists, and we sized it ourselves", and a file claiming full
- * traceability has to show which is which.
+ * Every magic number in this project, with the study it came from. No
+ * coefficient without a `source`; `derived: true` means the direction is the
+ * study's and the magnitude is ours.
  */
 
 export const SOURCES = {
@@ -50,6 +40,11 @@ export const SOURCES = {
     url: 'https://newsletter.gamediscover.co/p/why-your-steam-follower-to-wishlist',
     note: 'Range 7x-20x, average 12.37x, median 12x. By tag: 4X 7.5x, turn-based strategy 9.0x, survival 9.5x, story-rich 13.2x, relaxing 15.7x, puzzle 15.9x.'
   },
+  GDC_FOLLOWERS_2026: {
+    label: 'GameDiscoverCo — measured follower-to-wishlist multiplier, 600+ games (May 2026)',
+    url: 'https://newsletter.gamediscover.co/p/launch-success-on-steam-are-there',
+    note: 'Median 16.1x, measured from GameDiscoverCo Pro data rather than surveyed, on games released in the last 12 months with over 50,000 launch wishlists, biggest outliers removed. Measured independently of this repository and of the two surveys below, and lands within 1% of OURS_FOLLOWER_RATIO.'
+  },
   GDC_FOLLOWERS_2019: {
     label: "GameDiscoverCo — Steam follower counts, Jake Birkett's rule of thumb",
     url: 'https://newsletter.gamediscover.co/p/steams-follower-counts-hidden-in',
@@ -60,11 +55,6 @@ export const SOURCES = {
     url: 'https://newsletter.gamediscover.co/p/the-state-of-steam-wishlist-conversions',
     note: 'Median week-1 sales 0.11x the launch wishlist balance; 0.15x for games with 25,000+ wishlists, 0.10x for games priced above $10. Outcomes vary by 10-20x, not 10-20%.'
   },
-  VGI_WISHLISTS_2025: {
-    label: 'Video Game Insights — "The importance of wishlists in 2025", games launched from Mar 2024 with 20+ reviews',
-    url: 'https://app.sensortower.com/vgi/assets/reports/VGI_Wishlist_Report_July_2025.pdf',
-    note: 'Distribution of wishlists at launch over 12 months: under 1,000 29%, 1,000-10,000 37%, 10,000-50,000 23%, 50,000-100,000 5%, above 100,000 6%. That top 6% breaks down as 253 games at 100k-500k, 26 at 500k-1M and 22 above 1M. Largest of the period Black Myth: Wukong at 4.3M. Correlation of launch wishlists with month-one units 70% overall but only 17% below 100,000 wishlists. Pre-launch accumulation, indexed to launch = 100%, runs 71% at 17 weeks out to 94% at one week out; that curve is measured on the top 50 games by launch wishlists.'
-  },
   STEAM_TOP_WISHLISTS: {
     label: "Steam store — the store's own Top Wishlists ordering",
     url: 'https://store.steampowered.com/search/?filter=popularwishlist',
@@ -73,7 +63,7 @@ export const SOURCES = {
   OURS_WISHLIST_RANKS: {
     label: 'Measured in this repository — daily snapshot of the Top Wishlists ordering',
     url: 'https://github.com/q-sn/steam-revenue-wishlist-estimator/blob/main/tools/crawl-wishlist-ranks.mjs',
-    note: 'Run `node tools/crawl-wishlist-ranks.mjs` to reproduce. Walks the store ordering in pages of 100 and records the app id at each position, together with the size of the ordering and the number of unreleased games it is drawn from. On 5 Sep 2026: 5,262 games ranked out of 15,343 announced, so the ordering covers the top 34% of what Steam has a page for.'
+    note: 'Run `node tools/crawl-wishlist-ranks.mjs` to reproduce. Walks the store ordering in pages of 100 with ignore_preferences=1 and records the app id at each position. On 5 Sep 2026: 5,574 games ranked out of 15,343 announced. Ordering is by cumulative wishlist count, not velocity — regressing log(rank) on log(announced) and log(appid) leaves page age insignificant at t = -0.09 to -0.84 — and is region-invariant, with 0 order inversions across us/de/jp/br. Regional and preference differences are pure deletions from one global order.'
   },
   STEAMWORKS_FOLLOWERS: {
     label: 'Steamworks documentation — Followers',
@@ -117,27 +107,39 @@ export const SOURCES = {
   },
   OURS_OWNER_QUALITY: {
     label: 'Measured in this repository — the SteamSpy owner band against disclosed sales',
-    url: 'https://github.com/q-sn/steam-revenue-wishlist-estimator/blob/main/tools/calibrate-owners.mjs',
-    note: 'Run `node tools/calibrate-owners.mjs` to reproduce. SteamSpy publishes no post-2018 accuracy figure, so its bucket today is compared against units developers disclosed a mean of 4.5 years ago; owners can only exceed units, so the bucket should contain or exceed every figure. Bucket midpoint over disclosed units, by disclosed size: 1M+ median 1.58x (12 games), 100k-1M median 3.39x (12), under 100k median 4.18x (6, ranging 0.21x to 15.81x, one of them arithmetically impossible). One-sided: it can show a bucket too low, never too high.'
+    url: 'https://github.com/q-sn/steam-revenue-wishlist-estimator/blob/main/test/fixtures.json',
+    note: 'One-off measurement, from SteamSpy appdetails against the disclosed units in test/fixtures.json. SteamSpy publishes no post-2018 accuracy figure, so its bucket today is compared against units developers disclosed a mean of 4.5 years ago; owners can only exceed units, so the bucket should contain or exceed every figure. Bucket midpoint over disclosed units, by disclosed size: 1M+ median 1.58x (12 games), 100k-1M median 3.39x (12), under 100k median 4.18x (6, ranging 0.21x to 15.81x, one of them arithmetically impossible). One-sided: it can show a bucket too low, never too high.'
+  },
+  OURS_WISHLIST_MODEL: {
+    label: 'Measured in this repository — one model of rank, announcement age and the milestone floor',
+    url: 'https://github.com/q-sn/steam-revenue-wishlist-estimator/blob/main/tools/calibrate-wishlist-model.mjs',
+    note: 'Run `node tools/calibrate-wishlist-model.mjs` to reproduce. One median (L1) regression over every disclosure at any age, one anchor per game, 1,051 posts across 648 ranked games: log(wishlists) = log A - B*log(rank + Q) - ALPHA*log(1 + age/90) - RUNGK*gap, where gap is the log-distance to the next rung on the ladder studios post at and is zero for off-ladder figures. Gives A 503,667,749, B 1.31652, Q 84.699, ALPHA 0.35859. Ranks come from an ignore_preferences=1 crawl because the store default hides 415 of 5,574 positions non-uniformly, from 1.4% of the first 500 to 12.4% of 3001-3500. Held-out error over 5x10 folds split by game: median 12.3% under 30 days, 14.7% under 90, 19.4% under a year, 21.9% at any age. Band 0.695-1.294 is the p10 and p90 of that out-of-sample residual, covering 76%.'
+  },
+  OURS_ANNOUNCEMENT_FLOOR: {
+    label: 'Measured in this repository — how far a wishlist announcement undershoots the true count',
+    url: 'https://github.com/q-sn/steam-revenue-wishlist-estimator/blob/main/tools/calibrate-wishlist-model.mjs',
+    note: 'A studio posting "20,000 wishlists" has just crossed 20,000, so every announced figure is a floor. Estimated inside the joint fit as RUNGK 0.15942 against a mean rung gap of 0.2393 in logs, which is x1.039 at the centre. Cross-checked directly: off-ladder figures such as "114,000" are not milestone crossings, and their median residual sits x1.06 above on-ladder figures at the same ranks (x1.03 within 60 days, x1.16 over all ages). The shipped model carried x1.21 here, which cross-validation scored as measurably worse than applying nothing at all.'
+  },
+  OURS_WISHLIST_GROWTH: {
+    label: 'Measured in this repository — how fast an unreleased game accumulates wishlists',
+    url: 'https://github.com/q-sn/steam-revenue-wishlist-estimator/blob/main/tools/calibrate-wishlist-model.mjs',
+    note: 'Growth is the age term of the model above, so the curve and the carry-forward cannot contradict each other: x(1 + age/90)^0.35859, which is x1.34 at 90 days and x1.79 at a year. Deceleration is real and a constant percent per day is wrong at every age — it has to undershoot young anchors to avoid exploding on old ones. Confirmed three ways sharing no estimator: 0.3586 from the joint fit, 0.3604 from a curve fitted only on 30-day anchors and profiled against older announcements, 0.3639 from a p50 pinball fit on the cross-validated residual. Not measured from consecutive posts by the same studio divided by elapsed days: that is a regression through the origin, and the same regression with an intercept reads 0.119%/day on an intercept of x1.75, because the size of a leg is set by the milestone ladder and only its duration by growth.'
+  },
+  OURS_FOLLOWER_RATIO: {
+    label: 'Measured in this repository — followers against wishlist counts developers announced',
+    url: 'https://github.com/q-sn/steam-revenue-wishlist-estimator/blob/main/tools/calibrate-follower-ratio.mjs',
+    note: 'Run `node tools/calibrate-follower-ratio.mjs` to reproduce. Divides a wishlist figure a studio posted on its own store page by that game\'s public follower count, one game per disclosure, restricted to figures announced within the window so the two readings describe the same week. Over 83 games announced within 30 days: min 4.5x, p10 9.6x, median 16.2x, p90 32.8x, max 79.7x. Stable across windows and ranks — 16.6x at 14 days (n=38), 15.3x at 90 days (n=200), 15.7x for ranks 201-1000 and 15.3x below rank 3000. Not stable by size, and no longer claimed to be: a 60-game re-measurement puts the slope of ln(ratio) on ln(wishlists) at +0.073 with a standard error of 0.049, indistinguishable from flat. Follower counts in the sample run from 132 to 12,036, so this is measured on small and mid-size games rather than on the head of the chart. Cross-checked against GDC_FOLLOWERS_2026, which measures 16.1x on a different population by a different method.'
   },
   OURS_PLAYTIME_BIAS: {
     label: 'Measured in this repository — reviewer playtime against average playtime',
-    url: 'https://github.com/q-sn/steam-revenue-wishlist-estimator/blob/main/tools/calibrate-playtime.mjs',
-    note: 'Run `node tools/calibrate-playtime.mjs` to reproduce. For each game in test/fixtures.json it divides SteamCharts player-hours up to the disclosure date by the disclosed unit count, giving the true average playtime with no estimation on either side, and compares it against the median playtime-at-review over the 90 days before that date. Over 26 games: min 0.50x, p10 0.78x, median 1.09x, p90 1.52x, max 2.07x.'
+    url: 'https://github.com/q-sn/steam-revenue-wishlist-estimator/blob/main/test/fixtures.json',
+    note: 'One-off measurement, from SteamCharts monthly concurrents against the disclosed units in test/fixtures.json. For each game, SteamCharts player-hours up to the disclosure date divided by the disclosed unit count gives the true average playtime with no estimation on either side, compared against the median playtime-at-review over the 90 days before that date. Over 26 games: min 0.50x, p10 0.78x, median 1.09x, p90 1.52x, max 2.07x.'
   }
 };
 
 /**
- * Base reviews-to-units multiplier by year of release.
- *
- * Steam added a "would you like to review this?" prompt in late October 2019,
- * which roughly halved the sales-per-review ratio. Games released before that
- * also kept accumulating reviews afterwards, so old games drift downward over
- * time. Treat pre-2017 numbers as the softest part of this table.
- *
- * Blended from VGI_2021 (2020+ gives 20-55x with a point of 30x) and
- * GDC_NB_2020, whose per-year medians are 74 for pre-2017, 65 for 2017-2018
- * and 51 for 2019.
+ * Base reviews-to-units multiplier by release year; the oldest rows are the
+ * softest. Blended from VGI_2021 and GDC_NB_2020.
  */
 export const BASE_MULTIPLIER = [
   { from: 2020, to: 9999, lo: 20, point: 30, hi: 55, source: 'VGI_2021' },
@@ -147,32 +149,11 @@ export const BASE_MULTIPLIER = [
   { from: 0, to: 2013, lo: 40, point: 80, hi: 110, source: 'VGI_2021' }
 ];
 
-/**
- * Multiplicative adjustments applied on top of the base multiplier.
- *
- * The review-score curve is the least certain sourced block here: it is
- * non-monotonic (very positive and very negative games both sit low,
- * mid-scoring games sit high) and the base table already reflects a mix
- * skewed toward 80%+ games. Coefficients are deliberately damped relative to
- * the raw study medians.
- *
- * Rows marked `derived` take their direction from the cited study and their
- * size from us. VGI_2021 says in as many words that it has not quantified
- * price or genre yet, and GAMALYTIC_RATIO_2023 presents genre as a chart with
- * no table before concluding that genre is a weak factor. Sized
- * conservatively for that reason.
- */
+/** Multiplicative adjustments on top of the base multiplier. */
 export const ADJUSTMENTS = {
   isFree: { factor: 2.0, label: 'Free to play', source: 'GAMALYTIC_RATIO_2023' },
 
-  /**
-   * Keyed off the list price, never off the current sale price.
-   *
-   * This describes the price point a game sells at over its life. Reading it
-   * from `price_overview.final` scores a $40 game as a sub-$10 game for the
-   * length of every discount, moving the estimate by 1.35x on a fact about
-   * the calendar rather than about the game.
-   */
+  /** Keyed off the list price, never off the current sale price. */
   price: [
     { maxPrice: 10, factor: 1.15, label: 'Priced under $10', source: 'GAMALYTIC_RATIO_2023', derived: true },
     { maxPrice: 30, factor: 1.0, label: 'Priced $10-$30', source: 'GAMALYTIC_RATIO_2023' },
@@ -192,16 +173,7 @@ export const ADJUSTMENTS = {
     { match: ['sports', 'racing'], factor: 0.8, label: 'Sports or racing', source: 'VGI_2021', derived: true }
   ],
 
-  /**
-   * Discount depth over a game's life, not the banner on the page today.
-   *
-   * GAMALYTIC_RATIO_2023 measures games that "were significantly discounted",
-   * which is a property of a price history, and no free source publishes price
-   * history. How far below list a game sits right now is a weak proxy for it:
-   * a game at -75% today is more likely than not to be a game that discounts
-   * deeply. Applied only when the current cut is deep enough to say something,
-   * and the size of it is ours.
-   */
+  /** Lifetime discount depth, proxied by today's cut past `thresholdPct`. */
   heavyDiscount: {
     thresholdPct: 50,
     factor: 1.2,
@@ -212,24 +184,9 @@ export const ADJUSTMENTS = {
 };
 
 /**
- * Sales per review also tracks how many reviews a game has.
- *
- * GDC_REVIEW_COUNT_2023 puts games under 100 reviews at 36x against 52.8x for
- * games with 1,000 to 10,000 — the mid-size band sits 1.47x above the small
- * one. That within-dataset ratio is the durable part of the finding. The
- * absolute levels belong to Gamalytic's 2023 dataset, whose overall median
- * ratio is about 35, and cannot be dropped in beside a base table blended
- * from two other vintages — the same trap the wishlist festival block
- * describes. So the shape carries over and the level does not, anchored at the
- * geometric centre of the published pair so this table changes the spread
- * between sizes without moving the overall level.
- *
- * sqrt(52.8 / 36) = 1.211, and 1 / 1.211 = 0.826.
- *
- * The same sources say the very largest games fall back toward the small-game
- * ratio — Elden Ring is given as roughly 20 sales per review — but publish no
- * median for that group, so above 10,000 reviews this returns to neutral
- * rather than inventing a decline.
+ * Sales per review also tracks review count. Only the shape of
+ * GDC_REVIEW_COUNT_2023 carries over: the factors are sqrt(52.8/36) = 1.211
+ * and its inverse. Above 10,000 reviews returns to neutral.
  */
 export const REVIEW_COUNT_BANDS = [
   { maxReviews: 100, factor: 0.83, label: 'Under 100 reviews', source: 'GDC_REVIEW_COUNT_2023' },
@@ -239,34 +196,8 @@ export const REVIEW_COUNT_BANDS = [
 ];
 
 /**
- * Which store pages the estimators apply to.
- *
- * The manifest matches every /app/ page, and Steam serves several different
- * kinds of thing from that path. Asking the store API for a handful of them
- * shows what reaches us:
- *
- *   game      Cyberpunk 2077                 977,729 reviews   $59.99
- *   dlc       Cyberpunk: Phantom Liberty      23,823 reviews   $29.99
- *   music     Terraria: Official Soundtrack      548 reviews    $2.49
- *   hardware  Steam Deck                          20 reviews  $399.00
- *   demo      Duck Norris Tales Demo              12 reviews      free
- *
- * The review multiple was calibrated on base games, so only `game` gets a
- * number. The rest are wrong in different ways and deserve to be told apart:
- *
- * - `demo` has no sales at all, and its `is_free` flag would double the
- *   multiplier on top. Where Steam names the parent game we estimate that
- *   instead; where it does not, there is nothing to estimate.
- * - `dlc` and `music` do have sales. Only the coefficient is borrowed: DLC is
- *   bought by people who already own the base game and have often already
- *   reviewed it, so its reviews-per-sale ratio is its own and nobody has
- *   published it. The figure would look entirely plausible, which is worse
- *   than an obvious error.
- * - `hardware` is not sold under the revenue share at all — Valve pays itself
- *   no royalty — and no review multiple was ever measured for devices.
- *
- * Anything not listed still declines, because an unrecognised type is not
- * evidence that the game multiple applies to it.
+ * Which store pages get a number. The review multiple was measured on base
+ * games, so every other /app/ type declines, including unlisted ones.
  */
 export const APP_TYPES = {
   /** The only type the published multiples were measured on. */
@@ -276,16 +207,8 @@ export const APP_TYPES = {
 };
 
 /**
- * Below MIN_REVIEWS we refuse to produce a number at all.
- *
- * Ten is where Steam itself starts. Ask the store's own review summary about a
- * game with nine reviews and it answers `review_score: 0` with the description
- * "9 user reviews"; at eleven it answers with a score and a word. Valve will
- * not commit to a verdict on a smaller sample, and neither will we: under ten,
- * one more review moves the estimate by a tenth, so the figure would track the
- * sample rather than the game.
- *
- * Between MIN and CONFIDENT the band is widened instead of withheld.
+ * No number below MIN_REVIEWS. Between MIN and CONFIDENT the band is widened
+ * by LOW_SAMPLE_WIDEN rather than withheld.
  */
 export const REVIEW_GATES = {
   MIN_REVIEWS: 10,
@@ -293,15 +216,7 @@ export const REVIEW_GATES = {
   LOW_SAMPLE_WIDEN: { lo: 0.75, hi: 1.4 }
 };
 
-/**
- * Refunds.
- *
- * GDC_REFUNDS_2024 surveyed around 150 developers: median 9.5%, average 10.8%,
- * Early Access median 12.4%. The envelope is the span the same body of work
- * reports across portfolios and markets — 6% where a niche audience is bought
- * in, 13% at and above the Early Access median — and it is what widens the
- * revenue band rather than a figure anyone has to set.
- */
+/** Refund rate, as a share of gross. Fractions, not percent. See GDC_REFUNDS_2024. */
 export const REFUNDS = { lo: 0.06, mid: 0.095, hi: 0.13, source: 'GDC_REFUNDS_2024' };
 
 /** Revenue waterfall defaults. All user-editable in the options page. */
@@ -313,19 +228,10 @@ export const REVENUE_DEFAULTS = {
 };
 
 /**
- * Combined effect of regional pricing and VAT on the average realised price.
+ * Regional pricing and VAT combined, as a fraction of US list price.
  *
- * The two anchored values are the worked scenarios in IMMUTABLE_NET_2026: a
- * US/EU-concentrated audience keeps 0.88 of US list, and a globally
- * distributed one 0.78 — the "roughly 22% below list" that following Steam's
- * suggested regional prices costs. `emerging` is ours: the same source puts
- * Southeast Asia, the CIS, Brazil and China at 40-70% below USD list, so an
- * audience genuinely concentrated there lands nearer 0.6 than the blended
- * 0.78.
- *
- * Order matters. `revenue.js` widens the band by stepping to the neighbouring
- * profile, so REGIONAL_ORDER has to run from the most to the least favourable
- * with nothing missing in between.
+ * revenue.js widens the band by stepping to the neighbouring profile, so
+ * REGIONAL_ORDER must run most to least favourable with nothing missing.
  */
 export const REGIONAL_PROFILES = {
   'us-eu': { factor: 0.88, label: 'Mostly US and EU buyers', source: 'IMMUTABLE_NET_2026' },
@@ -337,48 +243,21 @@ export const REGIONAL_PROFILES = {
 export const REGIONAL_ORDER = ['us-eu', 'mixed', 'emerging'];
 
 /**
- * Deriving the regional profile from the language mix of a game's reviews.
- *
- * The alternative is asking the developer, which is all the options page
- * dropdown can do on its own — and asking someone to declare their audience
- * split is asking them to guess. Review language is a measured signal pointing at the same
- * thing, and the reviews API returns a total per language for the price of one
- * cheap request each.
- *
- * It is a proxy, not the answer. Review propensity differs by market, and
- * GAMALYTIC_RATIO_2023 found the demographic correlation real but not
- * statistically significant, so the mix is mapped onto the three published
- * profiles rather than turned into a factor of its own, and the dropdown still
- * overrides it.
+ * The regional profile derived from the language mix of a game's reviews. A
+ * proxy; the options dropdown overrides it.
  */
 export const LANGUAGE_REGIONS = {
   /**
-   * The languages of the markets IMMUTABLE_NET_2026 names as priced well below
-   * US list: China, the CIS, Brazil and Latin America, Southeast Asia, Turkey.
-   *
-   * The reviews endpoint takes this whole list comma-joined in one request and
-   * returns the union, so reading a game's mix costs a single call against a
-   * lifetime total rather than a dozen calls or a sample. That matters more
-   * than it sounds: sampling the most recent hundred reviews put Stardew
-   * Valley at 71% low-price markets where its lifetime total is 41%, because
-   * where a game sells today is not where it has sold.
-   *
-   * Spanish is deliberately absent. Spain is a euro market at close to list
-   * price; `latam` is the code for the Spanish that is not.
+   * Markets IMMUTABLE_NET_2026 names as priced well below US list. Spanish is
+   * absent on purpose: Spain is a euro market near list, `latam` is not.
    */
   discounted: [
     'schinese', 'tchinese', 'russian', 'ukrainian', 'brazilian', 'latam',
     'turkish', 'thai', 'vietnamese', 'indonesian'
   ],
   /**
-   * Share of all reviews coming from those markets that tips a game from one
-   * profile into the next. Ours: the profiles are published, the boundaries
-   * between them are not, so they sit where the blended factor each profile
-   * stands for would come out about right for an audience split that way.
-   *
-   * Every language not on the list above lands in the denominator as a
-   * full-price market, which is true of most of them — the remainder is
-   * mostly European.
+   * Share of all reviews from those markets that tips a game into the next
+   * profile. Every other language counts as a full-price market.
    */
   thresholds: { mixed: 0.2, emerging: 0.5 },
   // Below this many reviews in total the mix is too thin to read.
@@ -387,23 +266,11 @@ export const LANGUAGE_REGIONS = {
   derived: true
 };
 
-/**
- * How wide the revenue band gets from the waterfall's own assumptions.
- *
- * Pushing the unit band through one set of point assumptions would make
- * revenue look exactly as certain as units, when every step of the chain has
- * a range of its own. The sliders on the options page set the midpoint of
- * each assumption; they do not make it certain.
- *
- * The discount span is ours. Nobody publishes a distribution of lifetime
- * average discounts, because doing so would need price history for every game
- * on the store.
- */
+/** How wide the revenue band gets from the waterfall's own assumptions. */
 export const REVENUE_UNCERTAINTY = {
   avgDiscount: { lo: 0.1, hi: 0.3, source: 'IMMUTABLE_NET_2026', derived: true },
   refundRate: { lo: REFUNDS.lo, hi: REFUNDS.hi, source: 'GDC_REFUNDS_2024' },
-  // The regional leg steps one profile either side of the chosen one, so it
-  // only ever spans values this file already publishes.
+  // How many profiles either side of the chosen one the regional leg steps.
   regionalNeighbourStep: 1
 };
 
@@ -414,35 +281,19 @@ export const STEAM_TIERS = [
   { upTo: Infinity, rate: 0.2 }
 ];
 
-/**
- * Followers -> wishlists. Only valid before release: after launch wishlists
- * are consumed by purchases while followers persist, and the total balance
- * typically peaks at 2-4x the pre-launch count.
- */
+/** Followers -> wishlists. Pre-release only. */
 export const WISHLIST = {
-  // Range and overall median from the 2023 survey.
-  lo: 7,
-  hi: 20,
-  median: 12.0,
+  /**
+   * See OURS_FOLLOWER_RATIO. lo and hi are the p10 and p90 of that
+   * measurement, not its min and max; read the median as a floor.
+   */
+  lo: 9.6,
+  hi: 32.8,
+  median: 16.2,
 
   /**
-   * Promotion history moves the midpoint, but the two surveys are different
-   * vintages and cannot be mixed directly.
-   *
-   * The festival breakdown is from GDC_FOLLOWERS_2021, when the overall median
-   * was 9.6x: no festival 7.77x, a Steam festival 10x, a festival plus a store
-   * feature 10.45x. The range and median we use are from GDC_FOLLOWERS_2023,
-   * where the overall median had risen to 12x.
-   *
-   * Dropping the 2021 numbers in beside the 2023 median would invert the
-   * effect: a game known to have been in a festival would score 10x while a
-   * game nothing is known about scores 12x, so a festival would *lower* the
-   * estimate. Festivals raise the ratio. What the 2021 survey measures is how
-   * far each group sits from its own median, so that is what carries over —
-   * the shape from 2021, anchored to the level from 2023.
-   *
-   * Nothing on a store page reveals promotion history, so in practice this is
-   * always 'unknown'. It stays because a caller that does know can pass it.
+   * Promotion history, as each group's distance from its own survey median of
+   * 9.6x. Always 'unknown' in practice; a caller that knows can pass it.
    */
   contexts: {
     none: { factor: 7.77 / 9.6, label: 'No festival or feature', source: 'GDC_FOLLOWERS_2021' },
@@ -452,18 +303,8 @@ export const WISHLIST = {
   },
 
   /**
-   * Genre moves this ratio further than festival participation does, and
-   * unlike festival participation it is readable from the store page.
-   *
-   * GDC_FOLLOWERS_2023 publishes per-tag multipliers alongside the 7-20x range
-   * and 12x median already in use here, so this is the same survey at the same
-   * vintage and the figures go in as absolute multipliers rather than as a
-   * shape to renormalise. Strategy audiences follow closely and wishlist
-   * sparingly; puzzle and relaxing audiences do the opposite.
-   *
-   * One tag adjustment only, resolved by the game's own tag ranking rather
-   * than by the order of this list — see matchTagRule in tags.js. The order
-   * here is by multiplier, purely so the table reads as a scale.
+   * Per-tag multipliers from GDC_FOLLOWERS_2023; divide by `surveyMedian`
+   * before use. One row applies — see matchTagRule in tags.js.
    */
   genres: [
     { match: ['4x'], multiplier: 7.5, label: '4X strategy', source: 'GDC_FOLLOWERS_2023' },
@@ -474,153 +315,85 @@ export const WISHLIST = {
     { match: ['puzzle'], multiplier: 15.9, label: 'Puzzle', source: 'GDC_FOLLOWERS_2023' }
   ],
 
-  source: 'GDC_FOLLOWERS_2023'
+  /** The median `genres` was published against; divide a genre row by this. */
+  surveyMedian: 12.0,
+
+  /** Where the level in force came from. One declaration for every caption. */
+  level: {
+    originKey: 'oMeasuredHere',
+    originParams: ['83'],
+    originText: 'measured here on 83 announced figures',
+    source: 'OURS_FOLLOWER_RATIO'
+  },
+
+  /** The genre shape is still the survey's; only the level is ours. */
+  source: 'OURS_FOLLOWER_RATIO'
 };
 
 /**
- * Wishlists from a game's position in Steam's own Top Wishlists ordering.
- *
- * This is the second wishlist estimator, and the one that does not run on
- * follower count. It matters because on a single leg wishlists would be the
- * one figure in this project with nothing to disagree with it: one signal,
- * one published ratio, no second opinion.
- *
- * The store publishes an ordering of unreleased games by wishlists and no
- * numbers at all. An ordering alone cannot be turned into a count — rank 340
- * is not 340 of anything — so something has to supply the distribution the
- * ranks are positions in. VGI_WISHLISTS_2025 publishes exactly that: what
- * share of games launch above 100,000 wishlists, above 50,000, and so on.
- * Reading a rank as a percentile and inverting that distribution gives a
- * count, and gives it without fitting anything.
- *
- * The alternative is fitting a curve of the form a*r^-b to games whose
- * developers announced their wishlist totals. It fails on paper: wishlist
- * counts are heavy-tailed with a steep head and a flat
- * body, which one power law cannot follow, and a fit forced through it misses
- * by more than 10x across the range of ranks even with perfect inputs. The
- * error there is in the shape, and no quality of input data removes it.
- * Reading the published distribution instead means the shape is measured
- * rather than assumed, which is the same reason the review multiplier here is
- * a table by year and not a formula.
- *
- * Those announcements are still worth collecting, and tools/harvest-anchors.mjs
- * collects them — as a way to check this mapping, not to build it.
+ * Rank in Steam's Top Wishlists ordering to a count: a / (rank + q)^b.
+ * `q` is the head offset — the top of the list is crowded, so rank 1 and rank
+ * 20 are not 20x apart. See OURS_WISHLIST_MODEL.
  */
-export const WISHLIST_RANK = {
-  /**
-   * Distribution of wishlists at launch, as the share of games sitting above
-   * each edge. Cumulative from the top.
-   *
-   * The bottom four rows are the bands VGI_WISHLISTS_2025 states directly: 6%
-   * of games launch above 100k wishlists, 5% more between 50k and 100k, 23%
-   * more between 10k and 50k, 37% more between 1k and 10k.
-   *
-   * The top two rows are the same report's breakdown of that 6%, which it
-   * gives as counts rather than shares: 22 games above 1M, 26 between 500k
-   * and 1M, 253 between 100k and 500k. Turning counts into shares needs the
-   * size of the sample, and the report does not state it — but 22+26+253 is
-   * 301, and 301 as 6% puts the sample at 5,017 games, against which every
-   * other band lands on its published percentage to the nearest whole game.
-   * Six rows that reconstruct from one number is not a coincidence, so the
-   * derivation stands.
-   *
-   * Without those two rows the first band runs from 100,000 to the largest
-   * game of the year and every title in the top 900 gets the same 43x answer,
-   * which is a coarser estimate than the data it rests on.
-   *
-   * The edges are the resolution of the source, and they are also what the
-   * band reports. A game landing in the 10,000-50,000 band is reported as
-   * 10,000 to 50,000, because that is the finest this source can distinguish.
-   * Interpolating a midpoint inside a band is reasonable; narrowing the band
-   * around it would claim a precision nobody measured.
-   */
-  distribution: [
-    { above: 1_000_000, shareAbove: 0.0044 },
-    { above: 500_000, shareAbove: 0.0096 },
-    { above: 100_000, shareAbove: 0.06 },
-    { above: 50_000, shareAbove: 0.11 },
-    { above: 10_000, shareAbove: 0.34 },
-    { above: 1_000, shareAbove: 0.71 }
-  ],
+export const WISHLIST_CURVE = {
+  a: 503_667_749,
+  q: 84.699,
+  b: 1.31652,
 
-  /**
-   * The largest launch wishlist count of the period the distribution covers,
-   * used as the top of the first band. Without it the top band has no upper
-   * edge and the game at rank 1 has no answer.
-   */
-  ceiling: 4_300_000,
+  /** p10 and p90 of the held-out log residual. Covers 76% of anchors. */
+  band: { lo: 0.695, hi: 1.294 },
 
-  /**
-   * How far into its accumulation an unreleased game is.
-   *
-   * The distribution above is of wishlists *at launch*. Every game in the
-   * ordering is pre-launch, so it holds some fraction of its eventual total,
-   * and the count this estimator reports is today's, not launch day's. That
-   * fraction is the correction.
-   *
-   * VGI_WISHLISTS_2025 publishes the curve, indexed so launch day is 100%.
-   * It stops at 17 weeks out, and so do we: a game announced for two years
-   * from now is far below the bottom of this table, and extrapolating a curve
-   * past its data to find out how far is the kind of number this project
-   * declines to print. Outside the window the band spans the whole published
-   * range instead, and the note says the game is outside it.
-   *
-   * Measured on the top 50 games by launch wishlists, which is a real
-   * limitation: a game that will launch with 15,000 wishlists is unlikely to
-   * accumulate them on the same schedule as one that will launch with a
-   * million. Direction over magnitude, and the width carries the doubt.
-   */
-  accumulation: {
-    // Week 0 is launch. Percentages of the launch total, as published.
-    curve: [
-      { weeksOut: 17, fraction: 0.71 }, { weeksOut: 16, fraction: 0.72 },
-      { weeksOut: 15, fraction: 0.73 }, { weeksOut: 14, fraction: 0.75 },
-      { weeksOut: 13, fraction: 0.77 }, { weeksOut: 12, fraction: 0.79 },
-      { weeksOut: 11, fraction: 0.80 }, { weeksOut: 10, fraction: 0.80 },
-      { weeksOut: 9, fraction: 0.82 }, { weeksOut: 8, fraction: 0.83 },
-      { weeksOut: 7, fraction: 0.85 }, { weeksOut: 6, fraction: 0.85 },
-      { weeksOut: 5, fraction: 0.85 }, { weeksOut: 4, fraction: 0.87 },
-      { weeksOut: 3, fraction: 0.90 }, { weeksOut: 2, fraction: 0.92 },
-      { weeksOut: 1, fraction: 0.94 }, { weeksOut: 0, fraction: 1.0 }
-    ],
-    // Used when the release date is unreadable or further out than the curve.
-    span: { lo: 0.71, hi: 1.0 }
+  /** Positions in the ignore_preferences=1 snapshot the fit was made on. */
+  listed: 5574,
+
+  /** Announcements the fit stands on, for the caption that cites it. */
+  fittedOn: 1051,
+
+  source: 'OURS_WISHLIST_MODEL'
+};
+
+/**
+ * An announced figure carried forward: announced * floor * (1 + age/tau)^alpha.
+ * `alpha` is the age term of the same joint fit as WISHLIST_CURVE, so the two
+ * legs share one growth law. `tau` is pinned, not fitted. `floor` corrects for
+ * the announcement being a milestone crossing. See OURS_WISHLIST_MODEL.
+ */
+export const WISHLIST_SAID = {
+  tau: 90,
+  alpha: 0.35859,
+  floor: 1.0389,
+  loFloor: 0.8583,
+  loAlpha: 0.13356,
+  hiFloor: 1.35065,
+  hiAlpha: 0.89203,
+
+  /** Published beside the ordering by the same daily job, newest figure per game. */
+  feed: {
+    url: 'https://cdn.jsdelivr.net/gh/q-sn/steam-revenue-wishlist-estimator@data/wishlist-said.json',
+    fallbackUrl: 'https://raw.githubusercontent.com/q-sn/steam-revenue-wishlist-estimator/data/wishlist-said.json',
+    refreshMs: 12 * 60 * 60 * 1000
   },
 
+  source: 'OURS_WISHLIST_MODEL'
+};
+
+export const WISHLIST_RANK = {
   /**
-   * Where the daily snapshot comes from.
-   *
-   * A file, not a crawl. The ordering costs 50-odd requests to read and the
-   * extension never spends them: .github/workflows/wishlist-ranks.yml reads it
-   * once a day for everybody and commits the result, and this fetches that.
-   * The difference is not a nicety — 50 requests a day times every install is
-   * a load Valve would be right to block, and it would take the feature with
-   * it. It also means the extension never tells anyone which game is being
-   * looked at: the same file is served to every user regardless.
-   *
-   * jsDelivr fronts the repository because GitHub Pages carries a 100 GB
-   * monthly bandwidth limit that a popular extension would reach — 15 KB
-   * gzipped, once a day, is 45 GB a month at a hundred thousand users. Raw
-   * GitHub is the fallback for when the CDN has not caught up or is blocked.
+   * A file, not a crawl: .github/workflows/wishlist-ranks.yml reads the
+   * ordering once a day for everybody and commits it. Raw GitHub is the CDN
+   * fallback.
    */
   feed: {
     url: 'https://cdn.jsdelivr.net/gh/q-sn/steam-revenue-wishlist-estimator@data/wishlist-ranks.json',
     fallbackUrl: 'https://raw.githubusercontent.com/q-sn/steam-revenue-wishlist-estimator/data/wishlist-ranks.json',
-    // Twice the publishing cadence. jsDelivr caches a branch for 12 hours, so
-    // asking more often than that returns the same bytes from the same edge.
+    // Twice the publishing cadence; jsDelivr caches a branch for 12 hours.
     refreshMs: 12 * 60 * 60 * 1000
   },
 
-  /**
-   * How stale a ranking snapshot may be before it is not worth reading.
-   *
-   * The ordering is rebuilt daily. Two days is one missed run; beyond that
-   * the positions describe a store that has moved on, and a wrong rank is
-   * worse than no rank because it looks exactly as authoritative.
-   */
+  /** How stale a snapshot may be before it is dropped. Rebuilt daily. */
   maxAgeMs: 3 * 24 * 60 * 60 * 1000,
 
-  source: 'VGI_WISHLISTS_2025'
+  source: 'OURS_WISHLIST_RANKS'
 };
 
 /** Two independent published routes from public data to week-one sales. */
@@ -629,53 +402,29 @@ export const WEEK_ONE = {
   fromFollowers: { factor: 2.5, label: 'Followers x 2.5', source: 'GDC_FOLLOWERS_2019' }
 };
 
-/**
- * Confidence thresholds, expressed as the ratio of the high end of a range to
- * its low end. A 2x spread is the honest floor for this class of estimate.
- *
- * Widening them to 2.75x and 5.1x — on the reasoning that the published
- * multiplier band spans 2.75x on its own, so nothing narrower is reachable —
- * answers the wrong question. What the ensemble produces on 22 real games is
- * bimodal: eighteen games sit between 2.23x and 2.64x, four sit between 7.4x
- * and 12.6x, and nothing lands in between. With two estimators the width of
- * the band is close to a binary signal — either the two ranges overlap or they
- * do not — so no pair of thresholds populates three levels. All the choice
- * decides is which label the big cluster gets.
- *
- * At 2.75x that cluster reads *reliable*, which claims accuracy on 82% of the
- * store on the strength of two wide, correlated, measurably biased sources
- * happening to overlap. At 2.2x it reads *rough*, which is what a 2.4x band
- * built from a review multiple that is right within 30% half the time and a
- * SteamSpy bucket with a measured 1.58x median offset actually is.
- *
- * Underclaiming is the correct direction to be wrong in here, and the top of
- * the scale stays out of reach
- * until there is a third estimator whose input can be specified, or frozen
- * snapshots to calibrate against. That is recorded as a known limitation
- * rather than fixed by moving a number.
- */
+/** Confidence thresholds, as the ratio of a band's high end to its low end. */
 export const CONFIDENCE = {
   good: 2.2,
-  fair: 3.5
+  fair: 3.5,
+
+  /**
+   * A ceiling on the wishlist grade, not the driver of it. Measured over the
+   * whole ordering the band is 1.86x with the ranking alone, 2.11x with a
+   * follower count too, and 2.31x with a stale announcement, so width barely
+   * varies; only a contradiction pushes it past 3.5x.
+   */
+  wishlists: {
+    good: 2.0,
+    fair: 3.5,
+    source: 'OURS_WISHLIST_MODEL',
+    derived: true
+  }
 };
 
 /**
- * Converting SteamSpy owner bands into paid units.
- *
- * Owners are not sales. The band includes free keys, giveaways, review copies
- * and bundle purchases that produced little or no revenue, so the raw number
- * is a ceiling.
- *
- * The store page cannot supply the share to remove. A bundle widget in the
- * purchase block says whether a bundle is on offer today, while the
- * coefficient is about every key ever handed out — blind to a game bundled
- * two years ago, and firing on games that merely carry a publisher bundle.
- *
- * The reviews API answers the real question. Asking for `purchase_type=steam`
- * and for `purchase_type=all` gives the share of reviewers who bought on Steam
- * rather than activating a key, and GAMALYTIC_METHOD_2023 names exactly this
- * ratio as the signal for telling sold copies from given-away ones. `floor`
- * and `ceiling` bound it, because reviewers are not a random sample of owners.
+ * SteamSpy owner bands into paid units. Owners are a ceiling: the band
+ * includes keys, giveaways and bundles. The share to remove is read from the
+ * reviews API, bounded by `floor` and `ceiling`.
  */
 export const OWNERS_TO_UNITS = {
   // Used when the key share cannot be read at all.
@@ -684,14 +433,8 @@ export const OWNERS_TO_UNITS = {
   ceiling: 0.98,
 
   /**
-   * The keyless API answers on a fixed ladder — 20k, 50k, 100k, 200k, 500k,
-   * 1M and so on — so each bucket is 2x or 2.5x wide and the bottom rung has
-   * no lower edge at all. This is that step, used to give "0 .. 20,000" an
-   * implied floor rather than treating it as "possibly none".
-   *
-   * The width of those rungs is the reason a bucket's midpoint is not a
-   * reading: every game between 20M and 50M gets the same one. See
-   * ENSEMBLE.alarmGap for what follows from that.
+   * The keyless API answers on a fixed ladder (20k, 50k, 100k, ...) whose
+   * bottom rung has no lower edge. This step gives it an implied floor.
    */
   ladderStep: 2.5,
 
@@ -699,21 +442,9 @@ export const OWNERS_TO_UNITS = {
 };
 
 /**
- * Ensemble weights.
- *
- * Only estimators of the same quantity may be averaged, and only when we can
- * say what they measure. The review multiple and the owner band both estimate
- * lifetime units on inputs we can specify, so they combine.
- *
- * Two things stay outside the average for different reasons. The peak-CCU rule
- * estimates week-one sales, which is a different quantity. The player-hours
- * route estimates the right quantity but divides by an average playtime we
- * cannot measure, so it can widen a band and lower confidence without moving
- * the midpoint.
- *
- * SteamSpy's sample collapsed when Valve made profiles private in 2018 and it
- * is worst for small games, so its weight scales with the size of the band —
- * a direction checked against OURS_OWNER_QUALITY rather than assumed.
+ * Ensemble weights. Only the review multiple and the owner band are averaged;
+ * peak-CCU and player-hours stay cross-checks. Owner weight scales with band
+ * size; see STEAMSPY_PRIVACY.
  */
 export const ENSEMBLE = {
   boxleiter: { base: 1.0, lowSamplePenalty: 0.6 },
@@ -727,77 +458,25 @@ export const ENSEMBLE = {
     // Checked for direction against OURS_OWNER_QUALITY, not fitted to it.
     quality: 'OURS_OWNER_QUALITY'
   },
-  // No playtime entry. The player-hours route is a cross-check, not a leg:
-  // see PLAYTIME for why its divisor cannot be specified from public data.
-  // Midpoints are combined as a weighted geometric mean: the underlying
-  // multiplier distribution is closer to log-normal than normal, so an
-  // arithmetic mean would bias every result upward.
+  // No playtime entry; it is a cross-check, not a leg. See PLAYTIME.
+  // Midpoints combine as a weighted geometric mean.
   useGeometricMean: true,
 
   /**
-   * When estimators actually disagree.
-   *
-   * Every estimator here reports an interval, not a number, so agreement is a
-   * question about intervals: is there any figure all of them admit? If the
-   * bands share a region, nothing is in conflict, however far apart their
-   * midpoints happen to sit.
-   *
-   * Comparing midpoints against a 1.5x threshold measures the wrong thing,
-   * and measures it worst on the source least able to bear it. SteamSpy's
-   * keyless API answers on a fixed ladder of buckets, so the geometric centre
-   * of a 20M-50M bucket is 31.6M for every game in it: the midpoint is where
-   * the ladder's edges fall, not a claim about the game. On Baldur's Gate 3
-   * that reads as a "1.9x disagreement" between three bands that overlap on
-   * 17.2M to 20.1M, widening the band to cover a conflict that does not exist.
-   *
-   * So a gap between bands is the trigger, and its size sets the tier.
-   * `alarmGap` is the point where the nearest edges of two published bands are
-   * further apart than a single method's own published error — 1.3 / 0.7 from
-   * GAMALYTIC_METHOD_2023, where adjusted review multiples land within 30% on
-   * 50.4% of games and concurrents-over-playtime on 64.4%. Below it the
-   * sources merely fail to touch; above it they contradict each other.
+   * The gap between the nearest band edges that counts as a contradiction
+   * rather than a near miss. Between bands, not midpoints: a SteamSpy bucket's
+   * centre is where the ladder's edges fall. See GAMALYTIC_METHOD_2023.
    */
   alarmGap: 1.86,
-
-  /**
-   * Wishlist legs, weighted equally, and the equality is the point.
-   *
-   * The follower ratio rests on a survey of 125+ developers who volunteered
-   * their numbers. The rank leg rests on a published distribution of launch
-   * wishlists inverted through a position Valve publishes but does not
-   * document. Neither comes with an accuracy figure for this quantity — there
-   * is no wishlist equivalent of GAMALYTIC_METHOD_2023 — so there is nothing
-   * to prefer one on, and a weight picked to express a hunch would be a
-   * coefficient without a source.
-   *
-   * What the pair is actually for is the disagreement between them. On a
-   * single leg the band could only ever be as wide as one survey's published
-   * range, and nothing could contradict it. Two legs that sometimes conflict
-   * say more than either leg's midpoint does.
-   */
-  wishlists: { followers: 1, rank: 1 },
 
   source: 'GAMALYTIC_METHOD_2023',
   derived: true
 };
 
 /**
- * Peak concurrent players, as a week-one cross-check.
- *
- * GDC_CCU_2025 measured week-one sales against the *all-time* peak, so that is
- * the figure to feed it. SteamSpy's `ccu` field is yesterday's peak, which
- * coincides with the launch peak for about a fortnight and then diverges
- * without limit; feeding it in would make the rule quietly underestimate
- * every game older than that.
- *
- * The all-time peak is the launch peak only while nothing has beaten it since.
- * Stardew Valley peaked in March 2024, eight years after release, and running
- * a week-one rule on that would be nonsense. Which month the peak falls in is
- * readable from the same SteamCharts table, so the rule applies only when the
- * peak sits within `launchPeakWindowDays` of release and says why when it does
- * not. With no readable release date or no monthly history it declines to
- * answer: a gate that protects against a confidently wrong number has to fail
- * closed.
+ * Peak concurrent players as a week-one cross-check. Feed it the all-time
+ * peak, which is what GDC_CCU_2025 measured against — not SteamSpy's `ccu`.
+ * Applies only within `launchPeakWindowDays` of release.
  */
 export const CCU = {
   launchPeakWindowDays: 60,
@@ -808,58 +487,13 @@ export const CCU = {
 };
 
 /**
- * Units implied by concurrent-player history and playtime. A cross-check, and
- * the reason it is only a cross-check is worth the space.
- *
- * The method GAMALYTIC_METHOD_2023 ranks second of the five it benchmarks: add
- * up concurrent players over time for total player-hours, then divide by the
- * hours an average owner puts in. The first half we have exactly — SteamCharts
- * publishes average concurrents per month for a game's whole life, on the page
- * already fetched for the peak, and summing it is arithmetic.
- *
- * The second half is the average playtime of everyone who owns the game, and
- * we cannot get it. SteamSpy returns zero for every app. What is free is the
- * playtime attached to each review, and a review sample is not the owner
- * population:
- *
- *  - The newest hundred reviews of a mature game span days, not years. On
- *    Enshrouded they covered three days, and those buyers' median playtime was
- *    41.7 hours against 100.5 hours for reviewers from its launch quarter
- *    measured today. Sampling the newest reviews measures whoever just bought
- *    the game.
- *  - The quantity needed is a mean, since total hours over owners is a mean by
- *    definition, and playtime distributions have a long enough tail that the
- *    mean sits far above any median — 96.7 against 41.7 hours on that same
- *    sample.
- *
- * OURS_PLAYTIME_BIAS measured a correction for this and it does not transfer.
- * It compared playtime-at-review in the 90 days before each disclosure against
- * the true average at that date, which is a coherent specification, but the
- * estimator applies it to a different quantity at an arbitrary game age. The
- * measurement's own numbers show why that fails: the correction falls with a
- * game's age, 0.50x for Stardew Valley at six years and 0.55x for Garry's Mod
- * at fifteen, and averaging that into one constant gives a middle-80% band
- * that does not even contain those two games.
- *
- * Alternative specifications do no better: none of four tried on five games
- * is consistently closer, and the only yardstick available is whether the
- * answer matches the other two estimators — which is fitting an independent
- * method to the ones it exists to be independent of.
- *
- * So the honest reading of GAMALYTIC_METHOD_2023 here is that its 64.4% belongs
- * to *their* playtime estimate, drawn from profile data we do not have. The
- * article says as much: accuracy "depends completely on the average playtime
- * estimate". Claiming that figure for this implementation would be unearned.
- *
- * What remains is still worth showing. The player-hour total is measured, and
- * an owner count implied by a stated average playtime is a real cross-check
- * with its assumption in plain view. `biasRange` therefore spans the full
- * measured range rather than its middle, because the width is the finding.
+ * Units implied by concurrent-player history and playtime. A cross-check only:
+ * the divisor is the mean playtime of all owners, which no public source
+ * reports, and the reviewer figure standing in for it is a median of recent
+ * buyers. See OURS_PLAYTIME_BIAS.
  */
 export const PLAYTIME = {
-  // The whole measured range, not the middle 80%: min 0.50x, median 1.09x,
-  // max 2.07x over 26 fixtures. A band this wide is the honest report of a
-  // correction that depends on things it does not measure.
+  // The whole measured range over 26 fixtures, not its middle 80%.
   biasRange: { lo: 0.5, mid: 1.09, hi: 2.07 },
   // Fewer reviews than this and the median is not worth having.
   minSample: 20,
@@ -868,10 +502,7 @@ export const PLAYTIME = {
   source: 'OURS_PLAYTIME_BIAS'
 };
 
-/**
- * Local history. The extension keeps its own snapshots so it can show what
- * changed since the last visit; nothing leaves the browser.
- */
+/** Local snapshots, so the overlay can show what changed since the last visit. */
 export const HISTORY = {
   maxPoints: 60,
   minGapMs: 12 * 60 * 60 * 1000,

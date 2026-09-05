@@ -6,14 +6,10 @@
  * store.steampowered.com/search/?filter=popularwishlist, in pages the
  * infinite-scroll endpoint hands back as JSON. It prints no counts, so what
  * this collects is one app id per position — an ordinal signal that
- * src/core/wishlist-rank.js turns into a number by inverting a published
- * distribution.
+ * src/core/wishlist-rank.js turns into a number through a fitted curve.
  *
- * This runs in CI, once a day, for everybody. It must not run in the
- * extension: reading the whole ordering costs 50-odd requests, and 50 requests
- * a day multiplied by every user of a browser extension is an attack on an
- * undocumented endpoint that Valve would be right to close. One machine
- * fetches it and the result ships as a file.
+ * Runs in CI once a day, never in the extension: the whole ordering costs
+ * 50-odd requests, and that many per user per day would close the endpoint.
  *
  *   node tools/crawl-wishlist-ranks.mjs
  *   node tools/crawl-wishlist-ranks.mjs --out data/wishlist-ranks.json
@@ -29,10 +25,10 @@
  *  - Not every row is a game. Packages share the ordering and occupy real
  *    positions in it, so they are recorded as holes rather than skipped —
  *    dropping them would shift every rank below them by one.
- *  - Throttling arrives as HTTP 200 with a body that has no results in it, not
- *    as 429. A crawler that trusts the status code writes a short list and
- *    calls it a complete one, so every page here is checked for content and
- *    the whole run is checked against the total the store itself reports.
+ *  - Throttling arrives as HTTP 200 with a short or empty body, not as 429.
+ *    Every page is therefore required to come back with a full 100 rows —
+ *    only the last one may be short — and the run is checked against the total
+ *    the store itself reports.
  */
 
 import { writeFile, mkdir } from 'node:fs/promises';
@@ -60,14 +56,16 @@ const MAX_ATTEMPTS = 6;
 const REGION = { cc: 'us', l: 'english' };
 
 /**
- * Games only, on both queries.
+ * Games only, on both queries. Without it the ordering and the count of
+ * announced pages quietly include soundtracks and demos.
  *
- * The distribution these ranks are inverted through is a distribution of
- * games, so the ordering and the population it is a fraction of both have to
- * be games as well. Without this the denominator quietly included soundtracks
- * and demos and every percentile came out too small.
+ * ignore_preferences pins the axis. Steam's default anonymous content
+ * preferences hide 415 of 5,574 positions, and hide them non-uniformly — 1.4%
+ * of the first 500 against 12.4% of ranks 3001-3500 — so a snapshot taken
+ * without it is the real ordering compressed by a factor that reaches 1.08x,
+ * and would move under the curve the day Valve changes a default.
  */
-const GAMES_ONLY = { category1: '998' };
+const GAMES_ONLY = { category1: '998', ignore_preferences: '1' };
 
 const UA = {
   'User-Agent': 'steam-revenue-wishlist-estimator/ranks (+https://github.com/q-sn/steam-revenue-wishlist-estimator)',
@@ -82,12 +80,16 @@ function searchUrl(params) {
 }
 
 /**
- * One page, retried with a widening gap.
+ * One page, retried with a widening gap until it comes back full.
  *
- * Returns null only after every attempt produced nothing usable, which the
- * caller treats as a failed run rather than as the end of the list.
+ * A full page is 100 rows; only the last page of the ordering may hold fewer,
+ * and the total in the same response says how many. `start` advances by a
+ * fixed stride, so a short page anywhere else shifts every rank below it.
+ *
+ * Returns null after every attempt failed, which the caller treats as a failed
+ * run rather than as the end of the list.
  */
-async function page(start, { expectRows = true } = {}) {
+async function page(start) {
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
       const res = await fetch(searchUrl({ filter: 'popularwishlist', ...GAMES_ONLY, start: String(start), count: String(PAGE) }), { headers: UA });
@@ -101,9 +103,11 @@ async function page(start, { expectRows = true } = {}) {
         // the index in this array is the rank, and a hole keeps it that way.
         const rows = [...json.results_html.matchAll(/data-ds-itemkey="(App|Sub|Bundle)_(\d+)"/g)]
           .map((m) => (m[1] === 'App' ? Number(m[2]) : 0));
-        // An empty page at a position the store says exists is the throttle,
-        // wearing a 200. Treated as a retry, not as the end of the ordering.
-        if (rows.length || !expectRows) return { rows, total: json.total_count ?? null };
+
+        const total = Number(json.total_count);
+        const remaining = Number.isFinite(total) ? total - start : Infinity;
+        const want = Math.min(PAGE, Math.max(remaining, 1));
+        if (rows.length >= want) return { rows, total: Number.isFinite(total) ? total : null };
       }
     } catch { /* network flake, same handling */ }
 
@@ -140,8 +144,7 @@ async function main() {
   for (let start = PAGE; start < total; start += PAGE) {
     await sleep(DELAY_MS);
     const next = await page(start);
-    if (!next) throw new Error(`ordering stopped at ${appids.length} of ${total}: too many empty pages`);
-    if (!next.rows.length) break;
+    if (!next) throw new Error(`ordering stopped at ${appids.length} of ${total}: the page at ${start} never came back full`);
     appids.push(...next.rows);
   }
 
@@ -150,16 +153,12 @@ async function main() {
     throw new Error(`could not read the announced-game total (${upcoming})`);
   }
 
-  /**
-   * Refuse to publish a short list.
-   *
-   * A truncated ordering does not look broken downstream — it looks like a
-   * store where fewer games are wishlisted, which moves every percentile and
-   * silently inflates every estimate. Yesterday's file staying in place is
-   * the correct outcome of a bad run.
-   */
+  // Refuse to publish a short list. A truncated ordering does not look broken
+  // downstream, it looks like a store where fewer games are wishlisted, which
+  // moves every percentile. Every page had to come back full, so the only
+  // slack left is a total that moved mid-crawl.
   const completeness = appids.length / total;
-  if (completeness < 0.97) {
+  if (completeness < 0.995) {
     throw new Error(`only ${appids.length} of ${total} positions read (${(completeness * 100).toFixed(1)}%); refusing to write a partial ordering`);
   }
 

@@ -200,6 +200,9 @@
   "pillWishlists": {
     "message": "愿望单"
   },
+  "pillRank": {
+    "message": "第 $1 位"
+  },
   "ariaOpen": {
     "message": "展开销量与愿望单估算"
   },
@@ -360,7 +363,7 @@
     "message": "销量区间加上瀑布式扣减的假设"
   },
   "rFollowerRatio": {
-    "message": "采用全体游戏的中位系数；关注者倍率介于 7 至 20 倍"
+    "message": "全体游戏的中位系数；关注者比率的跨度为 $1 至 $2 倍"
   },
   "mAllTimePeak": {
     "message": "历史峰值"
@@ -410,9 +413,6 @@
   "nCcuNoPeakDate": {
     "message": "没有带日期的在线人数历史，就无法区分首发峰值与后来的高峰，因此不给出首周估算。"
   },
-  "nFromFollowersGenre": {
-    "message": "基于 $1 名关注者 · $2 类游戏平均每位关注者 $3 倍愿望单"
-  },
   "nDerivedMark": {
     "message": "* 幅度由我们自行设定：研究证实了该效应，但未给出数值"
   },
@@ -423,22 +423,40 @@
     "message": "这个区间不只是销量区间换算成钱：它还涵盖 $1 至 $2 的折扣和 $3 至 $4 的退款率。"
   },
   "rWishlistGenre": {
-    "message": "$1 类的类型系数，位于调查给出的 7 至 20 倍区间内"
+    "message": "$1 类的类型系数，位于实测的 $2 至 $3 倍区间内"
   },
   "mFollowerRatio": {
     "message": "关注者 × 已发表比率"
   },
+  "mWishlistSaid": {
+    "message": "开发者自己公布的数字"
+  },
   "mWishlistRank": {
-    "message": "Steam 愿望单排名"
+    "message": "Steam 愿望单排行位次"
+  },
+  "sWishlistMethods": {
+    "message": "愿望单方法如何合并"
+  },
+  "oMeasuredHere": {
+    "message": "基于 $1 个公布数字在此实测"
+  },
+  "oSaidOn": {
+    "message": "公布于 $1，按实测增长率推算至今"
   },
   "nWishlistRank": {
     "message": "排名第 $1 位（共 $2 位）· 已公布游戏中的前 $3%"
   },
+  "nWishlistRankOnly": {
+    "message": "排名第 $1 位（共 $2 位）"
+  },
   "nWishlistBelowList": {
     "message": "未进入 Steam 愿望单排名，该榜单止于约 $1"
   },
-  "rWishlistRankOnly": {
-    "message": "无法读取关注者数量，因此商店排名是唯一方法"
+  "rWishlistSaid": {
+    "message": "开发者公布过这款游戏的数字，因此估算主要基于该数字"
+  },
+  "rWishlistRankCurve": {
+    "message": "这款游戏没有公开的愿望单数字，因此估算来自它在 Steam 愿望单排行中的位置"
   },
   "rWishlistBelowList": {
     "message": "完全低于 Steam 愿望单排名，因此只有关注者比率给出答案"
@@ -448,9 +466,6 @@
   },
   "rWishlistCeiling": {
     "message": "关注者比率给出的愿望单数高于该游戏未上榜的排名下限"
-  },
-  "rWishlistAccumulation": {
-    "message": "无法读取发售日期，因此不知道该游戏已累积了多少愿望单"
   },
   "nDlcExcluded": {
     "message": "不含 $1 个 DLC 的收入，公开数据无法反映这部分。"
@@ -523,5 +538,8 @@
   },
   "nDemoReviews": {
     "message": "测自试玩版本身，不参与上方任何数字的计算。"
+  },
+  "oRankCurve": {
+    "message": "基于 $1 条公告在此拟合的曲线"
   }
 }

@@ -9,11 +9,11 @@ import {
   estimateAll, estimateRevenue, estimateRevenueRange, steamRoyalty,
   parseOwnersBand, parseAllTimePeak, parseChartsStats, parseMonthlyHistory,
   parseRecentTrend, parseReviewSummary, allTimePeakMonth, medianHours,
-  unitsFromOwners, unitsFromPlaytime, combineEstimators, collectAdjustments,
+  unitsFromOwners, unitsFromPlaytime, combineEstimators, precisionWeight, collectAdjustments,
   regionalFromLanguages, wishlistMultiplierFor,
-  wishlistsFromRank, invertDistribution, accumulationFactor,
+  wishlistsFromRank, curveAt, wishlistsFromAnnouncement,
   makeSnapshot, appendSnapshot, diffSince, sparklinePoints,
-  WISHLIST, WISHLIST_RANK, CCU, OWNERS_TO_UNITS, PLAYTIME, REGIONAL_PROFILES, REGIONAL_ORDER, REFUNDS, HISTORY,
+  WISHLIST, WISHLIST_RANK, WISHLIST_CURVE, CCU, OWNERS_TO_UNITS, PLAYTIME, REGIONAL_PROFILES, REGIONAL_ORDER, REFUNDS, HISTORY,
   CONFIDENCE, ENSEMBLE, APP_TYPES, REVIEW_GATES, scoreConfidence
 } from '../src/core/index.js';
 import { compact, money, setLocale } from '../src/core/format.js';
@@ -22,6 +22,7 @@ import { comparableScopes } from '../src/content/scrape.js';
 setLocale('en');
 
 let failures = 0;
+const LEVELS = ['good', 'fair', 'low', 'none'];
 const group = (name) => console.log(`\n  ${name}\n`);
 const check = (name, condition, detail = '') => {
   const ok = Boolean(condition);
@@ -174,7 +175,7 @@ check('an unknown context falls back cleanly', (() => {
 })(), 'caption cannot describe a multiplier the maths never used');
 check('two week-one routes are produced', unreleased.weekOne.paths.length === 2);
 check('their disagreement is surfaced, not averaged away',
-  unreleased.weekOne.disagreement > 1.5,
+  unreleased.weekOne.disagreement > 1,
   `${unreleased.weekOne.disagreement.toFixed(2)}x apart`);
 
 const released = estimateAll({
@@ -195,63 +196,147 @@ check('a shipped game reports shipping, not a missing follower count',
 group('Wishlists from the store ranking');
 
 const RANK_DAY = 24 * 60 * 60 * 1000;
-const listing = { listed: 5262, upcoming: 15343, at: Date.now() };
+const listing = { listed: 5154, upcoming: 14375, at: Date.now() };
 const ranked = (rank, extra = {}) => estimateAll({
   appId: 40, released: false, followers: 4200, tags: ['Puzzle'],
   wishlistRank: rank, wishlistListing: listing, ...extra
 });
 
-// The distribution is the whole estimator. If its rows ever stop descending
-// in value while ascending in share, every band inverts silently.
-check('the published distribution is monotonic', (() => {
-  const d = WISHLIST_RANK.distribution;
-  return d.every((row, i) => i === 0
-    || (row.above < d[i - 1].above && row.shareAbove > d[i - 1].shareAbove));
-})(), `${WISHLIST_RANK.distribution.length} bands, ${WISHLIST_RANK.ceiling.toLocaleString('en-US')} ceiling`);
-
-check('a rank becomes a band', wishlistsFromRank(340, listing).ok);
-check('band edges come from the published bands, not from a fit', (() => {
-  // With the release date readable the accumulation factor is a single
-  // number, so the edges are exactly the source's own edges times it.
-  const r = wishlistsFromRank(340, listing, { releaseDate: Date.now() });
-  return Math.abs(r.range.lo - 100_000) < 1 && Math.abs(r.range.hi - 500_000) < 1;
-})(), '100k-500k at rank 340');
+// The curve is the estimator. If its exponent or level ever drifts without the
+// tool that measures them being re-run, this is where it shows.
+check('the curve is one expression, not a set of segments',
+  WISHLIST_CURVE.b > 1 && WISHLIST_CURVE.b < 1.5 && WISHLIST_CURVE.a > 1e7 && WISHLIST_CURVE.q > 0,
+  `wishlists = ${WISHLIST_CURVE.a.toLocaleString('en-US')} / (rank + ${WISHLIST_CURVE.q})^${WISHLIST_CURVE.b}`);
 
 check('deeper ranks mean fewer wishlists', (() => {
-  const ranks = [1, 50, 200, 800, 2000, 5000];
+  const ranks = [1, 20, 100, 400, 1200, 3000, 5100, 5154];
   const mids = ranks.map((r) => wishlistsFromRank(r, listing).range.mid);
   return mids.every((v, i) => i === 0 || v < mids[i - 1]);
 })(), 'monotonic across the whole ordering');
 
-check('the top of the ordering does not collapse into one band',
-  wishlistsFromRank(50, listing).band.lo !== wishlistsFromRank(800, listing).band.lo,
-  "VGI's breakdown of its own top 6% is what makes this work");
+check('the band is the same width everywhere inside the fitted range',
+  Math.abs(
+    (wishlistsFromRank(100, listing).range.hi / wishlistsFromRank(100, listing).range.lo)
+    - (wishlistsFromRank(3000, listing).range.hi / wishlistsFromRank(3000, listing).range.lo)
+  ) < 0.01,
+  'it is this curve\'s out-of-sample error, not the spacing of somebody\'s histogram');
+
+// The property that matters most: no boundary anywhere in it.
+check('one formula answers at every position on the list', (() => {
+  const every = [];
+  for (let r = 1; r <= listing.listed; r++) every.push(wishlistsFromRank(r, listing));
+  return every.every((v) => v.ok)
+    && every.every((v) => Math.abs(v.range.mid / curveAt(v.rank) - 1) < 1e-9);
+})(), `ranks 1 to ${listing.listed}, all answered by a / (rank + q)^b with nothing switching`);
+
+check('and the band is the same width at every position', (() => {
+  const wid = (r) => wishlistsFromRank(r, listing).range.hi / wishlistsFromRank(r, listing).range.lo;
+  return [1, 27, 80, 500, 3000, 5154].every((r) => Math.abs(wid(r) - wid(100)) < 1e-9);
+})(), 'no rank gets a widened band, because no rank is outside the fit');
+
+// The offset is what makes that possible. Without it the same data reads
+// 147 million at rank 1, because a log-log straight line has no upper bound.
+check('the head of the ordering reads a number a game could actually hold',
+  WISHLIST_CURVE.q > 0 && curveAt(1) < 5_000_000,
+  `rank 1 reads ${compact(curveAt(1))}`);
+
+check('a game at the head gets both marks like any other', (() => {
+  const r = ranked(5);
+  return r.wishlists.ok && r.wishlists.contributors.length === 2 && !r.wishlists.rankReason;
+})(), 'nothing about the top of the list is handled specially any more');
+
 
 const both = ranked(340);
-check('follower ratio and ranking combine', both.wishlists.contributors.length === 2,
+check('two marks combine where nothing was announced', both.wishlists.contributors.length === 2,
   `${compact(both.wishlists.range.lo)}–${compact(both.wishlists.range.hi)}`);
-check('each leg leaves its own mark on the scale',
-  new Set(both.wishlists.contributors.map((c) => c.method)).size === 2);
+
+check('and both of them were measured here', (() => {
+  const methods = both.wishlists.contributors.map((c) => c.method).sort();
+  return methods.join() === 'followers,rank';
+})(), 'the follower coefficient and the curve are both fitted to one archive');
+
+// A leg earns its say by being precise, not by existing. These replace three
+// hand-set weights that gave a four-year-old announcement the same vote as a
+// fresh one.
+const saidShare = (days) => {
+  const at = new Date(Date.now() - days * RANK_DAY).toISOString().slice(0, 10);
+  const r = estimateAll({
+    appId: 44, released: false, followers: 4200, tags: [],
+    wishlistRank: 800, wishlistListing: listing,
+    wishlistSaid: { wishlists: 60_000, announcedAt: at }
+  });
+  return r.wishlists.contributors.find((c) => c.method === 'said').share;
+};
+
+check('weights come from the width of each band, not from a constant', (() => {
+  const wide = precisionWeight({ lo: 1, mid: 3, hi: 9 });
+  const tight = precisionWeight({ lo: 1, mid: 1.2, hi: 1.5 });
+  return tight > wide && wide > 0;
+})(), 'inverse variance in logs, so a wider band has less say');
+
+check('a fresh announcement carries most of the answer', saidShare(1) > 0.5,
+  `${(saidShare(1) * 100).toFixed(0)}% of the figure is what the developer said`);
+
+check('and a stale one carries almost none', saidShare(1460) < 0.1,
+  `a four-year-old figure keeps ${(saidShare(1460) * 100).toFixed(0)}% of the say`);
+
+check('so an old announcement cannot blow the band open', (() => {
+  const at = (d) => new Date(Date.now() - d * RANK_DAY).toISOString().slice(0, 10);
+  const spread = (said) => {
+    const r = estimateAll({ appId: 45, released: false, followers: 4200, tags: [],
+      wishlistRank: 800, wishlistListing: listing, wishlistSaid: said });
+    return r.wishlists.range.hi / r.wishlists.range.lo;
+  };
+  const none = spread(null);
+  const stale = spread({ wishlists: 60_000, announcedAt: at(1460) });
+  return stale < none * 1.15;
+})(), 'more evidence must not produce a worse answer');
+
+// A game whose developer announced a figure must not come back with a number
+// far above it. That is the whole point of the mark.
+check('a game that announced a figure is answered close to that figure', (() => {
+  const r = estimateAll({
+    appId: 43, released: false, followers: 36_890, tags: [],
+    wishlistRank: 80, wishlistListing: listing,
+    wishlistSaid: { wishlists: 500_000, announcedAt: new Date(Date.now() - 2 * RANK_DAY).toISOString().slice(0, 10) }
+  });
+  const ratio = r.wishlists.range.mid / 500_000;
+  const { lo, hi } = r.wishlists.range;
+  return r.wishlists.said && ratio > 1.0 && ratio < 1.30 && lo <= 500_000 && hi >= 500_000;
+})(), 'the announced figure is inside the band and the midpoint sits just above it');
+
+check('an announcement is never read as less than itself', (() => {
+  const said = { wishlists: 40_000, announcedAt: '2024-01-01' };
+  const leg = wishlistsFromAnnouncement(said);
+  return leg.ok && leg.range.lo >= 40_000 && leg.range.mid > leg.range.lo && leg.growth > 1;
+})(), 'wishlists do not fall before release, so the announced figure is a hard floor');
+
+check('and an old one widens instead of being dropped', (() => {
+  const wide = (days) => {
+    const at = new Date(Date.now() - days * RANK_DAY).toISOString().slice(0, 10);
+    const leg = wishlistsFromAnnouncement({ wishlists: 40_000, announcedAt: at });
+    return leg.range.hi / leg.range.lo;
+  };
+  return wide(900) > wide(2) && wishlistsFromAnnouncement({ wishlists: 40_000, announcedAt: '2019-01-01' }).ok;
+})(), 'no age cutoff, because a cutoff is a rule the reader cannot see');
 
 const rankOnly = ranked(340, { followers: null });
 check('a game with no readable follower count still gets a number',
-  rankOnly.wishlists.ok && rankOnly.wishlists.contributors.length === 1,
+  rankOnly.wishlists.ok && rankOnly.wishlists.contributors.length === 1
+  && rankOnly.wishlists.contributors[0].method === 'rank',
   'the ranking answers where the hidden group cannot');
-check('and says which leg is missing',
-  rankOnly.confidence.wishlists.reasons.some((r) => r.key === 'rWishlistRankOnly'));
 
 const unlisted = ranked(null, { followers: 300 });
 check('absence from the ordering is a ceiling, not a gap',
   unlisted.wishlists.ceiling > 0 && unlisted.wishlists.contributors.length === 1,
   `under ${compact(unlisted.wishlists.ceiling)}`);
+check('the ceiling is the curve at the last ranked position',
+  Math.abs(unlisted.wishlists.ceiling - curveAt(listing.listed) * WISHLIST_CURVE.band.hi) < 1);
 check('a ceiling never joins the average',
   unlisted.wishlists.contributors.every((c) => c.method !== 'rank'));
 check('and a follower estimate above it is reported as a contradiction',
   ranked(null, { followers: 4200 }).wishlists.ceilingBreached
-  && !unlisted.wishlists.ceilingBreached,
-  '4,200 followers cannot fit under the bottom of a list this game is not on');
-check('that contradiction reaches the verdict',
-  ranked(null, { followers: 4200 }).confidence.wishlists.level === 'low');
+  && !unlisted.wishlists.ceilingBreached);
 
 check('a stale snapshot is refused rather than trusted', (() => {
   const old = { ...listing, at: Date.now() - WISHLIST_RANK.maxAgeMs - RANK_DAY };
@@ -268,23 +353,26 @@ check('a released game gets no ranking estimate either', (() => {
     followers: 4200, wishlistRank: 340, wishlistListing: listing
   });
   return !r.wishlists.ok && r.wishlists.reason === 'released';
-})(), 'the store ordering holds no released games either');
+})());
 
-check('nearer to launch means a larger share already accumulated',
-  accumulationFactor(Date.now() + 7 * RANK_DAY).factor
-  > accumulationFactor(Date.now() + 100 * RANK_DAY).factor);
-check('past the published window it refuses to extrapolate',
-  accumulationFactor(Date.now() + 400 * RANK_DAY).reason === 'outside-window');
-check('and an unreadable date widens the band instead of guessing', (() => {
-  const dated = wishlistsFromRank(340, listing, { releaseDate: Date.now() + 14 * RANK_DAY });
-  const undated = wishlistsFromRank(340, listing, { releaseDate: null });
-  return undated.range.hi / undated.range.lo > dated.range.hi / dated.range.lo;
-})(), `${WISHLIST_RANK.accumulation.span.lo}x to ${WISHLIST_RANK.accumulation.span.hi}x of the launch total`);
+// The two legs are not independent — rank and follower count correlate at
+// -0.96 in logs. The scale must not hand out a level for having both.
+check('having both legs is not itself evidence', (() => {
+  const one = ranked(340, { followers: null }).confidence.wishlists.level;
+  const two = ranked(340).confidence.wishlists.level;
+  return LEVELS.indexOf(two) >= LEVELS.indexOf(one) - 1;
+})(), 'they are two readings of one underlying popularity');
 
-check('the ordering covers only part of what is announced',
-  listing.listed < listing.upcoming
-  && invertDistribution(listing.listed / listing.upcoming, 1 / listing.upcoming).hi <= 10_000,
-  'so its last position is near the 10,000 mark, not near zero');
+check('the rank leg is the curve alone',
+  wishlistsFromRank(340, listing).range.mid === curveAt(340),
+  'the band is the curve\'s own error and nothing else');
+
+check('a stale snapshot silences the rank leg', (() => {
+  const stale = { ...listing, at: Date.now() - WISHLIST_RANK.maxAgeMs - RANK_DAY };
+  const r = estimateAll({ appId: 42, released: false, followers: 4200, tags: ['Puzzle'],
+    wishlistRank: 340, wishlistListing: stale });
+  return r.wishlists.contributors.length === 1 && r.wishlists.contributors[0].method === 'followers';
+})(), 'a rank read from a store that has moved on is worse than no rank');
 
 group('Concurrent players');
 
@@ -895,7 +983,16 @@ const shapes = [
   ['thin sample', { appId: 93, reviews: 60, positivePct: 88, listPrice: 14.99, released: true, releaseYear: 2025 }],
   ['methods conflicting', { appId: 94, reviews: 1_551_818, positivePct: 97, listPrice: 9.99, released: true, releaseYear: 2011, owners: '20,000,000 .. 50,000,000', steamPurchaseShare: 0.9 }],
   ['unreleased, genre known', { appId: 95, reviews: null, released: false, releaseYear: 2027, followers: 4000, listPrice: 24.99, tags: ['Puzzle'] }],
-  ['unreleased, no genre', { appId: 96, reviews: null, released: false, releaseYear: 2027, followers: 4000, listPrice: 24.99 }]
+  ['unreleased, no genre', { appId: 96, reviews: null, released: false, releaseYear: 2027, followers: 4000, listPrice: 24.99 }],
+  // What actually moves the wishlist scale, now that the band width is close
+  // to a constant: where the game sits in the ordering, and whether the marks
+  // that answer there agree.
+  ['ranked, in the body', { appId: 97, reviews: null, released: false, followers: 1200, listPrice: 19.99,
+    wishlistRank: 2400, wishlistListing: { listed: 5154, upcoming: 14375, at: Date.now() } }],
+  ['ranked, at the head', { appId: 98, reviews: null, released: false, followers: 300_000, listPrice: 59.99,
+    wishlistRank: 4, wishlistListing: { listed: 5154, upcoming: 14375, at: Date.now() } }],
+  ['not in the ordering, but popular', { appId: 99, reviews: null, released: false, followers: 9000, listPrice: 19.99,
+    wishlistRank: null, wishlistListing: { listed: 5154, upcoming: 14375, at: Date.now() } }]
 ];
 const seen = { units: new Set(), revenue: new Set(), wishlists: new Set() };
 for (const [, g] of shapes) {
@@ -1192,10 +1289,26 @@ check('every published profile is in the stepping order',
 
 group('Wishlists by genre');
 
-check('a puzzle game gets the puzzle multiplier',
-  wishlistMultiplierFor(['Puzzle', 'Indie'])?.multiplier === 15.9);
+// The survey's own figures survive on `surveyed`, and what the estimate uses
+// is that shape scaled to the level in force — the same split the festival
+// factors carry. Asserting both keeps a rescale from quietly becoming a
+// rewrite of the source.
+check('a puzzle game gets the puzzle row',
+  wishlistMultiplierFor(['Puzzle', 'Indie'])?.surveyed === 15.9);
 check('a 4X game gets the lowest one',
-  wishlistMultiplierFor(['Grand Strategy', '4X'])?.multiplier === 7.5);
+  wishlistMultiplierFor(['Grand Strategy', '4X'])?.surveyed === 7.5);
+check('the published figures are rescaled to the level in use, not used raw', (() => {
+  const puzzleRule = wishlistMultiplierFor(['Puzzle']);
+  const expected = (puzzleRule.surveyed / WISHLIST.surveyMedian) * WISHLIST.median;
+  return Math.abs(puzzleRule.multiplier - expected) < 1e-9;
+})(), `${(WISHLIST.median / WISHLIST.surveyMedian).toFixed(2)}x of what the survey printed`);
+check('rescaling preserves what the survey actually measured', (() => {
+  // The survey measured how far genres sit from each other, not their
+  // absolute level. That spacing is the part that has to survive.
+  const puzzle = wishlistMultiplierFor(['Puzzle']);
+  const fourX = wishlistMultiplierFor(['4X']);
+  return Math.abs((puzzle.multiplier / fourX.multiplier) - (15.9 / 7.5)) < 1e-9;
+})(), 'puzzle over 4X stays 2.12x whatever the level');
 check('an untagged game gets nothing to apply',
   wishlistMultiplierFor([]) === null);
 // Letting table order decide this would score a game tagged Puzzle, Indie and
@@ -1210,7 +1323,7 @@ check('and the same game tagged the other way round flips it',
 check('tags with no published figure are skipped, not fatal',
   wishlistMultiplierFor(['Indie', 'Singleplayer', 'Survival'])?.label === 'Survival');
 check('one tag only',
-  Object.keys(wishlistMultiplierFor(['Puzzle', 'Survival'])).length === 3,
+  wishlistMultiplierFor(['Puzzle', 'Survival'])?.label === 'Puzzle',
   'stacking two would invent a number neither row supports');
 
 const puzzle = estimateAll({
@@ -1218,10 +1331,11 @@ const puzzle = estimateAll({
   followers: 1000, tags: ['Puzzle']
 });
 check('the genre figure moves the midpoint',
-  Math.abs(puzzle.wishlists.range.mid - 15_900) < 1, compact(puzzle.wishlists.range.mid));
-check('but not the published width',
-  puzzle.wishlists.range.lo === 7000 && puzzle.wishlists.range.hi === 20_000,
-  'the survey publishes one range for every game');
+  Math.abs(puzzle.wishlists.range.mid - 1000 * wishlistMultiplierFor(['Puzzle']).multiplier) < 1,
+  compact(puzzle.wishlists.range.mid));
+check('but not the width',
+  puzzle.wishlists.range.lo === 1000 * WISHLIST.lo && puzzle.wishlists.range.hi === 1000 * WISHLIST.hi,
+  'one range for every game; genre moves where the midpoint sits inside it');
 check('the midpoint stays inside its own band',
   puzzle.wishlists.range.mid > puzzle.wishlists.range.lo
   && puzzle.wishlists.range.mid < puzzle.wishlists.range.hi);
@@ -1234,8 +1348,22 @@ const twoRoutes = estimateAll({
   appId: 78, reviews: 0, released: false, releaseYear: 2026, followers: 4000
 });
 check('two routes are shown', twoRoutes.weekOne.paths.length === 2);
-check('their disagreement is reported', twoRoutes.weekOne.disagreement > 1.5,
+check('their disagreement is reported', twoRoutes.weekOne.disagreement > 1,
   `${twoRoutes.weekOne.disagreement.toFixed(1)}x apart`);
+
+// This gap used to be asserted at more than 1.5x, because with a 12x follower
+// ratio the two routes landed 1.9x apart and that spread was the headline
+// finding: two respected heuristics, composed, disagreeing by nearly double.
+//
+// Measuring the follower ratio moved it. At 16.2x the wishlist route gives
+// 1.78x followers against Birkett's direct 2.5x, so the two now sit 1.4x
+// apart. Worth recording rather than quietly relaxing: the older rule was
+// written when conversion was higher, the newer chain now nearly meets it,
+// and a threshold pinned to the old coefficient would have failed here for
+// the right reason and been "fixed" for the wrong one.
+check('and raising the follower ratio brought the two routes closer',
+  twoRoutes.weekOne.disagreement < 1.6,
+  `${twoRoutes.weekOne.disagreement.toFixed(2)}x apart, against 1.9x at the surveyed 12x`);
 check('and nothing in the result is a midpoint between them',
   twoRoutes.weekOne.range === undefined && twoRoutes.weekOne.span.mid === undefined,
   'anything called mid eventually gets rendered as an answer');

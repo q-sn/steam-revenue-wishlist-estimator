@@ -53,6 +53,28 @@ function valueFor(key, result) {
 }
 
 /**
+ * A short tail after a figure: another fact about the same number, never a
+ * second number of its own.
+ *
+ * The wishlist estimate carries the game's place in Steam's wishlist ordering.
+ * That position is the one thing on this row that is *measured* rather than
+ * inferred — everything else in the pill is the output of a model — and it is
+ * also what a reader can check for themselves in thirty seconds. It rides
+ * along with the figure it helped produce rather than taking a slot of its
+ * own, because it is not a peer of the other figures and a separator between
+ * them would say it was.
+ *
+ * Returned as a message descriptor, like every other user-facing string
+ * leaving the core: `#` is not a rank marker in every language this ships in.
+ */
+function suffixFor(key, result) {
+  if (key !== 'wishlists') return null;
+  const rank = result.wishlists?.rank?.rank;
+  if (!Number.isFinite(rank)) return null;
+  return { key: 'pillRank', value: rank, text: `#${rank}` };
+}
+
+/**
  * Figures to render, in canonical order.
  *
  * An item appears only when it is both switched on and actually available, so
@@ -67,6 +89,10 @@ export function pillFigures(result, config = {}) {
 
   return PILL_ITEMS
     .filter((item) => merged[item.key])
-    .map((item) => ({ ...item, value: valueFor(item.key, result) }))
+    .map((item) => ({
+      ...item,
+      value: valueFor(item.key, result),
+      suffix: suffixFor(item.key, result)
+    }))
     .filter((item) => item.value != null);
 }

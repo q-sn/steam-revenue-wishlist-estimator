@@ -200,6 +200,9 @@
   "pillWishlists": {
     "message": "istek listesi"
   },
+  "pillRank": {
+    "message": "$1. sıra"
+  },
   "ariaOpen": {
     "message": "Satış ve istek listesi tahminini aç"
   },
@@ -360,7 +363,7 @@
     "message": "Satış aralığı artı hesap zincirinin varsayımları"
   },
   "rFollowerRatio": {
-    "message": "Tüm oyunların medyan çarpanı; takipçi oranı 7x ile 20x arasında"
+    "message": "Tüm oyunların medyan çarpanı; takipçi oranı $1x ile $2x arasında değişiyor"
   },
   "mAllTimePeak": {
     "message": "Tüm zamanların zirvesi"
@@ -410,9 +413,6 @@
   "nCcuNoPeakDate": {
     "message": "Tarihli bir oyuncu geçmişi olmadan lansman zirvesi ile sonraki bir sıçrama ayırt edilemez, bu yüzden ilk hafta değeri gösterilmiyor."
   },
-  "nFromFollowersGenre": {
-    "message": "$1 takipçiye göre · $2 oyunlarında takipçi başına ortalama $3x"
-  },
   "nDerivedMark": {
     "message": "* büyüklüğü biz seçtik: çalışma etkiyi doğruluyor ama ölçmüyor"
   },
@@ -423,22 +423,40 @@
     "message": "Bu aralık yalnızca satış aralığının para karşılığı değil: $1 ile $2 arası indirimleri ve $3 ile $4 arası iadeleri de kapsıyor."
   },
   "rWishlistGenre": {
-    "message": "$1 için tür çarpanı, ankete göre 7x-20x aralığının içinde"
+    "message": "$1 için tür çarpanı, ölçülen $2x-$3x aralığının içinde"
   },
   "mFollowerRatio": {
     "message": "Takipçi × yayımlanmış oran"
   },
+  "mWishlistSaid": {
+    "message": "Geliştiricinin kendi açıkladığı sayı"
+  },
   "mWishlistRank": {
-    "message": "Steam istek listesi sıralaması"
+    "message": "Steam istek listesi sıralamasındaki yer"
+  },
+  "sWishlistMethods": {
+    "message": "İstek listesi yöntemleri nasıl birleşti"
+  },
+  "oMeasuredHere": {
+    "message": "burada $1 duyurulmuş rakam üzerinde ölçüldü"
+  },
+  "oSaidOn": {
+    "message": "$1 tarihinde açıklandı, ölçülen büyüme hızıyla bugüne taşındı"
   },
   "nWishlistRank": {
     "message": "$2 oyun içinde $1. sıra · duyurulan oyunların ilk %$3"
   },
+  "nWishlistRankOnly": {
+    "message": "$2 oyun içinde $1. sıra"
+  },
   "nWishlistBelowList": {
     "message": "Steam istek listesi sıralamasında yok; sıralama yaklaşık $1 civarında bitiyor"
   },
-  "rWishlistRankOnly": {
-    "message": "Okunabilir takipçi sayısı yok, bu yüzden tek yöntem mağaza sıralaması"
+  "rWishlistSaid": {
+    "message": "Geliştirici bu oyun için bir sayı yayımladı, tahmin büyük ölçüde ona dayanıyor"
+  },
+  "rWishlistRankCurve": {
+    "message": "Bu oyun için yayımlanmış bir sayı yok; tahmin, Steam istek listesi sıralamasındaki yerinden okundu"
   },
   "rWishlistBelowList": {
     "message": "Steam istek listesi sıralamasının tamamen altında, bu yüzden yalnızca takipçi oranı yanıt veriyor"
@@ -448,9 +466,6 @@
   },
   "rWishlistCeiling": {
     "message": "Takipçi oranı, bu oyunun yer almadığı sıralamanın en altından daha fazla istek listesi ima ediyor"
-  },
-  "rWishlistAccumulation": {
-    "message": "Okunabilir çıkış tarihi yok, bu yüzden istek listesi birikiminin ne kadarına ulaşıldığı bilinmiyor"
   },
   "nDlcExcluded": {
     "message": "$1 DLC'den gelen gelir dahil değil; hiçbir kamuya açık veri bunu göstermiyor."
@@ -523,5 +538,8 @@
   },
   "nDemoReviews": {
     "message": "Demonun kendisinde ölçüldü. Yukarıdaki hiçbir sayıya girdi değildir."
+  },
+  "oRankCurve": {
+    "message": "$1 duyuru üzerinde burada ölçülen eğri"
   }
 }

@@ -13,9 +13,12 @@
     "calibrate": "node tools/calibrate.mjs",
     "calibrate:live": "node tools/calibrate.mjs --live",
     "smoke": "node tools/smoke.mjs",
+    "locales": "node tools/build-locales.mjs",
     "ranks": "node tools/crawl-wishlist-ranks.mjs",
     "anchors": "node tools/harvest-anchors.mjs",
-    "check:ranks": "node tools/calibrate-wishlist-rank.mjs"
+    "condense": "node tools/condense-anchors.mjs",
+    "check:ratio": "node tools/calibrate-follower-ratio.mjs",
+    "check:model": "node tools/calibrate-wishlist-model.mjs"
   },
   "engines": {
     "node": ">=18"

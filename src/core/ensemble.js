@@ -1,44 +1,11 @@
-import { ENSEMBLE, CONFIDENCE } from './constants.js';
+import { ENSEMBLE, CONFIDENCE, WISHLIST } from './constants.js';
 
-/**
- * User-facing strings leave the core as message descriptors, never as finished
- * sentences. `text` carries the English wording so Node tooling and tests stay
- * readable; the overlay resolves `key` through chrome.i18n instead.
- */
+/** A descriptor: `key` resolves through chrome.i18n, `text` is the fallback. */
 function msg(key, params, text) {
   return { key, params, text };
 }
 
-/**
- * Combining estimators.
- *
- * The published benchmark that motivated this whole project found that no
- * single method beats a combination: a flat review multiple lands within 30%
- * on 42.7% of games, adjusted multiples on 50.4%, and an ensemble on 76.9%.
- * We cannot run the profile-polling leg of that ensemble from a browser, and
- * of the three that are reachable only two have inputs we can specify: the
- * adjusted review multiple and the SteamSpy owner band. Combining those two
- * still beats either alone. Player-hours over playtime measures the same
- * quantity and is kept outside the average, because its divisor is an average
- * playtime nothing public reports — see PLAYTIME.
- *
- * Two rules keep this honest:
- *
- *  1. Only estimators of the same quantity are averaged, and only when their
- *     inputs can be specified. The peak-CCU rule fails the first test and the
- *     player-hours route fails the second; both stay cross-checks that can
- *     widen a band and lower confidence without moving a midpoint.
- *
- *  2. Disagreement is never averaged away. When estimators diverge the band
- *     grows to cover both and the confidence drops, so the reader sees the
- *     uncertainty instead of a tidy midpoint that hides it.
- */
-
-/**
- * Weighted geometric mean. Sales estimates are multiplicative quantities with
- * a roughly log-normal spread, so averaging in log space avoids the upward
- * bias an arithmetic mean would introduce.
- */
+/** Weighted geometric mean. Sales figures are log-normally spread. */
 function weightedMean(values, weights) {
   const totalWeight = weights.reduce((a, b) => a + b, 0);
   if (totalWeight <= 0) return null;
@@ -51,13 +18,28 @@ function weightedMean(values, weights) {
 }
 
 /**
- * Nothing here is specific to units. Wishlists reach it too, through the same
- * two rules: the follower ratio and the store's wishlist ranking estimate the
- * same quantity from different signals, so they may be combined, and when
- * they leave no figure both admit the band grows to cover the disagreement.
+ * Weighted combination of estimators of the same quantity. Used for units and
+ * for wishlists.
  *
  * @param {Array<{method:string, range:{lo:number,mid:number,hi:number}, weight:number, label:string}>} estimators
  */
+/**
+ * Inverse-variance weight from a band's own width, in logs.
+ *
+ * A leg earns its say by being precise, not by existing. This replaces three
+ * hand-set constants that assumed every leg's width was fixed: the
+ * announcement leg's band runs from 1.4x on a fresh figure to 9.5x on a
+ * four-year-old one, and a constant weight gave a stale figure the same vote
+ * as a fresh one.
+ */
+const MIN_LOG_WIDTH = 0.05;
+
+export function precisionWeight(range) {
+  if (!range || !(range.hi > 0) || !(range.lo > 0)) return 0;
+  const width = Math.max(Math.log(range.hi / range.lo), MIN_LOG_WIDTH);
+  return 1 / (width * width);
+}
+
 export function combineEstimators(estimators) {
   const usable = estimators.filter((e) => e && e.range && e.weight > 0);
 
@@ -81,21 +63,17 @@ export function combineEstimators(estimators) {
   let lo = weightedMean(usable.map((e) => e.range.lo), weights);
   let hi = weightedMean(usable.map((e) => e.range.hi), weights);
 
-  // Do the bands share any figure at all? Every estimator here reports an
-  // interval, so this is the question that decides whether they conflict.
+  // Do the bands share any figure at all?
   const highestLow = Math.max(...usable.map((e) => e.range.lo));
   const lowestHigh = Math.min(...usable.map((e) => e.range.hi));
   const overlaps = highestLow <= lowestHigh;
   // How far apart the nearest edges are, once nothing is admitted by all.
   const gap = overlaps ? 1 : highestLow / Math.max(lowestHigh, 1);
 
-  // Kept for the record and for display: how far the point estimates sit
-  // apart. It is not what decides anything, because on a source that answers
-  // in buckets a midpoint is the centre of a bucket rather than a reading.
+  // How far the point estimates sit apart. Reported, never used to decide.
   const disagreement = Math.max(...mids) / Math.max(Math.min(...mids), 1);
 
-  // Only widen when no figure satisfies every method. Then the average is
-  // genuinely hiding something and the band has to cover what it is hiding.
+  // Widen only when no figure satisfies every method.
   let widened = false;
   if (!overlaps) {
     lo = Math.min(lo, ...usable.map((e) => e.range.lo));
@@ -126,11 +104,8 @@ export function worstLevel(levels) {
 }
 
 /**
- * One step down the scale, floored at 'low'.
- *
- * 'none' means there is no estimate to talk about. Letting a downgrade reach
- * it would turn "we are not confident in this number" into "there is no
- * number", which are different statements and only one of them is true.
+ * One step down the scale, floored at 'low'. 'none' means there is no estimate
+ * at all, so it never changes.
  */
 const WORST_SCORED = 'low';
 function downgraded(level) {
@@ -142,18 +117,8 @@ function downgraded(level) {
 
 
 /**
- * Revenue confidence.
- *
- * Revenue is the unit band pushed through the waterfall, so it can never be
- * better than the units it came from — and it is meaningfully worse, because
- * every step of that waterfall is an assumption with a real range of its own.
- * The regional factor alone spans 0.60 to 0.88 depending on where a game's
- * buyers are. One step down is the honest floor.
- *
- * Those ranges widen the band as well as this verdict, so the two say the
- * same thing: the width on screen carries the same uncertainty this word
- * does, rather than the word being marked down for uncertainty the band
- * never shows.
+ * Revenue confidence: the units level one step down, because every waterfall
+ * step adds an assumption with a range of its own.
  */
 export function scoreRevenueConfidence(unitsConfidence, ok, revenue = null) {
   if (!ok) return { level: 'none', reasons: [msg('rNoEstimate', [], 'No usable estimate')] };
@@ -161,16 +126,9 @@ export function scoreRevenueConfidence(unitsConfidence, ok, revenue = null) {
   const reasons = [msg('rRevenueAssumptions', [], 'Sales band plus the waterfall assumptions')];
   let level = downgraded(unitsConfidence.level);
 
-  // One fact of its own, and it is the one that varies: was the regional
-  // factor read off the game's review languages, or is it the fallback nobody
-  // chose? That factor swings the answer from 0.60 to 0.88 of list price,
-  // which is the widest single assumption in the chain, so knowing it from
-  // data rather than defaulting is worth a step.
-  //
-  // Without this the verdict is `downgraded(units)` and nothing else, and
-  // with the top of the units scale out of reach that makes this function a
-  // constant: every paid game on Steam reading "unreliable", forever, which
-  // is a label rather than a rating.
+  // The one waterfall assumption that varies per game: the regional factor
+  // spans 0.60 to 0.88 of list price, so reading it from the review languages
+  // rather than defaulting is worth a step.
   const derived = revenue?.settings?.regionalDerivedFrom?.ok === true;
   if (derived) {
     reasons.push(msg('rRegionalMeasured', [], 'Audience mix read from review languages, not assumed'));
@@ -183,52 +141,53 @@ export function scoreRevenueConfidence(unitsConfidence, ok, revenue = null) {
 }
 
 /**
- * Wishlist confidence, scored on its own terms.
+ * Wishlist confidence, scored on its own terms: how many methods answered,
+ * whether they agree, and whether anything contradicts them.
+ */
+/**
+ * How much to trust a wishlist figure.
  *
- * Nothing about the sales estimate speaks to this number: it comes from a
- * different signal entirely, and it exists on pages where there is no sales
- * estimate at all.
+ * Graded on what kind of number it is, not on how many methods answered. The
+ * band width no longer carries that information: it is 2.11x for almost every
+ * ranked game, because the curve's and the follower ratio's widths are fixed,
+ * so width says which legs spoke rather than how good the evidence was. It is
+ * kept only as a ceiling on the grade.
  *
- * Two legs answer it — the follower ratio and the store's wishlist ranking —
- * so the same questions the units scale asks apply here: how many methods
- * answered, whether they agree, and whether anything contradicts them
- * outright.
- *
- * No downgrade for an unknown promotion history. It is unknown on every game
- * — nothing on a store page reveals it — so a penalty applied every time is
- * not a penalty, just a quieter baseline that says nothing.
+ *   good  most of the answer is a figure the developer published, which
+ *         happens while that figure is under about a month old
+ *   fair  the answer is read off the store ranking; held out, the curve lands
+ *         within 25% for 73% of games and within 50% for 95%
+ *   low   the methods contradict, a bound is broken, or the ranking cannot
+ *         answer and only the follower ratio is left
  */
 export function scoreWishlistConfidence(wishlists) {
   if (!wishlists?.ok) return { level: 'none', reasons: [msg('rNoEstimate', [], 'No usable estimate')] };
 
   const found = [];
   const note = (severity, key, params, text) => found.push({ severity, key, params, text });
-  let level = 'good';
-  const downgrade = () => { level = level === 'good' ? 'fair' : 'low'; };
 
-  const legs = wishlists.contributors?.length ?? 1;
-  if (legs > 1) {
-    note(0, 'rMethodsCombined', [String(legs)], `${legs} independent methods combined`);
-  } else {
-    // Which leg is missing matters. "Not in the ranking" is a fact about the
-    // game that bounds the answer; "the ranking has not been downloaded" is a
-    // fact about this extension and bounds nothing.
-    if (wishlists.rank) {
-      note(1, 'rWishlistRankOnly', [],
-        'No readable follower count, so the store ranking is the only method');
-    } else if (wishlists.rankReason === 'below-list') {
-      note(1, 'rWishlistBelowList', [],
-        "Below Steam's wishlist ranking entirely, so only the follower ratio answers");
-    } else {
-      note(1, 'rWishlistRankPending', [],
-        'The wishlist ranking is not available, so there is no second method');
-    }
-    downgrade();
+  const saidShare = wishlists.contributors?.find((c) => c.method === 'said')?.share ?? 0;
+  let level = saidShare > 0.5 ? 'good' : 'fair';
+
+  if (wishlists.said) {
+    note(0, 'rWishlistSaid', [],
+      'The developer published a figure for this game, so the estimate is mostly that number');
+  }
+  if (wishlists.rank && saidShare <= 0.5) {
+    note(1, 'rWishlistRankCurve', [],
+      "No published figure for this game, so the estimate is read from its place in Steam's wishlist ranking");
+  } else if (!wishlists.rank && wishlists.rankReason === 'below-list') {
+    note(2, 'rWishlistBelowList', [],
+      "Below Steam's wishlist ranking entirely, so only the follower ratio answers");
+    level = 'low';
+  } else if (!wishlists.rank) {
+    note(2, 'rWishlistRankPending', [],
+      'The wishlist ranking has not arrived, so only the follower ratio answers');
+    level = 'low';
   }
 
-  // Two legs that leave no figure both admit. Same two tiers as the units
-  // scale: a gap inside the alarm threshold is reported, one beyond it decides
-  // the verdict.
+  // Two tiers: a gap inside the alarm threshold is reported, one beyond it
+  // sets the level.
   if (wishlists.widened) {
     const alarming = wishlists.gap > ENSEMBLE.alarmGap;
     note(alarming ? 2 : 1, 'rNoCommonFigure', [wishlists.gap.toFixed(1)],
@@ -236,42 +195,32 @@ export function scoreWishlistConfidence(wishlists) {
     if (alarming) level = 'low';
   }
 
-  // A bound broken is not a wide band, it is a contradiction: the follower
-  // ratio claims more wishlists than the last game on a list this one did not
-  // make. One of the two inputs is wrong and neither can be repaired here.
+  // A broken bound is a contradiction, not a wide band.
   if (wishlists.ceilingBreached) {
     note(2, 'rWishlistCeiling', [],
-      "Follower ratio implies more wishlists than the bottom of a ranking this game is not on");
+      'The follower ratio implies more wishlists than the bottom of a ranking this game is not in');
     level = 'low';
   }
 
-  // What differs between games on the follower leg is whether the midpoint is
-  // a figure the survey measured for this kind of game or the median across
-  // every kind. A tag the survey covers is real information; the all-games
-  // median is the answer for a game we can say nothing specific about.
+  // Which multiplier the follower leg used, as context only.
   if (wishlists.genre) {
-    note(0, 'rWishlistGenre', [wishlists.genre.label],
-      `Genre multiplier for ${wishlists.genre.label}, within the survey's 7x to 20x range`);
+    note(0, 'rWishlistGenre',
+      [wishlists.genre.label, String(WISHLIST.lo), String(WISHLIST.hi)],
+      `Genre multiplier for ${wishlists.genre.label}, inside the measured ${WISHLIST.lo}x to ${WISHLIST.hi}x range`);
   } else if (wishlists.followerRange) {
-    note(1, 'rFollowerRatio', [], 'All-games median multiplier; the follower ratio spans 7x to 20x');
-    downgrade();
+    note(0, 'rFollowerRatio', [String(WISHLIST.lo), String(WISHLIST.hi)],
+      `All-games median multiplier; the follower ratio spans ${WISHLIST.lo}x to ${WISHLIST.hi}x`);
   }
 
-  // Reported, not charged for. Not knowing how far into its accumulation a
-  // game is already widened the band by the full published span a few steps
-  // back, and marking the level down as well would count one fact twice.
-  if (wishlists.rank && !wishlists.rank.accumulation.ok) {
-    note(1, 'rWishlistAccumulation', [],
-      'No readable release date, so how far this game is into its wishlist accumulation is unknown');
-  }
-
+  // Width is a ceiling on the grade, never the driver.
   const { lo, hi } = wishlists.range;
   const spread = hi / Math.max(lo, 1);
-  if (spread > CONFIDENCE.fair) {
+  if (spread > CONFIDENCE.wishlists.fair) {
     note(2, 'rBandSpans', [spread.toFixed(1)], `Band spans ${spread.toFixed(1)}x`);
     level = 'low';
-  } else if (spread > CONFIDENCE.good) {
-    note(0, 'rBandSpans', [spread.toFixed(1)], `Band spans ${spread.toFixed(1)}x`);
+  } else if (spread > CONFIDENCE.wishlists.good && level === 'good') {
+    note(1, 'rBandSpans', [spread.toFixed(1)], `Band spans ${spread.toFixed(1)}x`);
+    level = 'fair';
   }
 
   const reasons = found
@@ -283,13 +232,8 @@ export function scoreWishlistConfidence(wishlists) {
 }
 
 /**
- * Confidence reflects how wide the band is and how well the signals agree.
- * It says nothing about the game itself.
- *
- * Reasons come back sorted by severity, worst first. The overlay shows the
- * leading one next to the dot, so whatever made the dot change colour has to
- * be the thing the reader sees — an alarming dot beside a reassuring sentence
- * is worse than no dot at all.
+ * Unit confidence: how well the signals agree and how wide the band is. Says
+ * nothing about the game itself. Reasons come back worst first.
  */
 export function scoreConfidence(combined, flags = {}) {
   if (!combined?.ok) {
@@ -300,28 +244,8 @@ export function scoreConfidence(combined, flags = {}) {
   const spread = hi / Math.max(lo, 1);
   const found = [];
 
-  /**
-   * The level starts from the evidence, not from the width of the band.
-   *
-   * Width does not vary. Every band here is dominated by a fixed published
-   * range — the review multiplier spans 20-55x on its own — so a combination
-   * of two overlapping bands lands between 2.2x and 2.7x on almost every game
-   * in the store. Measured across 22 real games the spreads are bimodal:
-   * eighteen inside that sliver, four above 7x, nothing between. Reading the
-   * level off that quantity gives `good` to nobody, and makes the revenue
-   * verdict — one step below units — a constant that says "unreliable" on
-   * every paid game ever released.
-   *
-   * What does vary, and what a reader can act on: how many independent
-   * methods contributed, whether they agree, whether the review sample is
-   * thick enough to mean anything, and whether a cross-check objects.
-   *
-   * Width has a say, but as a ceiling rather than the driver: a band
-   * wider than the `fair` threshold cannot be called anything but low, however
-   * good the evidence behind it looks. The band itself is on screen, so the
-   * word is free to describe confidence *in* that band rather than restating
-   * how wide it is.
-   */
+  // Starts from the evidence — how many methods answered, whether they agree,
+  // whether a cross-check objects. Width applies at the end, as a ceiling.
   let level = 'good';
 
   // 2 = this is why the level dropped, 1 = caution, 0 = context.
@@ -332,16 +256,8 @@ export function scoreConfidence(combined, flags = {}) {
     note(0, 'rMethodsCombined', [String(combined.contributors.length)],
       `${combined.contributors.length} independent methods combined`);
   } else {
-    // Caps at fair rather than dropping to low. Having one source is the
-    // normal case for unreleased games and small titles; red should mean
-    // something is wrong, not merely that a second opinion was unavailable.
-    //
-    // And it says which kind of unavailable, because they are not the same
-    // problem and only one of them is about the game. "SteamSpy has never
-    // processed this app" is a fact about SteamSpy; "the owner band is too
-    // small to trust" is a fact about the game's size; a bare "single method"
-    // left the reader unable to tell those apart, or to tell either from a
-    // request that simply failed.
+    // Caps at fair rather than low: one source is the normal case for
+    // unreleased and small titles. The branches name which leg is missing.
     if (flags.ownersMissing === 'owner-record-empty') {
       note(1, 'rOwnersNoRecord', [],
         'SteamSpy has no data on file for this game, so there is no second method');
@@ -354,15 +270,9 @@ export function scoreConfidence(combined, flags = {}) {
     downgrade();
   }
 
-  // Two tiers, because "these two methods are 1.9x apart" and "these two
-  // methods are 4x apart" are different findings. The first means one of them
-  // is outside its published 30% error; the second means one is outside 50%,
-  // which the published methods almost never are.
-  // Below the alarm tier this only reports; it does not also mark the level
-  // down. Widening the band is *how* a conflict shows up, and the spread was
-  // measured on the widened band a few lines above — so charging for it again
-  // counted one fact twice, which is what kept dropping healthy estimates to
-  // the bottom of the scale.
+  // Two tiers: 1.9x apart puts one method outside its published 30% error, 4x
+  // outside 50%. Below the alarm tier this only reports — `spread` was already
+  // measured on the widened band, so downgrading here would count it twice.
   if (combined.widened) {
     const alarming = combined.gap > ENSEMBLE.alarmGap;
     note(alarming ? 2 : 1, 'rNoCommonFigure', [combined.gap.toFixed(1)],
@@ -382,9 +292,7 @@ export function scoreConfidence(combined, flags = {}) {
     downgrade();
   }
 
-  // The width ceiling, applied last so nothing can talk its way past it. A
-  // band this wide is not something to be confident about no matter how many
-  // methods produced it.
+  // The width ceiling, applied last so nothing can talk its way past it.
   if (spread > CONFIDENCE.fair) {
     note(2, 'rBandSpans', [spread.toFixed(1)], `Band spans ${spread.toFixed(1)}x`);
     level = 'low';
@@ -392,9 +300,7 @@ export function scoreConfidence(combined, flags = {}) {
     note(0, 'rBandSpans', [spread.toFixed(1)], `Band spans ${spread.toFixed(1)}x`);
   }
 
-  // Only when nothing else has been said. With two methods the "N methods
-  // combined" line already carries this, and printing both puts two sentences
-  // that mean the same thing beside one figure.
+  // Only when nothing else has been said.
   if (level === 'good' && !found.length) {
     note(0, 'rAgree', [], 'Sources agree within the expected band');
   }
@@ -403,9 +309,7 @@ export function scoreConfidence(combined, flags = {}) {
   const reasons = found
     .map((r, i) => ({ ...r, i }))
     .sort((a, b) => b.severity - a.severity || a.i - b.i)
-    // Severity travels with the reason: the interface emphasises the number
-    // only when that number is the cause of an alarm, not when it is merely
-    // describing the shape of a healthy estimate.
+    // Severity travels with the reason so the interface can emphasise alarms.
     .map(({ key, params, text, severity }) => ({ key, params, text, severity }));
 
   return { level, spread, reasons };

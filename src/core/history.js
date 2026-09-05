@@ -1,14 +1,8 @@
 import { HISTORY } from './constants.js';
 
 /**
- * Local snapshot history.
- *
- * The extension records what it saw on each visit so it can show what moved
- * since last time, and draw a small trend line once a few visits accumulate.
- * Everything stays in chrome.storage.local; nothing is sent anywhere.
- *
- * Pure functions only — the storage calls live in the service worker so this
- * stays testable in Node.
+ * Local snapshot history, held in chrome.storage.local.
+ * Pure functions only; the storage calls live in the service worker.
  */
 
 /** @typedef {{at:number, reviews:number|null, followers:number|null, units:number|null}} Snapshot */
@@ -23,10 +17,7 @@ export function makeSnapshot(game, result) {
 }
 
 
-/**
- * Append a snapshot, collapsing writes that happen close together so a few
- * page refreshes do not flood the series with identical points.
- */
+/** Append a snapshot, collapsing writes less than HISTORY.minGapMs apart. */
 export function appendSnapshot(series, snapshot) {
   const list = Array.isArray(series) ? [...series] : [];
   const last = list[list.length - 1];
@@ -64,10 +55,7 @@ export function diffSince(series, current) {
   };
 }
 
-/**
- * Normalise a series to 0..1 for the sparkline. Returns null below two points,
- * because a trend line drawn through one observation is decoration.
- */
+/** Normalise a series to 0..1 for the sparkline. Null below two points. */
 export function sparklinePoints(series, key = 'reviews') {
   const values = (series ?? [])
     .map((s) => ({ at: s.at, v: s[key] }))

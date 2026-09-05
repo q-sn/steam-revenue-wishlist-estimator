@@ -1,20 +1,7 @@
 /**
- * Matching a game's tags against a table of per-genre coefficients.
- *
- * Two tables need this — the review multiplier and the follower-to-wishlist
- * ratio — and both apply exactly one row, because stacking genre coefficients
- * compounds noise.
- *
- * Which one, though, is the whole question. Iterating the *table* and taking
- * the first row that matches anything means the answer is decided by the order
- * the rows happen to sit in, which is an implementation detail: a game tagged
- * Puzzle, Indie and Relaxing would score as Relaxing purely because that row
- * is listed first.
- *
- * Iterating the *game's tags* instead uses real information. Steam returns
- * store-page tags ranked by how many players applied them, so the first tag
- * that matches any row is the game's most-agreed-upon genre among the ones we
- * have a figure for. Tag order is the signal; table order is not.
+ * Match a game's tags against a table of per-genre coefficients; exactly one
+ * row applies. Iterates the tags, not the table — Steam ranks tags by how many
+ * players applied them, so the first match is the game's strongest genre.
  */
 
 /**
