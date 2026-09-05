@@ -458,6 +458,9 @@
   "rWishlistRankCurve": {
     "message": "Bu oyun için yayımlanmış bir sayı yok; tahmin, Steam istek listesi sıralamasındaki yerinden okundu"
   },
+  "rWishlistSaidStale": {
+    "message": "Geliştiricinin yayımladığı sayı $1 tarihli, bu yüzden tahminin çoğunu sıralama taşıyor"
+  },
   "rWishlistBelowList": {
     "message": "Steam istek listesi sıralamasının tamamen altında, bu yüzden yalnızca takipçi oranı yanıt veriyor"
   },

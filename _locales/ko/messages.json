@@ -458,6 +458,9 @@
   "rWishlistRankCurve": {
     "message": "이 게임은 공개된 수치가 없어 Steam 위시리스트 순위에서 추정했습니다"
   },
+  "rWishlistSaidStale": {
+    "message": "개발자가 공개한 수치는 $1 자료라, 추정의 대부분은 순위가 담당합니다"
+  },
   "rWishlistBelowList": {
     "message": "Steam 위시리스트 순위 아래에 있어 팔로워 비율만 답합니다"
   },

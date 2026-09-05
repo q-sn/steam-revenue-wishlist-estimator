@@ -458,6 +458,9 @@
   "rWishlistRankCurve": {
     "message": "このゲームは公開された数字がないため、Steam のウィッシュリスト順位から推定しています"
   },
+  "rWishlistSaidStale": {
+    "message": "開発者が公開した数字は $1 のものなので、推定の大部分は順位が担っています"
+  },
   "rWishlistBelowList": {
     "message": "Steam のウィッシュリスト順位の圏外なので、答えるのはフォロワー比率だけです"
   },

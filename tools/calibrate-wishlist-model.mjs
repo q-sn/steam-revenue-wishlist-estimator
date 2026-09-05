@@ -15,6 +15,7 @@
  */
 import fs from 'node:fs';
 import { WISHLIST_CURVE, WISHLIST_SAID } from '../src/core/constants.js';
+import { COUNT, rejectStoredQuote } from './anchor-quote.mjs';
 
 /** Only used while fitting: the share of the rung gap, and its mean. */
 const RUNGK = 0.15942;
@@ -72,42 +73,23 @@ const nm = (f, x0, step = 0.06, iters = 40000) => {
   return S[o[0]];
 };
 
-/* ---- the validated contamination filter (99.9% precision / 98.2% recall) ---- */
-const COUNT = String.raw`(\d{1,3}(?:[,.  ]\d{3})+|\d+(?:[.,]\d+)?\s*[kKmM]\b|\d{4,})`;
-const MILESTONE = new RegExp(COUNT + String.raw`\s*\+?\s*(?:steam\s+)?wishlists?`, 'gi');
+/* ---- the shipped contamination filter, so the fit and the feed agree ---- */
 const parseCount = (raw) => {
   const t = raw.trim().toLowerCase(), s = t.endsWith('m') ? 1e6 : t.endsWith('k') ? 1e3 : 1;
   const d = t.replace(/[km]$/, '').trim();
-  const v = s === 1 ? Number(d.replace(/[,.  ]/g, '')) : Number(d.replace(/,/g, '.'));
+  const v = s === 1 ? Number(d.replace(/[,.\u00a0\u202f\u2009 ]/g, '')) : Number(d.replace(/,/g, '.'));
   return Number.isFinite(v) ? Math.round(v * s) : null;
 };
-const ACHIEVED = /\b(?:hits?|reach\w*|passe?[ds]?|surpass\w*|cross\w*|exceed\w*|smash\w*|gather\w*|collect\w*|amassed|received|milestone|thanks?|thank you|celebrat\w*|achiev\w*|blasted|broke|broken|climbed|now (?:at|has|have|sitting)|(?:we|they)(?:'re| are) (?:now )?at|are now at|we(?:'ve| have)|got|over|more than|almost|nearly|approach\w*|nearing|added to|wishlisted|of you|sitting at|currently at|up to|already)\b/i;
-const GOAL = /\b(?:help (?:us|me|them)(?: to)? (?:reach|hit|get|gather|smash)|let'?s (?:hit|reach|get)|we(?:'ll| will) hit|road to|on the (?:road|way) to|to the next|all the way to|if we (?:hit|reach|get)|once we (?:hit|reach)|when we (?:hit|reach)|aim(?:ing)? for|toward|hoping to (?:hit|reach)|hope to (?:hit|reach)|next (?:milestone|goal|tier|target)|(?:goal|target|dream|plan)\b[^.!?]{0,40}\bto (?:hit|reach|get to))\b|\b(?:goal|target)s?\b[^.!?]{0,18}$/i;
-const GOAL_MET = /\b(?:reach\w*|hit|passed|achieved|smashed|beat|exceeded|surpassed|cleared|met)\s+(?:our|the|my|its|a\s+\w+)?\s*(?:goal|target)\b/i;
-const GOAL_TRAIL = /\b(?:reaching (?:this|that) goal|if we (?:hit|reach)|once we (?:hit|reach)|will unlock|to unlock|help us (?:reach|hit|get))\b/i;
-const DELTA_LEAD = /\bgained\s+another\s+$|\bduring (?:the|our|this) (?:festival|event|fest|showcase|sale)\b[^.!?]{0,45}$/i;
-const DELTA_TRAIL = /^\W{0,3}(?:over the weekend|during (?:the|our|this) \w+|in (?:one|a|the last|the past)\s+(?:week|weekend|day|month))\b/i;
-const PLUS_DELTA = /\+\s*$/;
-const PLATFORM = /\bacross (?:all )?(?:platforms|steam and|consoles)|\bon steam and (?:epic|gog|consoles?|xbox|playstation)|\b(?:combined|multi-?platform)\s+(?:total|wishlists?)/i;
-const NARROW = /b(?:hits?|reachw*|passe?[ds]?|surpassw*|crossw*|exceedw*|smashw*|broke|climbed|milestone)b/i;
+
+/** A larger figure elsewhere in the post makes the matched one a retrospective. */
+const ANY_FIGURE = new RegExp(COUNT + String.raw`\s*\+?\s*(?:steam\s+)?(?:wishlists?|wishlist mark|mark\b|now\b)`, 'gi');
+
 const verdict = (row) => {
   const text = row.quoted || '';
-  let hit = null;
-  for (const m of text.matchAll(MILESTONE)) { const v = parseCount(m[1]); if (v === row.wishlists && (hit === null || Math.abs(m.index - 90) < Math.abs(hit.index - 90))) hit = m; }
-  if (!hit) return true;
-  const lead = text.slice(Math.max(0, hit.index - 60), hit.index);
-  const end = hit.index + hit[0].length, trail = text.slice(end, end + 90);
-  const leadHasVerb = NARROW.test(lead.slice(-22));
-  if (GOAL.test(lead) && !GOAL_MET.test(lead)) return false;
-  if (GOAL_TRAIL.test(trail)) return false;
-  if (DELTA_LEAD.test(lead)) return false;
-  if (PLUS_DELTA.test(lead) && !leadHasVerb) return false;
-  if (DELTA_TRAIL.test(trail) && !leadHasVerb) return false;
-  if (PLATFORM.test(text)) return false;
-  if (!ACHIEVED.test(lead) && !ACHIEVED.test(trail)) return false;
-  const bigger = [...text.matchAll(new RegExp(COUNT + String.raw`\s*\+?\s*(?:steam\s+)?(?:wishlists?|wishlist mark|mark\b|now\b)`, 'gi'))]
-    .map((m) => parseCount(m[1])).filter((v) => v != null && v > row.wishlists);
-  return !bigger.length;
+  if (rejectStoredQuote(text, row.wishlists)) return false;
+  return ![...text.matchAll(ANY_FIGURE)]
+    .map((m) => parseCount(m[1]))
+    .some((v) => v != null && v > row.wishlists);
 };
 
 /* ---- rung ladder ---- */

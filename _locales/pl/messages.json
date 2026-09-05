@@ -458,6 +458,9 @@
   "rWishlistRankCurve": {
     "message": "Dla tej gry nie opublikowano liczby, więc szacunek pochodzi z jej pozycji w rankingu list życzeń Steam"
   },
+  "rWishlistSaidStale": {
+    "message": "Liczba opublikowana przez dewelopera pochodzi z $1, więc większość szacunku niesie ranking"
+  },
   "rWishlistBelowList": {
     "message": "Poniżej całego rankingu list życzeń Steam, więc odpowiada tylko współczynnik obserwujących"
   },

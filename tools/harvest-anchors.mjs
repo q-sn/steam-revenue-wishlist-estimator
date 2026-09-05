@@ -23,6 +23,7 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import { COUNT, MILESTONE, rejectQuote } from './anchor-quote.mjs';
 
 const argv = process.argv.slice(2);
 const valueOf = (flag, fallback) => {
@@ -52,39 +53,6 @@ const jitter = (ms) => Math.round(ms * (0.75 + Math.random() * 0.5));
  * that the pattern costs more than the handful of "wishlists: 50,000" posts
  * it would catch.
  */
-const COUNT = String.raw`(\d{1,3}(?:[,.\u00a0\u202f\u2009 ]\d{3})+|\d+(?:[.,]\d+)?\s*[kKmM]\b|\d{4,})`;
-const MILESTONE = new RegExp(COUNT + String.raw`\s*\+?\s*(?:steam\s+)?wishlists?`, 'gi');
-
-/**
- * A number before the word "wishlist" is only evidence if the sentence says the
- * game reached it. These read the 60 characters before the number and the 90
- * after the word, rather than one window around both, because a window lets a
- * goal word anywhere nearby rescue a target and an achievement word anywhere
- * nearby rescue a goal. Positional testing raises precision from 97.0% to
- * 99.9% against 1,102 hand labels, at the cost of 1.8% of good rows.
- */
-const ACHIEVED = /\b(?:hits?|reach\w*|passe?[ds]?|surpass\w*|cross\w*|exceed\w*|smash\w*|gather\w*|collect\w*|amassed|received|milestone|thanks?|thank you|celebrat\w*|achiev\w*|blasted|broke|broken|climbed|now (?:at|has|have|sitting)|(?:we|they)(?:'re| are) (?:now )?at|we(?:'ve| have)|got|over|more than|almost|nearly|approach\w*|nearing|added to|wishlisted|of you|sitting at|currently at|up to|already)\b/i;
-
-/** A figure the studio wants to reach. "help us reach 100,000 wishlists". */
-const GOAL = /\b(?:help (?:us|me|them)(?: to)? (?:reach|hit|get|gather|smash)|let'?s (?:hit|reach|get)|we(?:'ll| will) hit|road to|on the (?:road|way) to|to the next|all the way to|if we (?:hit|reach|get)|once we (?:hit|reach)|when we (?:hit|reach)|aim(?:ing)? for|toward|hoping to (?:hit|reach)|hope to (?:hit|reach)|next (?:milestone|goal|tier|target)|(?:goal|target|dream|plan)\b[^.!?]{0,40}\bto (?:hit|reach|get to))\b|\b(?:goal|target)s?\b[^.!?]{0,18}$/i;
-
-/** Rescues a goal that was met: "we've reached our target of 10,000". */
-const GOAL_MET = /\b(?:reach\w*|hit|passed|achieved|smashed|beat|exceeded|surpassed|cleared|met)\s+(?:our|the|my|its|a\s+\w+)?\s*(?:goal|target)\b/i;
-const GOAL_TRAIL = /\b(?:reaching (?:this|that) goal|if we (?:hit|reach)|once we (?:hit|reach)|will unlock|to unlock|help us (?:reach|hit|get))\b/i;
-
-/** A gain over a period rather than a total. "35,000 wishlists over the weekend". */
-const DELTA_LEAD = /\bgained\s+another\s+$|\bduring (?:the|our|this) (?:festival|event|fest|showcase|sale)\b[^.!?]{0,45}$/i;
-const DELTA_TRAIL = /^\W{0,3}(?:over the weekend|during (?:the|our|this) \w+|in (?:one|a|the last|the past)\s+(?:week|weekend|day|month))\b/i;
-
-/** Separates "we hit 100k wishlists over the weekend" from "35,000 wishlists over the weekend". */
-const TOTAL_VERB = /\b(?:hits?|reach\w*|passe?[ds]?|surpass\w*|cross\w*|exceed\w*|smash\w*|broke|climbed|milestone)\b/i;
-
-/** Not this store's balance. "200k wishlists across Steam and consoles". */
-const PLATFORM = /\bacross (?:all )?(?:platforms|steam and|consoles)|\bon steam and (?:epic|gog|consoles?|xbox|playstation)|\b(?:combined|multi-?platform)\s+(?:total|wishlists?)/i;
-
-/** A larger figure elsewhere in the post makes the matched one a retrospective. */
-const ANY_FIGURE = new RegExp(COUNT + String.raw`\s*\+?\s*(?:steam\s+)?(?:wishlists?|wishlist mark|mark\b|now\b)`, 'gi');
-
 const stripHtml = (html) => String(html ?? '')
   .replace(/<[^>]+>/g, ' ')
   .replace(/&nbsp;/g, ' ')
@@ -119,18 +87,8 @@ function milestonesIn(item) {
     // giveaway, and above ten million nobody has been.
     if (value == null || value < 1_000 || value > 10_000_000) continue;
 
-    const lead = text.slice(Math.max(0, match.index - 60), match.index);
     const end = match.index + match[0].length;
-    const trail = text.slice(end, end + 90);
-    const claimsTotal = TOTAL_VERB.test(lead.slice(-22));
-
-    if (GOAL.test(lead) && !GOAL_MET.test(lead)) continue;
-    if (GOAL_TRAIL.test(trail)) continue;
-    if (DELTA_LEAD.test(lead)) continue;
-    if (/\+\s*$/.test(lead) && !claimsTotal) continue;
-    if (DELTA_TRAIL.test(trail) && !claimsTotal) continue;
-    if (PLATFORM.test(text)) continue;
-    if (!ACHIEVED.test(lead) && !ACHIEVED.test(trail)) continue;
+    if (rejectQuote(text.slice(Math.max(0, match.index - 60), match.index), text.slice(end, end + 90), text)) continue;
 
     // A retrospective: "we hit 10,000 wishlists (18,000 now)". The larger
     // figure is today's, and this one describes the past.

@@ -458,6 +458,9 @@
   "rWishlistRankCurve": {
     "message": "这款游戏没有公开的愿望单数字，因此估算来自它在 Steam 愿望单排行中的位置"
   },
+  "rWishlistSaidStale": {
+    "message": "开发者公布的数字来自 $1，因此排名承担了估算的主要部分"
+  },
   "rWishlistBelowList": {
     "message": "完全低于 Steam 愿望单排名，因此只有关注者比率给出答案"
   },

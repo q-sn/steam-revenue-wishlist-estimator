@@ -458,6 +458,9 @@
   "rWishlistRankCurve": {
     "message": "Für dieses Spiel wurde keine Zahl veröffentlicht, daher stammt die Schätzung aus seiner Position in Steams Wunschlisten-Rangliste"
   },
+  "rWishlistSaidStale": {
+    "message": "Die vom Entwickler veröffentlichte Zahl stammt vom $1, daher trägt die Rangliste den Großteil der Schätzung"
+  },
   "rWishlistBelowList": {
     "message": "Ganz unterhalb der Steam-Wunschlisten-Rangliste, daher antwortet nur das Follower-Verhältnis"
   },

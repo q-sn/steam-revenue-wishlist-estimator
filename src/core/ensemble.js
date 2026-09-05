@@ -174,8 +174,15 @@ export function scoreWishlistConfidence(wishlists) {
       'The developer published a figure for this game, so the estimate is mostly that number');
   }
   if (wishlists.rank && saidShare <= 0.5) {
-    note(1, 'rWishlistRankCurve', [],
-      "No published figure for this game, so the estimate is read from its place in Steam's wishlist ranking");
+    // Absence and staleness are different facts, and the caption must not
+    // report one as the other.
+    if (wishlists.said) {
+      note(1, 'rWishlistSaidStale', [wishlists.said.announcedAt],
+        `The figure the developer published dates from ${wishlists.said.announcedAt}, so the ranking carries most of the estimate`);
+    } else {
+      note(1, 'rWishlistRankCurve', [],
+        "No published figure for this game, so the estimate is read from its place in Steam's wishlist ranking");
+    }
   } else if (!wishlists.rank && wishlists.rankReason === 'below-list') {
     note(2, 'rWishlistBelowList', [],
       "Below Steam's wishlist ranking entirely, so only the follower ratio answers");

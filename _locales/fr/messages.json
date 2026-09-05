@@ -458,6 +458,9 @@
   "rWishlistRankCurve": {
     "message": "Aucun chiffre publié pour ce jeu : l'estimation vient de sa position dans le classement des listes de souhaits Steam"
   },
+  "rWishlistSaidStale": {
+    "message": "Le chiffre publié par le développeur date du $1 : le classement porte l'essentiel de l'estimation"
+  },
   "rWishlistBelowList": {
     "message": "Sous l'ensemble du classement des souhaits Steam : seul le ratio d'abonnés répond"
   },

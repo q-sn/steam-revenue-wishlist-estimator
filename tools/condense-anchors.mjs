@@ -9,6 +9,7 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
+import { rejectStoredQuote } from './anchor-quote.mjs';
 
 const argv = process.argv.slice(2);
 const valueOf = (flag, fallback) => {
@@ -46,6 +47,7 @@ async function main() {
     appsPerQuote.get(key).add(r.appid);
   }
   let crossPosted = 0;
+  const rejected = new Map();
 
   // Largest figure per game, tie-broken to the most recent, which is what the
   // model in src/core/constants.js is fitted on. A wishlist balance does not
@@ -56,6 +58,11 @@ async function main() {
     if (!Number.isFinite(r.wishlists) || r.wishlists <= 0) continue;
     if (typeof r.announcedAt !== 'string' || !r.announcedAt) continue;
     if ((appsPerQuote.get(fingerprint(r.quoted))?.size ?? 1) > 1) { crossPosted++; continue; }
+
+    // The archive is raw and append-only, so a rule fixed after a row landed
+    // has to be applied here rather than by rewriting history.
+    const why = rejectStoredQuote(r.quoted, r.wishlists);
+    if (why) { rejected.set(why, (rejected.get(why) ?? 0) + 1); continue; }
 
     const seen = best.get(r.appid);
     const better = !seen
@@ -89,7 +96,9 @@ async function main() {
 
   process.stderr.write(
     `${rows.length} disclosures -> ${payload.games} games, ${(text.length / 1024).toFixed(1)} KB -> ${OUT}`
-    + (crossPosted ? `, ${crossPosted} dropped as cross-posted\n` : '\n')
+    + (crossPosted ? `, ${crossPosted} cross-posted` : '')
+    + [...rejected].map(([w, n]) => `, ${n} ${w}`).join('')
+    + '\n'
   );
 }
 

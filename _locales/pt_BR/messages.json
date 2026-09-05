@@ -458,6 +458,9 @@
   "rWishlistRankCurve": {
     "message": "Não há número publicado para este jogo, então a estimativa vem da sua posição no ranking de listas de desejos da Steam"
   },
+  "rWishlistSaidStale": {
+    "message": "O número publicado pelo desenvolvedor é de $1, então o ranking carrega a maior parte da estimativa"
+  },
   "rWishlistBelowList": {
     "message": "Abaixo de todo o ranking de desejos da Steam, então só a razão de seguidores responde"
   },

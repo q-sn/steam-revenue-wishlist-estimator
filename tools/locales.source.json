@@ -2208,6 +2208,21 @@
     "pl": "Dla tej gry nie opublikowano liczby, więc szacunek pochodzi z jej pozycji w rankingu list życzeń Steam",
     "it": "Per questo gioco non c'è una cifra pubblicata, quindi la stima viene dalla sua posizione nella classifica delle liste dei desideri di Steam"
   },
+  "rWishlistSaidStale": {
+    "_ph": 1,
+    "en": "The figure the developer published dates from $1, so the ranking carries most of the estimate",
+    "ru": "Цифра разработчика датирована $1, поэтому основную часть оценки несёт рейтинг",
+    "zh_CN": "开发者公布的数字来自 $1，因此排名承担了估算的主要部分",
+    "es": "La cifra publicada por el desarrollador es del $1, así que el ranking aporta la mayor parte de la estimación",
+    "pt_BR": "O número publicado pelo desenvolvedor é de $1, então o ranking carrega a maior parte da estimativa",
+    "de": "Die vom Entwickler veröffentlichte Zahl stammt vom $1, daher trägt die Rangliste den Großteil der Schätzung",
+    "fr": "Le chiffre publié par le développeur date du $1 : le classement porte l'essentiel de l'estimation",
+    "ja": "開発者が公開した数字は $1 のものなので、推定の大部分は順位が担っています",
+    "ko": "개발자가 공개한 수치는 $1 자료라, 추정의 대부분은 순위가 담당합니다",
+    "tr": "Geliştiricinin yayımladığı sayı $1 tarihli, bu yüzden tahminin çoğunu sıralama taşıyor",
+    "pl": "Liczba opublikowana przez dewelopera pochodzi z $1, więc większość szacunku niesie ranking",
+    "it": "La cifra pubblicata dallo sviluppatore risale al $1, quindi la classifica porta gran parte della stima"
+  },
   "rWishlistBelowList": {
     "en": "Below Steam's wishlist ranking entirely, so only the follower ratio answers",
     "ru": "Игра ниже всего вишлист-рейтинга Steam, поэтому отвечает только отношение к подписчикам",

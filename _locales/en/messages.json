@@ -458,6 +458,9 @@
   "rWishlistRankCurve": {
     "message": "No published figure for this game, so the estimate is read from its place in Steam's wishlist ranking"
   },
+  "rWishlistSaidStale": {
+    "message": "The figure the developer published dates from $1, so the ranking carries most of the estimate"
+  },
   "rWishlistBelowList": {
     "message": "Below Steam's wishlist ranking entirely, so only the follower ratio answers"
   },

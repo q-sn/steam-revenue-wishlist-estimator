@@ -216,7 +216,7 @@ Steam publishes no wishlist counts for anybody. Three marks answer: a figure the
 
 ### One fit behind two of the marks
 
-Turning a position into a count and carrying an old announcement forward to today are the same estimation problem, and they are estimated together — one median (L1) regression over 1,234 posts across 732 ranked games:
+Turning a position into a count and carrying an old announcement forward to today are the same estimation problem, and they are estimated together — one median (L1) regression over 1,229 posts across 730 ranked games:
 
 ```
 log(wishlists) = log a - b*log(rank + q) - alpha*log(1 + age/90) - rungk*gap
@@ -230,7 +230,7 @@ log(wishlists) = log a - b*log(rank + q) - alpha*log(1 + age/90) - rungk*gap
 
 ### What the developer said, which outranks everything else here
 
-744 games have a wishlist figure their own studio published on their own store page, 732 of them ranked when the model was fitted — roughly one ranked game in eight. On the day it is posted such a figure carries **0.75** of the weight, because its band runs 0.858x to 1.351x of the announced figure against the curve's 0.693x to 1.401x. That share is not a constant: the announcement band widens with the age of the post, so the same figure four years later carries **0.04** and the curve decides instead. A fixed weight would have given a four-year-old floor the same vote as a fresh one, and did — it pushed the band to 10.2x and graded the answer red, so a game with a stale announcement scored worse than a game with none at all.
+730 games have a wishlist figure their own studio published on their own store page, all of them ranked when the model was fitted — roughly one ranked game in eight. On the day it is posted such a figure carries **0.75** of the weight, because its band runs 0.858x to 1.351x of the announced figure against the curve's 0.693x to 1.401x. That share is not a constant: the announcement band widens with the age of the post, so the same figure four years later carries **0.04** and the curve decides instead. A fixed weight would have given a four-year-old floor the same vote as a fresh one, and did — it pushed the band to 10.2x and graded the answer red, so a game with a stale announcement scored worse than a game with none at all.
 
 Two measured corrections turn a post into today's count.
 
