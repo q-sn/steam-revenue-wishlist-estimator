@@ -24,7 +24,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { ANY_FIGURE, MILESTONE, rejectQuote } from './anchor-quote.mjs';
+import { ANY_FIGURE, MILESTONE, clean, isAspirational, parseCount, rejectQuote } from './anchor-quote.mjs';
 
 const argv = process.argv.slice(2);
 const valueOf = (flag, fallback) => {
@@ -45,24 +45,6 @@ const MAX_BACKOFF_MS = 60_000;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const jitter = (ms) => Math.round(ms * (0.75 + Math.random() * 0.5));
 
-const stripHtml = (html) => String(html ?? '')
-  .replace(/<[^>]+>/g, ' ')
-  .replace(/&nbsp;/g, ' ')
-  .replace(/&amp;/g, '&')
-  .replace(/\s+/g, ' ')
-  .trim();
-
-/** "650 000" / "1,000,000" / "100k" / "1.5M" -> a number. */
-function parseCount(raw) {
-  const text = raw.trim().toLowerCase();
-  const scale = text.endsWith('m') ? 1_000_000 : text.endsWith('k') ? 1_000 : 1;
-  const digits = text.replace(/[km]$/, '').trim();
-  const value = scale === 1
-    ? Number(digits.replace(/[,.\u00a0\u202f\u2009 ]/g, ''))
-    : Number(digits.replace(/,/g, '.'));
-  return Number.isFinite(value) ? Math.round(value * scale) : null;
-}
-
 /** Whether a figure is a round milestone, which most of them are. */
 function isRound(value) {
   const magnitude = 10 ** Math.floor(Math.log10(value));
@@ -70,8 +52,13 @@ function isRound(value) {
 }
 
 export function milestonesIn(item) {
-  const text = stripHtml(`${item.title} . ${item.contents}`);
+  const title = clean(item.title);
+  const text = clean(`${item.title} . ${item.contents}`);
+  // Where the headline ends in the joined text: " . " is three characters.
+  const titleEnds = title ? title.length + 3 : 0;
   const out = [];
+  /** Figures the body called a goal. The headline runs first, so this is applied after. */
+  const wanted = new Set();
 
   for (const match of text.matchAll(MILESTONE)) {
     const value = parseCount(match[1]);
@@ -80,26 +67,54 @@ export function milestonesIn(item) {
     if (value == null || value < 1_000 || value > 10_000_000) continue;
 
     const end = match.index + match[0].length;
-    if (rejectQuote(text.slice(Math.max(0, match.index - 60), match.index), text.slice(end, end + 90), text)) continue;
+    const opts = { inTitle: match.index < titleEnds, raw: match[1], value };
+    const why = rejectQuote(text.slice(Math.max(0, match.index - 60), match.index), text.slice(end, end + 90), text, opts);
+    if (why) {
+      // A headline states the figure without a verb, so it is read as a claim.
+      // "Community Quest: 250k Wishlists" is a headline too, and its body says
+      // "we've set a huge community goal of 250,000 Wishlists". Remember which
+      // figures the body called a goal, so the headline cannot resurrect them.
+      if (!opts.inTitle && /^(?:goal|not-yet-reached|reward-tier)$/.test(why)) wanted.add(value);
+      continue;
+    }
 
     // A retrospective: "we hit 10,000 wishlists (18,000 now)". The larger
-    // figure is today's, and this one describes the past.
-    const larger = [...text.matchAll(ANY_FIGURE)]
-      .map((m) => parseCount(m[1]))
-      .some((v) => v != null && v > value);
+    // figure is today's, and this one describes the past \u2014 unless the larger
+    // one is the studio looking ahead, which is how "200,000 Wishlists -
+    // Thank You!" was lost to "we cannot wait to celebrate 300k wishlists".
+    const larger = [...text.matchAll(ANY_FIGURE)].some((m) => {
+      const other = parseCount(m[1]);
+      if (other == null || other <= value) return false;
+      return !isAspirational(text.slice(Math.max(0, m.index - 60), m.index));
+    });
     if (larger) continue;
 
     out.push({
       wishlists: value,
       round: isRound(value),
-      quoted: text.slice(Math.max(0, match.index - 90), match.index + 90).trim()
+      inTitle: opts.inTitle,
+      // Wide enough to hold both windows the decision was made on: 60 before
+      // and 90 after the word. A quote cut at match.index + 90 kept less trail
+      // than rejectQuote had read, so the condenser re-judged four rows on
+      // less evidence than the harvester and dropped them.
+      quoted: text.slice(Math.max(0, match.index - 90), end + 95).trim()
     });
   }
 
   // One figure per post. A milestone announcement repeats its own number in
   // the title and the body, and celebrating two at once ("100k wishlists and
   // 50k followers") is a different number wearing the same words.
-  const byValue = new Map(out.map((m) => [m.wishlists, m]));
+  const kept = out.filter((m) => !(m.inTitle && wanted.has(m.wishlists)));
+  // A milestone post states its number twice, and the two windows are not
+  // equally good. Keep the headline one: it is the cleanest sentence, and it
+  // is the occurrence whose `inTitle` the condenser will need when it re-reads
+  // the quote — storing the body copy made the condenser drop rows the
+  // harvester had just accepted.
+  const byValue = new Map();
+  for (const m of kept) {
+    const seen = byValue.get(m.wishlists);
+    if (!seen || (m.inTitle && !seen.inTitle)) byValue.set(m.wishlists, m);
+  }
   return byValue.size === 1 ? [...byValue.values()] : [];
 }
 
@@ -205,10 +220,13 @@ async function main() {
           announcedAt,
           wishlists: hit.wishlists,
           round: hit.round,
+          // The condenser re-reads the stored quote, which is a window rather
+          // than a post, so it cannot see that the figure was the headline.
+          inTitle: hit.inTitle,
           listed: ranks.listed,
           upcoming: ranks.upcoming,
           url: item.url ?? null,
-          quoted: hit.quoted.slice(0, 200)
+          quoted: hit.quoted.slice(0, 240)
         });
       }
     }

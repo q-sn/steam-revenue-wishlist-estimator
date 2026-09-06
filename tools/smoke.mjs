@@ -3,6 +3,7 @@
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { milestonesIn } from './harvest-anchors.mjs';
+import { rejectStoredQuote } from './anchor-quote.mjs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import {
@@ -1607,6 +1608,75 @@ check('a goal is not an achievement',
 
 check('a gain over a period is not a total',
   read('35,000 Wishlists Over The Weekend!') === null);
+
+// An audit of all 5,575 ranked games against their announcements found these.
+// Each line below stood for a class, not a single post; the counts are what
+// the class cost across the ranked list.
+
+check('BBCode between the number and the word does not break the match',
+  read('Thank you for helping [b]CrisisX[/b] reach [b]200,000[/b] wishlists on Steam!') === 200_000,
+  'bodies are BBCode, and stripping only <tags> left the markup in the middle');
+
+check('markup in the window does not hide the achievement word',
+  read('[p][img src="{STEAM_CLAN_IMAGE}/46211143/031e048e6ab7057b0b13745ef54e6ab8ffcd9801.png"][/img][/p]'
+    + '[p]We have officially hit 300,000 wishlists, thank you![/p]') === 300_000,
+  'one image filled the 90 characters after the word');
+
+check('a scale spelled out is a scale',
+  read('ILL has officially surpassed 1.5 million wishlists on Steam!') === 1_500_000,
+  '1.5M matched and 1.5 million did not; nine of the thirteen games above a million write it out');
+
+check('and so is a number spelled out',
+  read('Operation Lovecraft has achieved one million wishlists on Steam') === 1_000_000);
+
+const title = (t, body) => {
+  const found = milestonesIn({ title: t, contents: body });
+  return found.length ? found[0].wishlists : null;
+};
+
+check('a headline states the figure without needing a verb',
+  title('300,000 WISHLISTS!', 'Miners, simply - Thank You!') === 300_000,
+  '202 posts across the ranked list put the number in the title and no verb near it');
+
+check('but a headline that the body calls a goal is still a goal',
+  title('Community Quest: 250k Wishlists',
+    "we've set a huge community goal of 250,000 Wishlists. We're already 65,000 strong!") === null);
+
+check('a release year is not a count',
+  read('SILENT HILL: Townfall arrives in 2026 Wishlist now on Steam') === null,
+  'four such posts, against forty genuine milestones of 2,000');
+
+check('a plus against the number is a gain',
+  title('Next Fest Recap: +1510 Wishlists', 'What an amazing week!') === null);
+
+check('a plus with a space is a conjunction',
+  title('Release Date Confirmed: September 7th + 50K Wishlists!', 'Great news comes in waves!') === 50_000);
+
+check('unless a verb already claimed the total',
+  read('Hands Up, G! has reached +60,000 wishlists on Steam. Thank you!') === 60_000,
+  '"+60,000" is also how a studio writes "60,000 or more"');
+
+check('a place in the chart is not a balance',
+  title('Restitched | Top 1,000 Wishlists!', 'Restitched is now in the top 1,000 most-wishlisted games') === null);
+
+check('a figure not yet reached is not an anchor',
+  read("We're already close to reaching 10,000 wishlists - thank you all!") === null);
+
+check('a curled apostrophe does not turn a goal into an achievement',
+  read("Let’s collect 100 likes and 2000 wishlists, and she'll take her clothes off") === null,
+  "every rule spelling \"let's\" straight was missing the form actually typed");
+
+check('a larger figure the studio only hopes for leaves today alone',
+  title('200,000 Wishlists - Thank You!',
+    'Freerailers! 200,000 of you have wishlisted. We cannot wait to celebrate 300k wishlists with you!') === 200_000);
+
+check('what the harvester keeps, the condenser keeps',
+  (() => {
+    const item = { title: '1 MILLION WISHLISTS ON STEAM', contents: 'Six months after revealing WARDOGS to the world. 1 MILLION WISHLISTS ON STEAM. Humbled.' };
+    const [hit] = milestonesIn(item);
+    return hit && !rejectStoredQuote(hit.quoted.slice(0, 240), hit.wishlists, { inTitle: hit.inTitle });
+  })(),
+  'the stored quote was cut shorter than the window the decision was made on');
 
 group('The seam between the collector and the core');
 

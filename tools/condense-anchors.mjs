@@ -61,7 +61,7 @@ async function main() {
 
     // The archive is raw and append-only, so a rule fixed after a row landed
     // has to be applied here rather than by rewriting history.
-    const why = rejectStoredQuote(r.quoted, r.wishlists);
+    const why = rejectStoredQuote(r.quoted, r.wishlists, { inTitle: r.inTitle === true });
     if (why) { rejected.set(why, (rejected.get(why) ?? 0) + 1); continue; }
 
     const seen = best.get(r.appid);
