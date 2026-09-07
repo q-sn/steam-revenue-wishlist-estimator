@@ -3,7 +3,7 @@
     "message": "Wishlytic — Steam Gelir ve İstek Listesi Tahmincisi"
   },
   "extDesc": {
-    "message": "Her Steam mağaza sayfasında satış, gelir ve istek listesi tahmini. Sahte kesinlik yerine aralıklar. Ücretsiz, hesap gerekmez."
+    "message": "Steam gelir hesaplayıcı: satılan kopya, net gelir ve istek listesi tahmini. Kaynaklı aralıklar, sahte kesinlik yok. Ücretsiz."
   },
   "confReliable": {
     "message": "Güvenilir"

@@ -3,7 +3,7 @@
     "message": "Wishlytic — Stimatore di ricavi e liste dei desideri di Steam"
   },
   "extDesc": {
-    "message": "Stima vendite, ricavi e liste dei desideri su ogni pagina Steam. Intervalli, non falsa precisione. Gratis, senza account."
+    "message": "Calcolatore di ricavi Steam: copie vendute, ricavi netti e liste dei desideri su ogni pagina. Intervalli con fonti. Gratis."
   },
   "confReliable": {
     "message": "Affidabile"

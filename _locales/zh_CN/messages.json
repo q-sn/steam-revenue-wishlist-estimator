@@ -3,7 +3,7 @@
     "message": "Wishlytic — Steam 收入与愿望单估算器"
   },
   "extDesc": {
-    "message": "在任意商店页面估算 Steam 游戏的销量、收入和愿望单数量。给出区间，而非虚假的精确值。免费，无需账号。"
+    "message": "Steam 收入计算器：在任意商店页面估算销量、净收入和愿望单。给出有来源的区间，而非虚假精度。免费。"
   },
   "confReliable": {
     "message": "可靠"
