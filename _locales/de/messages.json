@@ -18,13 +18,14 @@
     "message": "Keine Daten"
   },
   "legendGood": {
-    "message": "Die Methoden stimmen überein, die Bandbreite ist schmal"
+    "message": "Zwei Methoden lassen dieselbe Zahl zu, bei einem Spiel der Größe, die die Quellen gemessen haben",
+    "description": "Deliberately says nothing about the band being narrow, and nothing about the answer being close. Band width no longer scores, and the grade has not been shown to predict accuracy. See the Confidence section of docs/METHODOLOGY.md."
   },
   "legendFair": {
-    "message": "Brauchbar, aber die Bandbreite ist groß oder es gab nichts zum Gegenprüfen"
+    "message": "Nur eine Methode, ein knappes Verfehlen zwischen den Bändern, oder ein widersprechender Gegencheck"
   },
   "legendLow": {
-    "message": "Die Methoden widersprechen sich oder eine Plausibilitätsprüfung ist gescheitert — lies die Bandbreite, nicht den Mittelwert"
+    "message": "Die Methoden widersprechen sich, oder die Quellen haben nie ein Spiel dieser Größe gemessen — lies die Bandbreite, nicht den Mittelwert"
   },
   "legendNone": {
     "message": "Es konnte keine Schätzung erstellt werden"
@@ -46,6 +47,12 @@
   },
   "rBandSpans": {
     "message": "Bandbreite umfasst das $1-Fache"
+  },
+  "rBeyondMeasured": {
+    "message": "Größer als jedes Spiel, an dem das Verhältnis Verkäufe pro Review gemessen wurde; oberhalb von etwa $1 Reviews sinkt es um einen unveröffentlichten Betrag"
+  },
+  "rBelowMeasured": {
+    "message": "Unter $1 Exemplaren — dieser Bereich war vom Genauigkeitsvergleich hinter der Methode ausgeschlossen"
   },
   "rAgree": {
     "message": "Die Quellen stimmen innerhalb der erwarteten Bandbreite überein"

@@ -144,6 +144,11 @@ export function estimateAll(game, settings = {}) {
   // the number.
   const flags = {
     lowSample: boxleiter.lowSample,
+    // The sample the multiple was applied to. `combined` carries a unit range
+    // and not the review count behind it, and CONFIDENCE.measuredRange needs
+    // the count: the upper edge is a fact about how many reviews the sources
+    // ever measured, not about how many copies we think were sold.
+    reviews: Number.isFinite(game.reviews) ? game.reviews : null,
     // Why there is no owner band, when there is not one.
     ownersMissing: owners.ok ? null : owners.reason,
     ownersUntrusted: owners.ok && owners.weight === 0

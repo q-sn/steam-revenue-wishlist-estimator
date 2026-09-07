@@ -18,13 +18,14 @@
     "message": "Sem dados"
   },
   "legendGood": {
-    "message": "Os métodos concordam e a faixa é estreita"
+    "message": "Dois métodos admitem um número em comum, em um jogo do tamanho que as fontes mediram",
+    "description": "Deliberately says nothing about the band being narrow, and nothing about the answer being close. Band width no longer scores, and the grade has not been shown to predict accuracy. See the Confidence section of docs/METHODOLOGY.md."
   },
   "legendFair": {
-    "message": "Utilizável, mas a faixa é ampla ou não houve como cruzar os dados"
+    "message": "Apenas um método, faixas que quase se tocam, ou um cruzamento que discorda"
   },
   "legendLow": {
-    "message": "Os métodos divergem ou uma verificação falhou: olhe a faixa, não o ponto médio"
+    "message": "Os métodos se contradizem, ou as fontes nunca mediram um jogo deste tamanho: olhe a faixa, não o ponto médio"
   },
   "legendNone": {
     "message": "Não foi possível gerar uma estimativa"
@@ -46,6 +47,12 @@
   },
   "rBandSpans": {
     "message": "A faixa abrange $1x"
+  },
+  "rBeyondMeasured": {
+    "message": "Maior que qualquer jogo em que a relação vendas por análise foi medida: acima de cerca de $1 análises ela cai, e ninguém publica quanto"
+  },
+  "rBelowMeasured": {
+    "message": "Menos de $1 cópias, faixa que o teste de precisão deste método excluiu"
   },
   "rAgree": {
     "message": "As fontes concordam dentro da faixa esperada"

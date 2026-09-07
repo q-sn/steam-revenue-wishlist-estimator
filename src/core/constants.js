@@ -135,6 +135,11 @@ export const SOURCES = {
     url: 'https://github.com/q-sn/steam-revenue-wishlist-estimator/blob/main/src/content/scrape.js',
     note: 'appdetails returns the 1.0 date, not the date a game first took money, so every Early Access title reads younger than it is and picks a base multiplier from the wrong band. Measured over 930 games drawn across SteamSpy owner pages 0, 3, 7, 12 and 18 with 10+ reviews each: 62 of the 920 that answered — 6.7%, one game in fifteen — land in the wrong BASE_MULTIPLIER band, and every one of them in the same direction, understating the multiple by x1.08 to x2.47 with a median of x1.45. Space Engineers, The Forest, Raft, Squad, Starbound and Quake Champions are all in it. Two sources fix it and agree with each other: IStoreBrowseService returns original_steam_release_date, which is present for only 78 of 920 games but where present sits a median 1.3 years and up to 9.5 years before the shipped date; and appreviewhistogram returns results.start_date, which matches that field within 45 days on 76 of those 78 (97%) and catches a further 55 games the field omits entirely. Of the 62 corrections, 30 come from the field and 32 from the histogram alone. The 180-day floor is not sensitive: 30 days moves 64 games, 90 moves 63, 180 moves 62, 270 moves 62. It is set at 180 because the 30-to-180-day window holds 22 games whose early reviews come from pre-release beta access rather than a sale, and buying two extra corrections is not worth adopting that ambiguity.'
   },
+  OURS_CONFIDENCE_CHECK: {
+    label: 'Measured in this repository — the units confidence grade against disclosed sales',
+    url: 'https://github.com/q-sn/steam-revenue-wishlist-estimator/blob/main/tools/calibrate.mjs',
+    note: 'Run `node tools/calibrate.mjs` to reproduce; it prints accuracy by grade. Scored over the 62 frozen snapshots in test/fixtures.json, which carry one estimator each. THE GRADE DOES NOT SEPARATE OUTCOMES ON THIS DATA. What shipped before graded 46 games `fair` and 16 `low` on band width alone: within 30% error 50.0% against 31.3% (permutation p = 0.25) and truth inside the band 54.3% against 68.8% — the worse grade covering MORE often, p = 0.39. Every single observable was tested for its ability to rank outcomes: AUC on within-30% is 0.62 for ln(reviews) [0.47-0.76], 0.62 for ln(predicted units) [0.47-0.76], 0.66 for ln(list price) [0.52-0.79], 0.47 for release year, 0.53 for positive share, 0.57 for the 200-review gate — every interval contains 0.5. A ridge logistic on all five at once scores in-sample AUC 0.616 and leave-one-out 0.430, worse than chance, permutation p = 0.46: there is nothing in these observables to fit. The dimension carrying most of the grade — whether two methods agree — is untestable here, and structurally rather than by accident: a frozen snapshot holds no owner band, the disclosures average 3.1 years old so a live band would be years out of date, and only 2 of the 62 are both under a year old and large enough for the owner leg to carry weight at all. What ships is therefore checked against outcomes on one rule (CONFIDENCE.measuredRange, direction only, 6 games) and published-but-unmeasured on the rest. See the Confidence section of docs/METHODOLOGY.md.'
+  },
   OURS_PLAYTIME_BIAS: {
     label: 'Measured in this repository — reviewer playtime against average playtime',
     url: 'https://github.com/q-sn/steam-revenue-wishlist-estimator/blob/main/test/fixtures.json',
@@ -434,6 +439,25 @@ export const WEEK_ONE = {
 };
 
 /**
+ * What the units grade is allowed to read.
+ *
+ * Band width is **not** on the list, and that is a change made on evidence.
+ * Width used to cap the grade at 2.2x and 3.5x. Over the 62 frozen snapshots
+ * in test/fixtures.json the ceiling is the only rule that ever fires — it puts
+ * 16 games at the bottom — and it does not predict accuracy: 31.3% of them
+ * land within 30% error against 50.0% of the rest, which is inside the noise
+ * of 62 games (p = 0.25), while the truth sits inside the band for 68.8% of
+ * them against 54.3% of the rest. The grade ran *backwards* against the thing
+ * the product actually shows. The cause is mechanical: a band wider than 3.5x
+ * here means a sample under 200 reviews, which the estimator has already
+ * widened by x0.75 and x1.4, so the ceiling was the low-sample penalty coming
+ * back in through a side door after the front door was closed. See
+ * OURS_CONFIDENCE_CHECK.
+ *
+ * What is left is `measuredRange`: whether the game is the kind of game the
+ * review multiple's sources actually measured. Both edges are published.
+ */
+/**
  * Turning Steam's release date into the date a game first took money.
  *
  * `appdetails` reports the 1.0 date. For an Early Access title that can be
@@ -455,16 +479,52 @@ export const FIRST_SALE = {
   derived: true
 };
 
-/** Confidence thresholds, as the ratio of a band's high end to its low end. */
 export const CONFIDENCE = {
-  good: 2.2,
-  fair: 3.5,
+  /**
+   * Outside this the multiple is being asked about a population its own
+   * accuracy figures do not cover, so the grade drops to the bottom.
+   *
+   * `minUnits` is Gamalytic's own exclusion, verbatim: games under 1,000
+   * copies were left out of the benchmark that produces the 50.4% figure this
+   * project quotes for the adjusted multiple. Below it there is no published
+   * accuracy at all, ours or theirs.
+   *
+   * `maxReviews` is the other end. GDC_REVIEW_COUNT_2023 reports that the
+   * largest games fall back toward 20 sales per review and publishes no median
+   * for them, so the size table returns to neutral above 10,000 reviews and
+   * the decline is not modelled. The magnitude is ours: the source says
+   * "hundreds of thousands of reviews", which reads as 200,000. It is checked
+   * against the fixtures for direction and deliberately not fitted to them —
+   * the four fixtures above it are Valheim, Stardew Valley, Rust and Garry's
+   * Mod, and on three of the four the midpoint reads 2.5x to 3.7x high and the
+   * disclosed figure falls below the *whole* band, whose low edge still sits
+   * 1.34x to 2.00x above the truth. That is the direction the source
+   * predicted. Four games is a direction and not a demonstration; the fixtures
+   * cannot tell 100,000 from 200,000, so the source's wording picks the edge
+   * rather than the split that flatters it.
+   */
+  measuredRange: {
+    minUnits: 1_000,
+    minUnitsSource: 'GAMALYTIC_METHOD_2023',
+    maxReviews: 200_000,
+    maxReviewsSource: 'GDC_REVIEW_COUNT_2023',
+    // The 200,000 is our reading of "hundreds of thousands".
+    derived: true,
+    checkedAgainst: 'OURS_CONFIDENCE_CHECK'
+  },
 
   /**
    * A ceiling on the wishlist grade, not the driver of it. Measured over the
    * whole ordering the band is 2.02x with the ranking alone, 2.30x with a
    * follower count too, and 2.52x with a stale announcement, so width barely
    * varies; only a contradiction pushes it past 3.5x.
+   *
+   * Kept where the units ceiling was removed, because the two ceilings do
+   * different things. Here 3.5x is unreachable except by a contradiction, so
+   * the rule is a second expression of the gap alarm and fires on nothing
+   * else. On units it fired on 26% of the fixtures purely because their review
+   * sample was thin, which is uncertainty the band was already widened for.
+   * That is the difference between a backstop and a penalty.
    */
   wishlists: {
     good: 2.0,

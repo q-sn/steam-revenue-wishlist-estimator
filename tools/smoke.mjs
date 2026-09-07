@@ -957,9 +957,9 @@ group('Every confidence scale has to vary');
 // `good` to nobody, pins revenue at "unreliable" on every paid game ever
 // released, and pins wishlists at "rough" on every unreleased one.
 //
-// So each scale reads the evidence that differs between games, and width
-// serves only as a ceiling. These checks assert that each one takes more than
-// one value, which no test of a single game could ever catch.
+// So each scale reads the evidence that differs between games. These checks
+// assert that each one takes more than one value, which no test of a single
+// game could ever catch.
 // The three shapes are taken from real games rather than invented, so that
 // "reachable" means reachable on the store and not merely on a fixture. Each
 // carries the review count, owner bucket, reviewer playtime median and
@@ -972,12 +972,18 @@ const scale = [
     appId: 80, reviews: 105_184, positivePct: 85.8, listPrice: 29.99, released: true,
     releaseYear: 2024, owners: '2,000,000 .. 5,000,000', steamPurchaseShare: 0.88
   }],
-  ['Path of Exile 2-shaped: the playtime cross-check objects', {
-    appId: 81, reviews: 225_264, positivePct: 80, listPrice: 29.99, released: true,
-    releaseYear: 2024, owners: '5,000,000 .. 10,000,000', steamPurchaseShare: 0.9,
-    monthlyHistory: months(21, 2024, 60_000), reviewerMedianHours: 120, reviewerSampleSize: 100
+  // The one assembled shape rather than a copied one, and deliberately so:
+  // the cross-check has to land outside the band, and the entry that used to
+  // sit here claimed to do that and did not — its player-hours range and its
+  // unit band overlapped, so nothing objected and no assertion noticed. A
+  // co-op survival game's numbers, five years of sustained concurrents against
+  // a review count an order of magnitude smaller.
+  ['Player-hours imply far more owners than the reviews do', {
+    appId: 81, reviews: 60_000, positivePct: 88, listPrice: 39.99, released: true,
+    releaseYear: 2019, owners: '1,000,000 .. 2,000,000', steamPurchaseShare: 0.9,
+    monthlyHistory: months(60, 2019, 12_000), reviewerMedianHours: 60, reviewerSampleSize: 100
   }],
-  ['Terraria-shaped: two bands that do not touch', {
+  ['Terraria-shaped: past every published median', {
     appId: 82, reviews: 1_551_818, positivePct: 97, listPrice: 9.99, released: true,
     releaseYear: 2011, owners: '20,000,000 .. 50,000,000', steamPurchaseShare: 0.9
   }]
@@ -992,7 +998,15 @@ for (const [label, g] of scale) {
 }
 check('the units scale reaches its top when the evidence is there',
   reached.has('good'), [...reached].join(' '));
-check('and its bottom when methods conflict', reached.has('low'));
+check('and its bottom when the sources never measured a game like this',
+  reached.has('low'));
+// The middle exists for a reason: a cross-check that objects is worth one
+// step, not the bottom. It used to be a step and then the width ceiling
+// finished the job, which made the two indistinguishable.
+check('and its middle when a cross-check objects',
+  estimateAll(scale[1][1]).confidence.units.level === 'fair'
+  && estimateAll(scale[1][1]).confidence.units.reasons.some((r) => r.key === 'rPlaytimeDisagree'),
+  estimateAll(scale[1][1]).confidence.units.reasons.map((r) => r.key).join(' '));
 
 // Every scale, across shapes that differ only in what is known about them.
 const shapes = [
@@ -1027,22 +1041,125 @@ check('revenue takes more than one scored value', scored(seen.revenue).length > 
 check('wishlists takes more than one scored value', scored(seen.wishlists).length > 1,
   scored(seen.wishlists).sort().join('/'));
 
-// And the one fact that moves the revenue verdict is a real one.
+// Money is worth exactly what the unit estimate behind it is worth. The
+// waterfall's own uncertainty is already in the width of the revenue band, so
+// charging the verdict for it too said `good` on units and `low` on revenue
+// for the same game — two figures from one estimate disagreeing about how much
+// to trust it.
 const measured = estimateAll(shapes[0][1], {});
 const defaulted = estimateAll(shapes[1][1], {});
-check('a measured audience mix is worth a step on revenue',
-  measured.confidence.revenue.level !== defaulted.confidence.revenue.level,
-  `${measured.confidence.revenue.level} against ${defaulted.confidence.revenue.level}`);
+for (const [label, r] of [['read from languages', measured], ['defaulted', defaulted]]) {
+  check(`revenue is graded exactly as the units are, ${label}`,
+    r.confidence.revenue.level === r.confidence.units.level,
+    `${r.confidence.revenue.level} against units ${r.confidence.units.level}`);
+}
+// It still has to say which it was: the audience mix is worth knowing even
+// when it is not worth a grade.
 check('and the reason says which it was',
   measured.confidence.revenue.reasons.some((r) => r.key === 'rRegionalMeasured')
   && defaulted.confidence.revenue.reasons.some((r) => r.key === 'rRegionalAssumed'));
 
-check('width still caps the level regardless of evidence',
-  estimateAll(shapes[4][1], {}).confidence.units.level === 'low'
-  && CONFIDENCE.good === 2.2 && CONFIDENCE.fair === 3.5,
-  'a band past the fair threshold cannot be called anything else');
 check('the gap alarm sits at the methods\' own published error, not under it',
   ENSEMBLE.alarmGap > 1.5, `${ENSEMBLE.alarmGap}x`);
+
+group('Band width is reported and never graded');
+
+// This is the one rule the fixtures could test, and it failed. Width used to
+// cap the grade at 2.2x and 3.5x. Over the 62 frozen snapshots in
+// test/fixtures.json the ceiling is the only rule that ever fires — 16 games —
+// and the games it condemned have the truth inside their band 68.8% of the
+// time against 54.3% for the rest. It ranked the band backwards on the one
+// product this tool ships. `npm run calibrate` prints that table and exits
+// non-zero if a lower grade ever covers significantly more often again.
+//
+// The cause is mechanical rather than mysterious: past 3.5x here means a
+// sample under 200 reviews, whose band the estimator already widened by x0.75
+// and x1.4. The ceiling was the low-sample penalty coming back through a side
+// door after the front door was closed.
+check('no width threshold survives in the units scale',
+  CONFIDENCE.good === undefined && CONFIDENCE.fair === undefined,
+  'width is context, not a level');
+
+// Two games differing only in how wide the band is. The wide one is wide
+// because the sample is thin, and it must not be graded for that twice.
+const wideBand = estimateAll({
+  appId: 60, reviews: 80, positivePct: 90, listPrice: 19.99, released: true, releaseYear: 2025
+}, {});
+const narrowBand = estimateAll({
+  appId: 61, reviews: 4000, positivePct: 90, listPrice: 19.99, released: true, releaseYear: 2025
+}, {});
+check('a five-times-wide band grades the same as a two-and-a-half-times one',
+  wideBand.confidence.units.level === narrowBand.confidence.units.level,
+  `${(wideBand.units.range.hi / wideBand.units.range.lo).toFixed(1)}x and `
+  + `${(narrowBand.units.range.hi / narrowBand.units.range.lo).toFixed(1)}x, both `
+  + wideBand.confidence.units.level);
+check('the width is still on the reasons, as context',
+  wideBand.confidence.units.reasons.some((r) => r.key === 'rBandSpans' && r.severity === 0),
+  'the band is on screen; the word must not pretend to measure it');
+check('and the thin sample is named without being charged',
+  wideBand.confidence.units.reasons.some((r) => r.key === 'rFewReviews'));
+
+group('Outside the range the sources measured');
+
+// The two edges of CONFIDENCE.measuredRange are the sources' own. Above the
+// top the sales-per-review ratio is known to fall and no median is published;
+// below the bottom Gamalytic's benchmark excluded the games outright, so the
+// 50.4% figure this project quotes does not cover them.
+const past = { positivePct: 92, listPrice: 19.99, released: true, releaseYear: 2023 };
+const huge = estimateAll({ appId: 62, reviews: 400_000, ...past,
+  owners: '10,000,000 .. 20,000,000', steamPurchaseShare: 0.9 }, {});
+const inside = estimateAll({ appId: 63, reviews: 40_000, ...past,
+  owners: '1,000,000 .. 2,000,000', steamPurchaseShare: 0.9 }, {});
+check('two agreeing methods still cannot reach the top past the last median',
+  huge.units.contributors.length === 2 && !huge.units.widened
+  && huge.confidence.units.level === 'low',
+  `${huge.confidence.units.level}, ${huge.units.contributors.length} methods agreeing`);
+check('the same shape inside the measured range does reach it',
+  inside.confidence.units.level === 'good',
+  `${inside.confidence.units.level} at ${compact(40_000)} reviews`);
+check('and the reason names the ratio rather than the game',
+  huge.confidence.units.reasons[0].key === 'rBeyondMeasured',
+  huge.confidence.units.reasons[0].text);
+// Direction checked against the fixtures, not fitted to them: the four games
+// above the edge are Valheim, Stardew Valley, Rust and Garry's Mod, and three
+// of the four have the disclosed figure below the whole band.
+check('the edge is where the source put it, not where the fixtures split',
+  CONFIDENCE.measuredRange.maxReviews === 200_000
+  && CONFIDENCE.measuredRange.derived === true,
+  '"hundreds of thousands of reviews", magnitude ours');
+
+const belowBenchmark = estimateAll({
+  appId: 64, reviews: 12, positivePct: 100, listPrice: 4.99, released: true, releaseYear: 2026
+}, {});
+check('an estimate under a thousand copies says the benchmark skipped it',
+  belowBenchmark.confidence.units.level === 'low'
+  && belowBenchmark.confidence.units.reasons[0].key === 'rBelowMeasured',
+  `${compact(belowBenchmark.units.range.mid)} copies, ${belowBenchmark.confidence.units.level}`);
+check('and the floor is the number the benchmark published',
+  CONFIDENCE.measuredRange.minUnits === 1_000
+  && CONFIDENCE.measuredRange.minUnitsSource === 'GAMALYTIC_METHOD_2023');
+
+group('A near miss costs a step');
+
+// METHODOLOGY has always published "a near miss between bands" as a
+// middle-level verdict, and the code did not implement it: short of the alarm
+// gap the widening was reported and never charged, so two bands with no figure
+// between them read `good` whenever the envelope stayed under the old 3.5x
+// ceiling. Removing the ceiling made that visible instead of accidental.
+const tightMiss = combineEstimators([
+  { method: 'boxleiter', label: 'B', range: { lo: 100_000, mid: 130_000, hi: 170_000 }, weight: 1 },
+  { method: 'owners', label: 'O', range: { lo: 180_000, mid: 200_000, hi: 220_000 }, weight: 0.8 }
+]);
+check('bands that admit no common figure are not called agreement',
+  tightMiss.widened && tightMiss.gap < ENSEMBLE.alarmGap
+  && scoreConfidence(tightMiss).level === 'fair',
+  `gap ${tightMiss.gap.toFixed(2)}x, ${scoreConfidence(tightMiss).level}, `
+  + `envelope ${(tightMiss.range.hi / tightMiss.range.lo).toFixed(2)}x`);
+check('and a real overlap still is',
+  scoreConfidence(combineEstimators([
+    { method: 'boxleiter', label: 'B', range: { lo: 100_000, mid: 150_000, hi: 220_000 }, weight: 1 },
+    { method: 'owners', label: 'O', range: { lo: 160_000, mid: 200_000, hi: 260_000 }, weight: 0.8 }
+  ])).level === 'good');
 
 // Baldur's Gate 3, as measured: three bands whose midpoints sit 1.88x apart
 // and which all admit 17.2M to 20.1M. SteamSpy answers on a ladder, so the
@@ -1096,8 +1213,13 @@ group('Why the second method is missing');
 // other field at zero, which is indistinguishable from a genuinely tiny game
 // unless you look at its own review tally. PEAK carries 367,000 Steam reviews
 // against a record like that; Escape from Tarkov 63,000.
+//
+// Tarkov's figure is the one used here, because PEAK's is past the last review
+// count any source publishes a sales-per-review median for, and that outranks
+// a missing second method: at 367,000 reviews the leading sentence should be
+// about the ratio, not about SteamSpy. Both facts still appear on the panel.
 const emptyRecord = estimateAll({
-  appId: 100, reviews: 367_166, positivePct: 93, listPrice: 7.99, released: true,
+  appId: 100, reviews: 63_709, positivePct: 93, listPrice: 7.99, released: true,
   releaseYear: 2025, owners: '0 .. 20,000', ownerRecordReviews: 0
 }, {});
 const reallyTiny = estimateAll({

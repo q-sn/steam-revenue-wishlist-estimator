@@ -18,13 +18,14 @@
     "message": "No data"
   },
   "legendGood": {
-    "message": "Methods agree and the band is narrow"
+    "message": "Two methods admit a common figure, on a game the sources measured",
+    "description": "Deliberately says nothing about the band being narrow, and nothing about the answer being close. Band width no longer scores, and the grade has not been shown to predict accuracy. See the Confidence section of docs/METHODOLOGY.md."
   },
   "legendFair": {
-    "message": "Usable, but the band is wide or nothing could cross-check it"
+    "message": "One method only, a near miss between bands, or a cross-check objecting"
   },
   "legendLow": {
-    "message": "Methods disagree or a sanity check failed — read the range, not the midpoint"
+    "message": "Methods contradict, or the sources never measured a game this size — read the range, not the midpoint"
   },
   "legendNone": {
     "message": "No estimate could be produced"
@@ -46,6 +47,12 @@
   },
   "rBandSpans": {
     "message": "Band spans $1x"
+  },
+  "rBeyondMeasured": {
+    "message": "Bigger than any game the sales-per-review ratio was measured on; above about $1 reviews it falls by an amount nobody publishes"
+  },
+  "rBelowMeasured": {
+    "message": "Under $1 copies, which the accuracy benchmark behind this method excluded"
   },
   "rAgree": {
     "message": "Sources agree within the expected band"

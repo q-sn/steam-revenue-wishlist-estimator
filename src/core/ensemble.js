@@ -1,4 +1,5 @@
 import { ENSEMBLE, CONFIDENCE, WISHLIST } from './constants.js';
+import { compact } from './format.js';
 
 /** A descriptor: `key` resolves through chrome.i18n, `text` is the fallback. */
 function msg(key, params, text) {
@@ -122,40 +123,39 @@ export function worstLevel(levels) {
 }
 
 /**
- * One step down the scale, floored at 'low'. 'none' means there is no estimate
- * at all, so it never changes.
- */
-const WORST_SCORED = 'low';
-function downgraded(level) {
-  if (level === 'none') return 'none';
-  const i = LEVEL_ORDER.indexOf(level);
-  if (i < 0) return WORST_SCORED;
-  return LEVEL_ORDER[Math.min(i + 1, LEVEL_ORDER.indexOf(WORST_SCORED))];
-}
-
-
-/**
- * Revenue confidence: the units level one step down, because every waterfall
- * step adds an assumption with a range of its own.
+ * Revenue confidence: exactly the units level, for gross and for net alike.
+ *
+ * It used to be the units level one step down, and another step down when the
+ * regional factor was a default rather than read from review languages. That
+ * double-counted, and visibly: a game with two methods agreeing inside 2.4x
+ * read `good` on units and `low` on revenue, which is not a statement anyone
+ * can act on.
+ *
+ * The waterfall's own uncertainty is already in the figure. `estimateRevenueRange`
+ * walks every assumption to its published edge — discount 10-30%, refunds
+ * 6-13%, the regional profile one either side — so the revenue band is wider
+ * than the unit band it came from, by exactly the amount those assumptions are
+ * worth. Marking the level down as well charges for the same uncertainty
+ * twice. That is the rule `scoreConfidence` already states for a widened
+ * ensemble band, and METHODOLOGY says the revenue band was drawn wide rather
+ * than narrow for this precise reason.
+ *
+ * What is left is what the unit estimate is worth, which is what sets the
+ * width of both figures. The waterfall still gets its say, as reasons: whether
+ * the audience mix was read or assumed is worth knowing and does not change
+ * how much to trust the number.
  */
 export function scoreRevenueConfidence(unitsConfidence, ok, revenue = null) {
   if (!ok) return { level: 'none', reasons: [msg('rNoEstimate', [], 'No usable estimate')] };
 
   const reasons = [msg('rRevenueAssumptions', [], 'Sales band plus the waterfall assumptions')];
-  let level = downgraded(unitsConfidence.level);
 
-  // The one waterfall assumption that varies per game: the regional factor
-  // spans 0.60 to 0.88 of list price, so reading it from the review languages
-  // rather than defaulting is worth a step.
   const derived = revenue?.settings?.regionalDerivedFrom?.ok === true;
-  if (derived) {
-    reasons.push(msg('rRegionalMeasured', [], 'Audience mix read from review languages, not assumed'));
-  } else {
-    reasons.push(msg('rRegionalAssumed', [], 'Audience mix is a default; the regional factor spans 0.60 to 0.88'));
-    level = downgraded(level);
-  }
+  reasons.push(derived
+    ? msg('rRegionalMeasured', [], 'Audience mix read from review languages, not assumed')
+    : msg('rRegionalAssumed', [], 'Audience mix is a default; the regional factor spans 0.60 to 0.88'));
 
-  return { level, reasons };
+  return { level: unitsConfidence.level, reasons };
 }
 
 /**
@@ -257,20 +257,51 @@ export function scoreWishlistConfidence(wishlists) {
 }
 
 /**
- * Unit confidence: how well the signals agree and how wide the band is. Says
- * nothing about the game itself. Reasons come back worst first.
+ * Unit confidence.
+ *
+ * Two questions, and nothing else:
+ *
+ *   1. How many independent methods answered, do their bands admit a common
+ *      figure, and does either cross-check object? This is the only dimension
+ *      with a published reason to predict accuracy — GAMALYTIC_METHOD_2023
+ *      puts the adjusted multiple alone at 50.4% of games within 30% error and
+ *      a weighted ensemble at 76.9% — and it is the dimension the fixtures
+ *      cannot test, because a frozen snapshot carries no owner band.
+ *      Unvalidated, and labelled as such in docs/METHODOLOGY.md rather than
+ *      quietly assumed.
+ *   2. Is this the kind of game the multiple's sources measured? Both edges of
+ *      CONFIDENCE.measuredRange are published: Gamalytic excluded games under
+ *      1,000 copies from the benchmark, and nobody publishes a median for
+ *      games with hundreds of thousands of reviews.
+ *
+ * Band width is not one of the questions any more. It was, as a ceiling, and
+ * over the 62 fixtures it is the only rule that ever fired: the 16 games it
+ * condemned land within 30% error less often (31.3% against 50.0%, p = 0.25)
+ * but have the truth inside their band MORE often (68.8% against 54.3%,
+ * p = 0.39). A rule that grades a band down for being wide, on a product whose
+ * whole promise is the band, was pointing the wrong way. See
+ * OURS_CONFIDENCE_CHECK and CONFIDENCE.measuredRange.
+ *
+ * Says nothing about the game itself. Reasons come back worst first.
+ *
+ * @param {object} combined output of combineEstimators
+ * @param {object} flags    lowSample, ownersMissing, ownersUntrusted,
+ *                          ccuDisagrees, playtimeDisagrees, and `reviews` —
+ *                          the sample the multiple was applied to, which
+ *                          `measuredRange` needs and `combined` does not carry
  */
 export function scoreConfidence(combined, flags = {}) {
   if (!combined?.ok) {
     return { level: 'none', spread: null, reasons: [msg('rNoEstimate', [], 'No usable estimate')] };
   }
 
-  const { lo, hi } = combined.range;
+  const { lo, mid, hi } = combined.range;
   const spread = hi / Math.max(lo, 1);
   const found = [];
 
-  // Starts from the evidence — how many methods answered, whether they agree,
-  // whether a cross-check objects. Width applies at the end, as a ceiling.
+  // Reads the evidence only: how many methods answered, whether they agree,
+  // whether a cross-check objects, and whether the sources ever measured a
+  // game like this one.
   let level = 'good';
 
   // 2 = this is why the level dropped, 1 = caution, 0 = context.
@@ -295,18 +326,31 @@ export function scoreConfidence(combined, flags = {}) {
     downgrade();
   }
 
-  // Two tiers: 1.9x apart puts one method outside its published 30% error, 4x
-  // outside 50%. Below the alarm tier this only reports — `spread` was already
-  // measured on the widened band, so downgrading here would count it twice.
+  // Two tiers, and both of them now cost something. Past the alarm gap the
+  // methods contradict each other and the level goes to the bottom; short of
+  // it they still admit no common figure, which is a near miss and worth one
+  // step.
+  //
+  // The step is new. It used to be reported and not charged, on the grounds
+  // that the widening had already paid for it — but the thing that read the
+  // widening was the width ceiling, and with the ceiling gone the near miss
+  // was free. Two bands with no figure between them then graded `good`
+  // whenever the envelope happened to stay under 3.5x, which contradicted the
+  // scale this file's own documentation publishes.
   if (combined.widened) {
     const alarming = combined.gap > ENSEMBLE.alarmGap;
     note(alarming ? 2 : 1, 'rNoCommonFigure', [combined.gap.toFixed(1)],
       `No figure fits every method; the nearest bands are ${combined.gap.toFixed(1)}x apart`);
     if (alarming) level = 'low';
+    else downgrade();
   }
+  // Reported, not charged for. A game under 200 reviews already had its band
+  // widened by x0.75 and x1.4, and over the fixtures that widening is if
+  // anything too generous — the truth lands inside the widened band 68.8% of
+  // the time against 54.3% for thicker samples — so a grade docked here bills
+  // the same uncertainty twice and bills it against the evidence.
   if (flags.lowSample) {
     note(1, 'rFewReviews', [], 'Few reviews, so the band is widened');
-    downgrade();
   }
   if (flags.ccuDisagrees) {
     note(1, 'rCcuDisagree', [], 'Player-count cross-check implies a larger launch than the review estimate');
@@ -317,18 +361,31 @@ export function scoreConfidence(combined, flags = {}) {
     downgrade();
   }
 
-  // The width ceiling, applied last so nothing can talk its way past it.
-  if (spread > CONFIDENCE.fair) {
-    note(2, 'rBandSpans', [spread.toFixed(1)], `Band spans ${spread.toFixed(1)}x`);
+  // Outside the range the multiple's own sources measured, applied last so
+  // nothing can talk its way past it. Both edges are the sources' own, and
+  // this is the one rule here that the fixtures can check: the four games
+  // above `maxReviews` are Valheim, Stardew Valley, Rust and Garry's Mod, and
+  // on three of them the disclosed figure falls below the entire band.
+  const { minUnits, maxReviews } = CONFIDENCE.measuredRange;
+  if (Number.isFinite(flags.reviews) && flags.reviews > maxReviews) {
+    note(2, 'rBeyondMeasured', [compact(maxReviews)],
+      `Larger than any game the sales-per-review ratio has a published median for; above about ${compact(maxReviews)} reviews it is known to fall and the decline is not modelled`);
     level = 'low';
-  } else if (spread > CONFIDENCE.good) {
-    note(0, 'rBandSpans', [spread.toFixed(1)], `Band spans ${spread.toFixed(1)}x`);
+  } else if (Number.isFinite(mid) && mid < minUnits) {
+    note(2, 'rBelowMeasured', [compact(minUnits)],
+      `Under ${compact(minUnits)} copies, which the benchmark behind this method excluded, so its published accuracy does not cover a game this small`);
+    level = 'low';
   }
 
-  // Only when nothing else has been said.
-  if (level === 'good' && !found.length) {
+  // Only when nothing has been charged for.
+  if (level === 'good' && !found.some((r) => r.severity > 0)) {
     note(0, 'rAgree', [], 'Sources agree within the expected band');
   }
+
+  // Width is context and goes last, because it is never a level. The band is
+  // already on screen; naming it here tells the reader what they are looking
+  // at without pretending the number measures how much to trust the figure.
+  note(0, 'rBandSpans', [spread.toFixed(1)], `Band spans ${spread.toFixed(1)}x`);
 
   // Stable sort by severity: the reason that set the level leads.
   const reasons = found

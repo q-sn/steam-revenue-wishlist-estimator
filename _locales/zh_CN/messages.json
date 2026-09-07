@@ -18,13 +18,14 @@
     "message": "无数据"
   },
   "legendGood": {
-    "message": "各方法结果一致，区间较窄"
+    "message": "两种方法存在共同取值，且该游戏属于来源实测过的范围",
+    "description": "Deliberately says nothing about the band being narrow, and nothing about the answer being close. Band width no longer scores, and the grade has not been shown to predict accuracy. See the Confidence section of docs/METHODOLOGY.md."
   },
   "legendFair": {
-    "message": "可用，但区间较宽，或没有其他方法可供交叉验证"
+    "message": "只有一种方法，或两条区间差之毫厘，或交叉验证有异议"
   },
   "legendLow": {
-    "message": "各方法结果冲突，或未通过合理性检查——请看区间，而不是中位数"
+    "message": "各方法互相矛盾，或来源从未测算过这一体量的游戏——请看区间，而不是中位数"
   },
   "legendNone": {
     "message": "无法生成估算"
@@ -46,6 +47,12 @@
   },
   "rBandSpans": {
     "message": "区间跨度 $1 倍"
+  },
+  "rBeyondMeasured": {
+    "message": "比任何用于测算「每条评测对应销量」的游戏都大：超过约 $1 条评测后该比值会下降，但降幅无人公布"
+  },
+  "rBelowMeasured": {
+    "message": "低于 $1 份，而该方法的准确度基准测试排除了这一区间"
   },
   "rAgree": {
     "message": "各来源在预期区间内相互一致"

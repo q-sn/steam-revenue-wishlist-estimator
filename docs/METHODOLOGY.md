@@ -74,18 +74,6 @@ Multiplicative adjustments on top:
 
 Several of those magnitudes are ours rather than the studies'. Each is marked in the code and in the panel; see "sourced direction, our magnitude" for the list and the reasoning.
 
-### Player-hours over playtime (a cross-check, not a leg)
-
-Gamalytic's second-strongest method, at 64.4% within 30% error: add up concurrent players over time for total player-hours, then divide by the hours an average owner puts in.
-
-The first half we have exactly. SteamCharts publishes average concurrents per month for a game's whole life, on the page already fetched for the peak, and summing it is arithmetic. Enshrouded has 334 million player-hours on the record.
-
-The second half is the average playtime of everyone who owns the game, and we cannot get it. SteamSpy returns zero for every app. What is free is the playtime attached to each review, and a review sample is not the owner population — in two compounding ways.
-
-**The newest reviews are the newest buyers.** The hundred most recent reviews of Enshrouded span three days. Their median playtime is 41.7 hours. Reviewers from the game's launch quarter, measured today, have a median of 100.5 hours. For a game two and a half years old the owner population is mostly people who bought long ago and accumulated time, and sampling the newest reviews measures whoever bought this week. This is the same error as sampling recent reviews for the language mix, in the same function.
-
-**The quantity needed is a mean.** Total hours divided by owners is a mean by definition, and playtime distributions have a long enough tail that the mean sits far above any median — 96.7 against 41.7 hours on that same sample.
-
 ### The adjustment that lost to nothing
 
 The review-score row is commented out in `constants.js` rather than tuned, and the reason is worth stating in full because it is the first coefficient here to be removed on evidence.
@@ -108,6 +96,18 @@ That the honestly-measured table scores *worst* is the finding, not an embarrass
 So this is not a claim that review score does not matter. It is that a wrong coefficient moves every game while the real effect would sharpen only some, and nobody has yet sized it well enough to pay for that. It goes back in when the fixtures set is large enough to show a version that wins.
 
 Two caveats belong here rather than in a footnote. Sixty-two games is small, and the gap between 40.3% and 45.2% is three games. And `positivePct` is still read everywhere else — the panel shows it, the confidence score uses it — it simply no longer moves the multiple.
+
+### Player-hours over playtime (a cross-check, not a leg)
+
+Gamalytic's second-strongest method, at 64.4% within 30% error: add up concurrent players over time for total player-hours, then divide by the hours an average owner puts in.
+
+The first half we have exactly. SteamCharts publishes average concurrents per month for a game's whole life, on the page already fetched for the peak, and summing it is arithmetic. Enshrouded has 334 million player-hours on the record.
+
+The second half is the average playtime of everyone who owns the game, and we cannot get it. SteamSpy returns zero for every app. What is free is the playtime attached to each review, and a review sample is not the owner population — in two compounding ways.
+
+**The newest reviews are the newest buyers.** The hundred most recent reviews of Enshrouded span three days. Their median playtime is 41.7 hours. Reviewers from the game's launch quarter, measured today, have a median of 100.5 hours. For a game two and a half years old the owner population is mostly people who bought long ago and accumulated time, and sampling the newest reviews measures whoever bought this week. This is the same error as sampling recent reviews for the language mix, in the same function.
+
+**The quantity needed is a mean.** Total hours divided by owners is a mean by definition, and playtime distributions have a long enough tail that the mean sits far above any median — 96.7 against 41.7 hours on that same sample.
 
 A correction for all this was measured, and it does not transfer. It compares playtime-at-review in the 90 days before each disclosure against the true average at that date, over 26 games: min 0.50x, median 1.09x, max 2.07x. That is a coherent measurement, and the estimator applies it to a different quantity at an arbitrary game age. The measurement's own numbers say why it fails — the correction falls with a game's age, 0.50x for Stardew Valley at six years and 0.55x for Garry's Mod at fifteen, and one global constant papers over that so thoroughly that its middle-80% band does not contain either game.
 
@@ -175,7 +175,9 @@ Midpoints combine as a **weighted geometric mean**. Sales estimates are multipli
 
 When the estimators leave no figure that all of them admit, the band expands to cover all of their ranges and confidence drops. Showing a narrow band around sources that exclude each other would actively mislead.
 
-Agreement is a question about intervals, because every estimator here reports one. If the bands share a region there is no conflict, however far apart their midpoints happen to sit. Judging by midpoint ratio against a 1.5x threshold makes Baldur's Gate 3 read as a 1.9x disagreement between three bands that all admit 17.2M to 20.1M, widening the band to cover a conflict that does not exist — the offender is the owner leg, whose midpoint is the centre of a 20M-50M rung rather than a reading of the game. Judging by overlap, the same three bands agree and the game reads reliable.
+Agreement is a question about intervals, because every estimator here reports one. If the bands share a region there is no conflict, however far apart their midpoints happen to sit. Judging by midpoint ratio against a 1.5x threshold makes Baldur's Gate 3 read as a 1.9x disagreement between three bands that all admit 17.2M to 20.1M, widening the band to cover a conflict that does not exist — the offender is the owner leg, whose midpoint is the centre of a 20M-50M rung rather than a reading of the game. Judging by overlap, the same three bands agree, and the band stays where the sources put it instead of being stretched to cover a conflict.
+
+Agreeing does not by itself make that game's verdict green. Baldur's Gate 3 carries 856,000 reviews, which is past the last review count anybody publishes a sales-per-review median for, and that is a separate objection scored separately — see Confidence. Overlap settles whether the band widens; it does not settle whether the multiple was ever measured on a game this size.
 
 ## Cross-checks that never enter the average
 
@@ -225,8 +227,6 @@ It is a proxy and is presented as one. Review propensity differs by market — G
 
 On the shipped defaults this lands near **0.40 × list price**, and near **0.45** for a US/EU-weighted audience. Those are the two scenarios the cited waterfall works through. The options page shows the ratio live as a sanity check: drifting toward 0.70 means a deduction has been switched off.
 
-### The revenue band
-
 ### Gross as well as net, and which gross
 
 The panel shows two figures, in the order the waterfall runs. Net is what the developer banks. Gross is what buyers paid — list, less the discounts copies really sold at, at the prices the game's regions really charge — and it is the figure a developer recognises from their own reporting.
@@ -242,6 +242,8 @@ Two mundane explanations fit the gap and neither is established. Steamworks' "Gr
 One naming trap is worth stating. Steamworks prints its own "Gross Steam Sales" **with VAT still in it**, and the regional factor here has already taken VAT out. So this figure matches what developers say in postmortems, not the top line of Valve's report. The two developers quoted above also used "net" for two different things — one after Valve's cut, one before it — which is why the panel labels both figures rather than trusting the word.
 
 Both figures walk the same envelope, so the pessimistic gross and the pessimistic net describe one scenario rather than two, and both carry the same confidence: what sets their width is the unit estimate feeding them, not the two deductions between them.
+
+### The revenue band
 
 The band is not the unit band converted into money. Every step of the waterfall has a range of its own, and drawing the revenue figure exactly as wide as the sales estimate would leave the confidence score marked down a step for uncertainty the band never shows.
 
@@ -394,7 +396,9 @@ GameDiscoverCo's own warning on this metric deserves repeating: conversion outco
 
 Some published findings establish that an effect exists and leave the size for later. VGI's 2021 study says in as many words that higher-priced games have lower multiples and that MMOs run higher while sports and racing run lower — and then says the quantification is still to come. Gamalytic presents genre as a chart with no table before concluding that genre is a weak factor.
 
-The numbers expressing those directions are therefore ours: the over-$30 and under-$10 price factors, the three genre factors, the heavy-discount factor, the 100–1,000 and over-10,000 review bands, the emerging-markets regional profile, the language-mix thresholds, the discount span in the revenue envelope, and the confidence and disagreement thresholds. Each carries `derived: true` in `constants.js`, and the "why this number" panel marks them with an asterisk.
+The numbers expressing those directions are therefore ours: the over-$30 and under-$10 price factors, the three genre factors, the heavy-discount factor, the 100–1,000 and over-10,000 review bands, the emerging-markets regional profile, the language-mix thresholds, the discount span in the revenue envelope, the disagreement threshold, the wishlist width ceiling, and the 200,000-review edge past which the sales-per-review ratio has no published median. Each carries `derived: true` in `constants.js`, and the "why this number" panel marks them with an asterisk.
+
+The 1,000-copy edge on the other side of that last one is not on the list, because Gamalytic published the figure verbatim: it is the size below which their benchmark excluded games outright.
 
 It is the difference between "the survey measured this" and "the survey measured that this exists, and we sized it ourselves". A file claiming full traceability has to show which is which, and a reader auditing the chain deserves to know which links are measured and which are judgement.
 
@@ -441,33 +445,99 @@ Refusing to answer is a feature. Every wrong number this tool does not print is 
 
 Each figure is scored separately, because the three rest on different evidence and a single verdict would have to be wrong about at least one of them.
 
+### The measurement first, because it is not flattering
+
+**On the 62 games in `test/fixtures.json`, the units grade does not separate outcomes.** `npm run calibrate` prints the table:
+
+| grade | n | within 30% error | truth inside the band | median band |
+| --- | --- | --- | --- | --- |
+| green | 0 | *no fixture can reach this grade* | | |
+| neutral | 56 | 46.4% [34–59] | 60.7% [48–72] | 2.75x |
+| red | 6 | 33.3% [10–70] | 33.3% [10–70] | 2.75x |
+
+Both differences point the right way and neither is a difference: 13 percentage points on the midpoint at a permutation p of 0.68, and 27 points on band coverage at p = 0.39. Six games in the bottom cell is not a measurement, it is a direction. So the grade is a description of the evidence and not a forecast of the error, the tooltips say that, and the last paragraph of this section says it again where a reader will actually meet it.
+
+The grade nevertheless changed, because the version this replaced was measurably *wrong* rather than merely unproven. Its only active rule over these fixtures was a ceiling on band width, at 2.2x and 3.5x. That rule fired on 16 of 62 games, and:
+
+| the old width ceiling | n | within 30% | truth inside the band |
+| --- | --- | --- | --- |
+| neutral (band under 3.5x) | 46 | 50.0% | 54.3% |
+| red (band over 3.5x) | 16 | 31.3% | **68.8%** |
+
+The games it condemned had the truth inside their band *more* often than the games it approved — 68.8% against 54.3%, p = 0.39 — while landing further from it at the midpoint, 31.3% against 50.0%, p = 0.25. Neither is significant, and the coverage one runs backwards against the thing this tool actually shows. A band is the product; a rule that marks a band down for being wide is telling a reader to distrust the answers most likely to contain the truth.
+
+The mechanism is not mysterious. A band past 3.5x here means a review sample under 200, which the estimator has already widened by ×0.75 and ×1.4. The ceiling was the low-sample penalty coming back in through a side door after the front door was closed, and the fixtures say the widening is if anything already generous. So width is now reported and never graded, and `npm run calibrate` exits non-zero if a lower grade ever covers the truth significantly more often again.
+
+### There is nothing else in the observables
+
+Before concluding that, every signal a frozen replay can see was tested for its ability to *rank* outcomes, with the direction fixed in advance by whatever the source claims:
+
+| signal | AUC on within-30% | 95% CI |
+| --- | --- | --- |
+| list price | 0.658 | 0.52–0.79 |
+| review count | 0.621 | 0.47–0.76 |
+| size of the estimate | 0.620 | 0.47–0.76 |
+| the 200-review gate | 0.572 | 0.46–0.68 |
+| positive share | 0.531 | 0.38–0.67 |
+| release year | 0.467 | 0.32–0.61 |
+
+Every interval contains 0.5. And fitting all of them at once does worse than any of them: a ridge logistic on review count, estimate size, price, year and positive share scores an in-sample AUC of 0.616 and a leave-one-out AUC of **0.430** — below chance, permutation p = 0.46. There is nothing in these five columns to learn from sixty-two games.
+
+That is consistent with what this file already found while removing the review-score adjustment: the between-game spread in sales per review is ×4.9 and *the game's own identity explains 98% of it*. The error of a single review multiple is dominated by something no store page exposes. The only thing that could help is a second opinion, which is what an ensemble is.
+
+One contrast is worth recording rather than acting on. Games priced under $10 come out at 25.0% within 30% error and 45.0% band coverage, against 54.8% and 64.3% for games at $10 or more, and they overestimate by a mean of 1.45x in logs. That is the largest gap in the set and the only one whose unadjusted p reaches 0.033 — but it is one of eight cuts tried, so multiplicity alone takes it past 0.2; it is a bias rather than a spread, and the honest fix for a bias is a coefficient; and no source claims cheap games are estimated less accurately. This repository has already rejected a stronger case than that: the review-score table was measured at Spearman −0.46 with p = 0.006 and was switched off for losing on these same fixtures. So the price gap is written down here and nowhere else. It goes into the grade when a source names it, or when the fixture set is big enough that eight cuts do not matter.
+
+### The dimension that carries the grade cannot be tested here at all
+
+The grade rests mostly on **how many independent methods answered and whether they agree**, and that is the one dimension these fixtures cannot score. Say so plainly rather than validating something adjacent.
+
+A frozen snapshot holds a review count and a positive share reconstructed from the review histogram. It holds no SteamSpy owner band, because no public source publishes what SteamSpy said on a past date. So a replay has one estimator, which is why the green cell in the table above is not merely small but *empty*: no fixture can reach a grade that requires two methods.
+
+Fetching owner bands live does not fix it, and the reason is structural rather than a matter of effort:
+
+- The disclosures average 3.1 years old, median 3.4. Today's owner band against a figure from 2022 is exactly the bias `--live` mode exists to warn about.
+- 42 of the 62 games disclosed at least 20,000 units, so a truthful owner band would carry weight for them — the leg's floor is 20,000 owners.
+- Only 9 disclosures are less than a year old.
+- **Both at once: two games.** Static Dread: The Lighthouse and The Last Caretaker.
+
+And that intersection is not small by accident. The fixtures recent enough for a live band to be roughly contemporaneous are recent indie releases, and recent small releases are precisely the population where SteamSpy answers late, coarsely, or not at all — the same fact this file records under "an empty record is not a small game". The subset that would test the agreement dimension is the subset where the second estimator declines.
+
+So: the agreement dimension is unvalidated. Its warrant is published rather than measured — Gamalytic's own benchmark puts the adjusted review multiple at 50.4% of games within 30% error and a weighted ensemble at 76.9%, which is the strongest reason anyone has to believe that two agreeing methods beat one. That is a better reason than nothing and a worse reason than a measurement, and the difference is what this paragraph is for. What would settle it is fixtures carrying a snapshot of the owner band as well as the review count, captured on the day of the announcement.
+
 ### What the scale reads
 
-None of the three scales is driven by the width of the band, because **width does not vary here**. Every band in this project is dominated by a fixed published range: the review multiplier spans 20-55x on its own, the follower-to-wishlist ratio is 9.6-32.8x for every game, and the revenue band is the unit band pushed through an envelope. Measured across 22 real games the unit spreads came out bimodal — eighteen between 2.23x and 2.64x, four above 7x, nothing in between.
+Not the width of the band, for the reason above, and not for the reason that used to be given here either. The old argument was that width could not be the *driver* because it barely varies — every band is dominated by a fixed published range, the review multiplier spans 20-55x on its own, the follower-to-wishlist ratio is 9.6-32.8x for every game, and across 22 real games the unit spreads were bimodal, eighteen between 2.23x and 2.64x and four above 7x. That argument is still true and still worth stating, because it is why reading a level off width would make revenue a constant and wishlists a constant. It simply was not the whole story: width was kept as a ceiling, and the ceiling is the part the fixtures refuted.
 
-Reading a level off that quantity would have three consequences:
+The wishlist scale keeps its ceiling at 2.0x and 3.5x, and the asymmetry is deliberate. There, 3.5x is unreachable except through a contradiction between marks, so the rule is a second expression of the gap alarm and fires on nothing else. On units it fired on a quarter of the fixtures purely because their review sample was thin. That is the difference between a backstop and a penalty.
 
-- **Units** could never reach the top. The threshold sits at 2.2x and two overlapping published bands cannot combine below about 2.23x.
-- **Revenue** is capped one step below units, so with the top of the units scale out of reach it would be a *constant*: every paid game on Steam reading "unreliable", forever.
-- **Wishlists** would be scored on a range that is 9.6-32.8x by construction, so every unreleased game would read "rough". Also a constant.
+**Units** read two things and nothing else.
 
-A rating that never varies is a label. So each scale reads whatever actually differs between games, and width serves only as a ceiling.
+*How the methods stand to each other.* How many contributed, whether their bands admit a common figure, and whether either cross-check objects. Two methods with a figure both admit is the best this tool does and it says so; a single source is a step down; a near miss is a step down; an objecting cross-check is a step down; a gap past the published error envelope is the bottom.
 
-**Units** — how many independent methods contributed, whether their bands admit a common figure, whether the review sample is past the low-sample gate, and whether either cross-check objects. Two methods agreeing on a healthy sample is the best this tool does, and it says so; a single source or a thin sample is a step down; a conflict past the published error envelope, or a band wider than 3.5x, is the bottom.
+*Whether this is the kind of game the multiple's sources measured.* Both edges are published, and this is the one rule the fixtures can check.
 
-**Revenue** can never be rated above the units it derives from and is capped a step below, because the waterfall runs on assumptions with real ranges of their own. Its own varying fact is whether the regional factor was read from the game's review languages or left at a default — that factor swings the answer between 0.60 and 0.88 of list price, the widest single assumption in the chain, so measuring it rather than assuming it is worth a step.
+- Gamalytic's benchmark **excluded games that sold under 1,000 copies**. Below that, the 50.4% figure quoted at the top of this file does not describe the estimate on screen — nobody's accuracy figure does.
+- At the other end, GameDiscoverCo reports on Gamalytic's data that the largest games fall back toward 20 sales per review and **publishes no median for them**, so the size table returns to neutral above 10,000 reviews and the decline is not modelled. The wording is "hundreds of thousands of reviews", which is read here as 200,000. The magnitude is ours and is marked `derived`.
 
-**Wishlists** are scored on whether the midpoint is a multiplier the survey published for this kind of game, or the median across every kind. The band is the same either way; what differs is how much is known about where inside it the answer sits.
+The upper edge is checked against the fixtures for direction and deliberately not fitted to them, the same treatment the owner-weight curve gets. The four fixtures above it are Valheim, Stardew Valley, Rust and Garry's Mod. On three of the four the midpoint reads 2.5x to 3.7x high and the disclosed figure falls below the *entire* band — the band's low edge still sits 1.34x to 2.00x above the truth. That is the direction the source predicted, on four games, which is a direction and not a demonstration. The fixtures cannot tell 100,000 from 200,000; the next game below the edge is Slime Rancher at 76,000 reviews. So the source's wording picks the number rather than the split that flatters it.
+
+A thin review sample is reported and does not move the level, and now that is true through the front door and the side door alike. Under 200 reviews the band is already widened by ×0.75 and ×1.4, and over the fixtures the truth lands inside that widened band 68.8% of the time against 54.3% for thicker samples, so a grade docked here bills the same uncertainty twice and bills it against the evidence.
+
+**Revenue** — gross and net alike — is graded exactly as the units it derives from, because that is what it is: one estimate, expressed in money. The waterfall's assumptions are already paid for in the width of the figure, since the band walks each of them to its published edge, and a level marked down on top of that bills them a second time. It used to be capped a step below units and a further step when the regional factor was a default, which put `good` on the units and `low` on the revenue of the same game — two readings of one estimate disagreeing about how far to trust it. Whether the regional factor was read from the game's review languages or left at a default is still reported, because a reader should know which assumption is doing the work; it is a fact about the chain rather than a measure of how much to believe it.
+
+No fixture scores this scale. The two developers who published revenue without a unit count are in `_revenueOnly` and cannot; the revenue grade inherits both the units grade and its unvalidated status.
+
+**Wishlists** are scored on whether most of the answer is a figure the developer published or an inference from the store ordering. That scale is the one graded against outcomes here, and on a different dataset: the boundary is `share > 0.5`, which falls at about a month, and the held-out error either side of it is 12.3% against 14.7%. Where the units scale has a published warrant and no measurement, the wishlist scale has both.
 
 ### The scale
 
-- **Green** — two methods admitting a common figure, on a sample thick enough to mean something, with no cross-check objecting
-- **Neutral** — a single method, a thin sample, a cross-check objecting, or a near miss between bands
-- **Red** — a gap of more than 1.86x between the nearest band edges, or a band wider than 3.5x whatever the evidence looks like
-
-The width thresholds are 2.2x and 3.5x for units. Widening them to 2.75x and 5.1x would move 18 of 22 games into *reliable* by relabelling rather than by learning anything, which is the argument for width being a ceiling rather than the level itself.
+- **Green** — two methods admitting a common figure, with no cross-check objecting, on a game inside the size range the sources measured
+- **Neutral** — a single method, a cross-check objecting, or a near miss between bands
+- **Red** — a gap of more than 1.86x between the nearest band edges, or a game outside the range the sources measured
 
 A single source caps at the neutral level rather than dropping to red. Having one method is the normal case for unreleased and small games; red should mean something is wrong, not that a second opinion was unavailable. An unknown promotion history costs nothing, because it is unknown on every game and a penalty applied every time is not a penalty.
+
+A near miss now costs its step. This file has published "a near miss between bands" as a neutral verdict for as long as the scale has existed, and the code did not implement it: short of the alarm gap the widening was reported and never charged, on the grounds that the width ceiling had already read it. With the ceiling gone that became a hole — two bands with no figure between them graded green whenever the envelope happened to stay under 3.5x — so the step is explicit now, which is what the scale said all along.
 
 #### Wishlists are scored separately, and on different facts
 
@@ -485,7 +555,7 @@ What grades the estimate is what kind of number it is.
 
 The collapsed row shows several figures at once, so its single word reports the weakest of the ones on display.
 
-Confidence reflects how well the sources agree and how much of the chain is measured rather than assumed. It says nothing about the game, and it is **not** a claim that the band is narrow — the band is on screen, and on a typical released game it is still about 2.5x wide.
+Confidence reports how many of the sources answered, whether they agree, and whether the game is the kind of game they measured. It says nothing about the game itself, it is **not** a claim that the band is narrow — the band is on screen, and on a typical released game it is still about 2.5x wide — and on the units figure it is **not** a claim that the answer is close. That last one is measured, at the top of this section, and the measurement says the grade does not separate outcomes on sixty-two games.
 
 ### What is not double-counted
 
@@ -495,7 +565,7 @@ An alarm threshold below the noise floor of the methods alarms at healthy. Adjus
 
 Comparing midpoints compares the wrong quantity — these are interval estimates, one of them centred on a bucket from a fixed ladder. Overlap between bands is the question worth asking.
 
-And charging one fact twice: a conflict widens the band, so measuring the spread on the widened band and marking the level down again for the conflict that produced it counts it once in the width and once in the word.
+And charging one fact twice. This used to be the argument for reading the band's width as a ceiling and nothing else: a conflict widens the band, so scoring the widened band *and* docking the level for the conflict counts one fact in the width and again in the word. The resolution now runs the other way. Width is not read at all, so a conflict is counted exactly once — in the word — and the band is left to say what it says. The rule survives with the same force it always had, and the two places it still binds are the ones where an uncertainty is genuinely already inside the figure: a thin review sample, whose band was widened for it, and the revenue waterfall, whose band walks every assumption to its published edge.
 
 ## Where each number comes from
 
@@ -557,7 +627,9 @@ Valve withholds the recent score until a game has been available for 45 days and
 - SteamSpy supplies no owner band for many recent releases, so the units figure rests on one method for exactly the games where the review multiple is least reliable. There is no second free source of owner counts to fall back on.
 - The review multiple overestimates the very largest games. Gamalytic reports that games with hundreds of thousands of reviews fall back toward 20 sales per review — Elden Ring is the example given — but publishes no median for that group, so we do not model the decline.
 - The player-hours cross-check needs both a SteamCharts monthly history and at least 20 reviews with playtime, so it is unavailable for games too small or too new to have either. Its divisor is an assumption, which is why it is a cross-check.
-- Confidence is scored on agreement between sources and on how much of the chain is measured, not on outcomes. Nothing here has been calibrated against whether an estimate turned out to be right, because that needs frozen snapshots in `test/fixtures.json` and there are none yet. A green verdict means the sources concur, not that the answer is verified.
+- **The units confidence grade does not predict accuracy on the data we have.** It is now scored against outcomes rather than merely described: `npm run calibrate` grades all 62 fixtures and reports within-30% error and band coverage per grade, and the two reachable cells differ by 13 and 27 percentage points at permutation p of 0.68 and 0.39. A green verdict means the sources concur and the game is the size they were measured on. It does not mean the answer is verified, and on this evidence it does not mean the answer is closer. See Confidence for what was tried, what was removed for pointing the wrong way, and why the dimension carrying most of the grade cannot be tested with 62 disclosures averaging 3.1 years old.
+- The grade's top tier is unreachable in the validation set by construction, not by chance: a frozen snapshot carries no owner band, so every replay has one estimator and green needs two. Two of the 62 disclosures are both recent enough for a live owner band to be near-contemporaneous and large enough for that band to carry weight.
+- Games priced under $10 land within 30% error on 25.0% of cases against 54.8% above $10, and overestimate by 1.45x in logs. It is the largest gap in the fixture set and it does not move the grade, because it is a bias rather than a spread, no source claims it, and it is one of eight cuts tried — enough multiplicity to take an unadjusted p of 0.033 past 0.2.
 - The regional profile read from review languages is a proxy for where copies were bought, not a measurement of it.
 - Steam top-seller rank, the third reachable method in the benchmark table, is not implemented for units. Current rank is only published for the top of the chart and the historical series would take years to accumulate. The wishlist ordering is the same shape of signal and is implemented, because that one is published in full and a daily job can bank it — which is what the `data` branch is.
 - Scheduled workflows in public repositories are disabled by GitHub after 60 days without repository activity, and commits made by the job itself are not reliably counted as activity. If the ranking stops updating, that is the first thing to check.

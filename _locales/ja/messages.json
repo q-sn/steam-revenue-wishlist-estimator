@@ -18,13 +18,14 @@
     "message": "データなし"
   },
   "legendGood": {
-    "message": "各手法が一致し、範囲も狭い"
+    "message": "2つの手法が同じ数値を許容し、出典が実測した規模のゲームです",
+    "description": "Deliberately says nothing about the band being narrow, and nothing about the answer being close. Band width no longer scores, and the grade has not been shown to predict accuracy. See the Confidence section of docs/METHODOLOGY.md."
   },
   "legendFair": {
-    "message": "使えるが、範囲が広いか照合できる手法がなかった"
+    "message": "手法が1つだけ、範囲がわずかに重ならない、または照合が異を唱えています"
   },
   "legendLow": {
-    "message": "各手法が食い違うか、検算に失敗しました。中央値ではなく範囲を見てください"
+    "message": "各手法が矛盾するか、出典がこの規模のゲームを測定したことがありません。中央値ではなく範囲を見てください"
   },
   "legendNone": {
     "message": "推定を作成できませんでした"
@@ -46,6 +47,12 @@
   },
   "rBandSpans": {
     "message": "範囲の幅は $1 倍"
+  },
+  "rBeyondMeasured": {
+    "message": "レビュー1件あたり販売数を測定したどのゲームよりも大きく、約 $1 件を超えると比率は下がりますが、その幅は公表されていません"
+  },
+  "rBelowMeasured": {
+    "message": "$1 本未満で、この手法の精度検証から除外されていた規模です"
   },
   "rAgree": {
     "message": "各データは想定範囲内で一致しています"

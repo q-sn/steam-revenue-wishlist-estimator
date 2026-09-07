@@ -18,13 +18,14 @@
     "message": "Veri yok"
   },
   "legendGood": {
-    "message": "Yöntemler uyuşuyor ve aralık dar"
+    "message": "İki yöntem ortak bir değere izin veriyor ve oyun, kaynakların ölçtüğü büyüklükte",
+    "description": "Deliberately says nothing about the band being narrow, and nothing about the answer being close. Band width no longer scores, and the grade has not been shown to predict accuracy. See the Confidence section of docs/METHODOLOGY.md."
   },
   "legendFair": {
-    "message": "Kullanılabilir, ancak aralık geniş veya karşılaştıracak bir kaynak yoktu"
+    "message": "Tek bir yöntem, aralıkların kıl payı örtüşmemesi ya da itiraz eden bir karşılaştırma"
   },
   "legendLow": {
-    "message": "Yöntemler çelişiyor veya bir doğrulama başarısız oldu — orta değere değil aralığa bakın"
+    "message": "Yöntemler çelişiyor ya da kaynaklar bu büyüklükte bir oyunu hiç ölçmedi — orta değere değil aralığa bakın"
   },
   "legendNone": {
     "message": "Tahmin üretilemedi"
@@ -46,6 +47,12 @@
   },
   "rBandSpans": {
     "message": "Aralık $1 kat genişlikte"
+  },
+  "rBeyondMeasured": {
+    "message": "İnceleme başına satış oranının ölçüldüğü her oyundan daha büyük; yaklaşık $1 incelemenin üzerinde oran düşüyor ama ne kadar düştüğü yayımlanmıyor"
+  },
+  "rBelowMeasured": {
+    "message": "$1 kopyanın altında; bu yöntemin doğruluk ölçümü bu aralığı dışarıda bıraktı"
   },
   "rAgree": {
     "message": "Kaynaklar beklenen aralıkta uyuşuyor"

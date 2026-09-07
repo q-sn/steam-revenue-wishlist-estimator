@@ -18,13 +18,14 @@
     "message": "Aucune donnée"
   },
   "legendGood": {
-    "message": "Les méthodes concordent et la fourchette est étroite"
+    "message": "Deux méthodes admettent un même chiffre, sur un jeu de la taille mesurée par les sources",
+    "description": "Deliberately says nothing about the band being narrow, and nothing about the answer being close. Band width no longer scores, and the grade has not been shown to predict accuracy. See the Confidence section of docs/METHODOLOGY.md."
   },
   "legendFair": {
-    "message": "Exploitable, mais la fourchette est large ou rien ne permettait de recouper"
+    "message": "Une seule méthode, un quasi-recouvrement entre fourchettes, ou un recoupement qui objecte"
   },
   "legendLow": {
-    "message": "Les méthodes divergent ou un contrôle a échoué — lisez la fourchette, pas le point médian"
+    "message": "Les méthodes se contredisent, ou les sources n'ont jamais mesuré un jeu de cette taille — lisez la fourchette, pas le point médian"
   },
   "legendNone": {
     "message": "Aucune estimation n'a pu être produite"
@@ -46,6 +47,12 @@
   },
   "rBandSpans": {
     "message": "La fourchette s'étend sur un facteur $1"
+  },
+  "rBeyondMeasured": {
+    "message": "Plus grand que tous les jeux sur lesquels le rapport ventes/évaluation a été mesuré : au-delà d'environ $1 évaluations il baisse, sans que personne publie de combien"
+  },
+  "rBelowMeasured": {
+    "message": "Moins de $1 exemplaires, une tranche exclue du test de précision de cette méthode"
   },
   "rAgree": {
     "message": "Les sources concordent dans la fourchette attendue"

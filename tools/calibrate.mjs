@@ -18,6 +18,11 @@
  * route need state as it stood on the disclosure date, which a frozen snapshot
  * does not carry.
  *
+ * It also scores the confidence grade itself, by grade, because a grade that
+ * does not separate outcomes is a decoration. That table is the only check on
+ * the verdict the extension prints, and it exits non-zero if a lower grade
+ * ever covers the truth more often than a higher one.
+ *
  *   node tools/calibrate.mjs            # frozen snapshots only
  *   node tools/calibrate.mjs --live     # fetch current review counts
  *   node tools/calibrate.mjs --live --json
@@ -27,6 +32,8 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { estimateUnits } from '../src/core/units.js';
+import { combineEstimators, scoreConfidence } from '../src/core/ensemble.js';
+import { ENSEMBLE } from '../src/core/constants.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const args = new Set(process.argv.slice(2));
@@ -70,6 +77,22 @@ function scoreOne(fixture, inputs) {
   const predicted = est.range.mid;
   const error = (predicted - actual) / actual;
 
+  // The grade the extension would print for this game, from the shipping
+  // scorer rather than a copy of its rules. A frozen snapshot carries no owner
+  // band, so the ensemble has one leg — which is exactly why the agreement
+  // dimension cannot be scored here. See the note under the table.
+  const combined = combineEstimators([{
+    method: 'boxleiter',
+    range: est.range,
+    weight: est.lowSample
+      ? ENSEMBLE.boxleiter.base * ENSEMBLE.boxleiter.lowSamplePenalty
+      : ENSEMBLE.boxleiter.base
+  }]);
+  const confidence = scoreConfidence(combined, {
+    lowSample: est.lowSample,
+    reviews: inputs.reviews
+  });
+
   return {
     ...fixture,
     reviews: inputs.reviews,
@@ -78,8 +101,138 @@ function scoreOne(fixture, inputs) {
     error,
     absError: Math.abs(error),
     inBand: actual >= est.range.lo && actual <= est.range.hi,
+    spread: est.range.hi / est.range.lo,
+    grade: confidence.level,
+    gradeReason: confidence.reasons[0]?.key ?? null,
     multiplier: est.multiplier.mid
   };
+}
+
+/** Wilson score interval, so a cell of twenty games reports as one. */
+function wilson(hits, n, z = 1.96) {
+  if (!n) return [0, 0];
+  const p = hits / n;
+  const denominator = 1 + (z * z) / n;
+  const centre = p + (z * z) / (2 * n);
+  const margin = z * Math.sqrt((p * (1 - p)) / n + (z * z) / (4 * n * n));
+  return [(centre - margin) / denominator, (centre + margin) / denominator];
+}
+
+/**
+ * Two-sided permutation p for a difference in rates between two grades. With
+ * cells of this size the exact test is cheap and the normal approximation is
+ * not trustworthy.
+ */
+function permutationP(a, b, hit, iters = 20000) {
+  const pool = [...a, ...b].map((r) => (hit(r) ? 1 : 0));
+  const na = a.length;
+  if (!na || !b.length) return null;
+  const rate = (arr, from, to) => {
+    let s = 0;
+    for (let i = from; i < to; i++) s += arr[i];
+    return s / (to - from);
+  };
+  const observed = Math.abs(rate(pool, 0, na) - rate(pool, na, pool.length));
+  let atLeast = 0;
+  for (let i = 0; i < iters; i++) {
+    for (let j = pool.length - 1; j > 0; j--) {
+      const k = Math.floor(Math.random() * (j + 1));
+      [pool[j], pool[k]] = [pool[k], pool[j]];
+    }
+    if (Math.abs(rate(pool, 0, na) - rate(pool, na, pool.length)) >= observed - 1e-12) atLeast++;
+  }
+  return { observed, p: (atLeast + 1) / (iters + 1) };
+}
+
+const GRADES = ['good', 'fair', 'low'];
+
+/**
+ * Accuracy by confidence grade.
+ *
+ * This is the whole point of the table: a grade that does not separate
+ * outcomes is a decoration. It is reported for both outcomes the interface
+ * shows — how close the midpoint lands, and whether the band contains the
+ * truth — because the two can disagree, and a rule that reads the width of the
+ * band separates them in opposite directions.
+ */
+function byGrade(rows) {
+  const scored = rows.filter((r) => !r.skipped);
+  const cells = GRADES.map((grade) => ({ grade, rows: scored.filter((r) => r.grade === grade) }));
+
+  console.log('\n  Accuracy by confidence grade');
+  console.log('  ' + '─'.repeat(66));
+  console.log('  grade    n    within 30%          truth in band       median band');
+  for (const { grade, rows: cell } of cells) {
+    if (!cell.length) {
+      console.log(`  ${grade.padEnd(7)}  0    (no fixture reaches this grade)`);
+      continue;
+    }
+    const w30 = cell.filter((r) => r.absError <= 0.3).length;
+    const band = cell.filter((r) => r.inBand).length;
+    const c30 = wilson(w30, cell.length);
+    const cb = wilson(band, cell.length);
+    const spreads = cell.map((r) => r.spread).sort((a, b) => a - b);
+    console.log(
+      `  ${grade.padEnd(7)} ${String(cell.length).padStart(2)}    `
+      + `${(w30 / cell.length * 100).toFixed(1).padStart(5)}%  [${(c30[0] * 100).toFixed(0)}-${(c30[1] * 100).toFixed(0)}]`.padEnd(20)
+      + `${(band / cell.length * 100).toFixed(1).padStart(5)}%  [${(cb[0] * 100).toFixed(0)}-${(cb[1] * 100).toFixed(0)}]`.padEnd(20)
+      + `${spreads[Math.floor(spreads.length / 2)].toFixed(2)}x`
+    );
+  }
+
+  const populated = cells.filter((c) => c.rows.length);
+  if (populated.length < 2) {
+    console.log('  ' + '─'.repeat(66));
+    console.log('  Only one grade is reachable on these fixtures, so the grade is');
+    console.log('  untested here. It is not evidence that it works.');
+    return { inverted: false };
+  }
+
+  const best = populated[0];
+  const worst = populated[populated.length - 1];
+  const w = permutationP(best.rows, worst.rows, (r) => r.absError <= 0.3);
+  const b = permutationP(best.rows, worst.rows, (r) => r.inBand);
+  console.log('  ' + '─'.repeat(66));
+  console.log(`  ${best.grade} against ${worst.grade}:`);
+  console.log(`    within 30%      ${(w.observed * 100).toFixed(0)}pp apart,  permutation p = ${w.p.toFixed(3)}`);
+  console.log(`    truth in band   ${(b.observed * 100).toFixed(0)}pp apart,  permutation p = ${b.p.toFixed(3)}`);
+  if (w.p > 0.05 && b.p > 0.05) {
+    console.log('    Neither is a difference. The grade does not separate outcomes on');
+    console.log('    this data, and nothing in the interface should imply that it does.');
+  }
+
+  // A guard, not a metric. The one thing a grade must never do is run
+  // backwards: a worse grade whose band contains the truth more often is
+  // telling the reader to distrust the answers most likely to be right. The
+  // band-width ceiling this replaced did exactly that, 68.8% against 54.3%.
+  //
+  // It fails the run only when the inversion is *significant*, which is the
+  // same standard this table applies to the grade itself. Failing on a 10pp
+  // gap at p = 0.4 would be the harness asserting a difference it has just
+  // finished calling noise, and would break on the next three fixtures
+  // somebody adds. A non-significant inversion prints and does not gate.
+  let inverted = false;
+  for (let i = 0; i < populated.length - 1; i++) {
+    for (let j = i + 1; j < populated.length; j++) {
+      const better = populated[i];
+      const lower = populated[j];
+      if (better.rows.length < 5 || lower.rows.length < 5) continue;
+      const bB = better.rows.filter((r) => r.inBand).length / better.rows.length;
+      const bL = lower.rows.filter((r) => r.inBand).length / lower.rows.length;
+      if (bL - bB <= 0) continue;
+      const test = permutationP(better.rows, lower.rows, (r) => r.inBand);
+      const significant = test.p < 0.05;
+      if (significant) inverted = true;
+      console.log(`\n  ${significant ? '✗' : '!'} ${significant ? 'INVERTED' : 'inverted, inside the noise'}:`
+        + ` "${lower.grade}" games have the truth inside their band`);
+      console.log(`    ${(bL * 100).toFixed(1)}% of the time against ${(bB * 100).toFixed(1)}%`
+        + ` for "${better.grade}" (p = ${test.p.toFixed(3)}).`);
+      if (significant) {
+        console.log('    A grade that ranks the band backwards is worse than no grade.');
+      }
+    }
+  }
+  return { inverted };
 }
 
 function summarise(rows) {
@@ -188,9 +341,13 @@ async function main() {
 
   if (JSON_OUT) {
     console.log(JSON.stringify({ summary, rows }, null, 2));
-  } else {
-    report(summary, rows);
+    return;
   }
+
+  report(summary, rows);
+  const graded = byGrade(rows);
+  console.log('');
+  if (graded.inverted) process.exit(1);
 }
 
 main().catch((err) => {

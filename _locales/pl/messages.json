@@ -18,13 +18,14 @@
     "message": "Brak danych"
   },
   "legendGood": {
-    "message": "Metody są zgodne, a zakres wąski"
+    "message": "Dwie metody dopuszczają tę samą liczbę, a gra jest z tych, na których mierzono",
+    "description": "Deliberately says nothing about the band being narrow, and nothing about the answer being close. Band width no longer scores, and the grade has not been shown to predict accuracy. See the Confidence section of docs/METHODOLOGY.md."
   },
   "legendFair": {
-    "message": "Użyteczne, ale zakres jest szeroki albo nie było czym zweryfikować"
+    "message": "Tylko jedna metoda, zakresy niemal się mijają albo weryfikacja się nie zgadza"
   },
   "legendLow": {
-    "message": "Metody się rozchodzą albo kontrola się nie powiodła — patrz na zakres, nie na środek"
+    "message": "Metody się wykluczają albo źródła nigdy nie mierzyły gry tej wielkości — patrz na zakres, nie na środek"
   },
   "legendNone": {
     "message": "Nie udało się wygenerować szacunku"
@@ -46,6 +47,12 @@
   },
   "rBandSpans": {
     "message": "Zakres obejmuje $1-krotność"
+  },
+  "rBeyondMeasured": {
+    "message": "Większa niż każda gra, na której mierzono liczbę sprzedaży na recenzję: powyżej około $1 recenzji wskaźnik spada, ale nikt nie publikuje o ile"
+  },
+  "rBelowMeasured": {
+    "message": "Poniżej $1 kopii — ten przedział został wyłączony z badania dokładności tej metody"
   },
   "rAgree": {
     "message": "Źródła są zgodne w oczekiwanym zakresie"

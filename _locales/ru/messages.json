@@ -18,13 +18,14 @@
     "message": "Нет данных"
   },
   "legendGood": {
-    "message": "Методы сходятся, полоса узкая"
+    "message": "Два метода допускают одно и то же число, и игра — из тех, на которых мерили",
+    "description": "Deliberately says nothing about the band being narrow, and nothing about the answer being close. Band width no longer scores, and the grade has not been shown to predict accuracy. See the Confidence section of docs/METHODOLOGY.md."
   },
   "legendFair": {
-    "message": "Пользоваться можно, но полоса широкая или сверить не с чем"
+    "message": "Только один метод, полосы почти сошлись или возражает перекрёстная проверка"
   },
   "legendLow": {
-    "message": "Методы расходятся или не прошла проверка — смотрите на диапазон, а не на середину"
+    "message": "Методы противоречат друг другу или на играх такого размера ничего не измеряли — смотрите на диапазон, а не на середину"
   },
   "legendNone": {
     "message": "Оценку построить не удалось"
@@ -46,6 +47,12 @@
   },
   "rBandSpans": {
     "message": "Полоса шириной в $1 раза"
+  },
+  "rBeyondMeasured": {
+    "message": "Крупнее любой игры, на которой измеряли число продаж на отзыв: выше примерно $1 отзывов оно падает, но насколько — никто не публикует"
+  },
+  "rBelowMeasured": {
+    "message": "Меньше $1 копий — такие игры бенчмарк точности этого метода не включал"
   },
   "rAgree": {
     "message": "Источники сходятся в пределах ожидаемой полосы"

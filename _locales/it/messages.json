@@ -18,13 +18,14 @@
     "message": "Nessun dato"
   },
   "legendGood": {
-    "message": "I metodi concordano e l'intervallo è stretto"
+    "message": "Due metodi ammettono una cifra comune, su un gioco della taglia misurata dalle fonti",
+    "description": "Deliberately says nothing about the band being narrow, and nothing about the answer being close. Band width no longer scores, and the grade has not been shown to predict accuracy. See the Confidence section of docs/METHODOLOGY.md."
   },
   "legendFair": {
-    "message": "Utilizzabile, ma l'intervallo è ampio o non c'era nulla con cui verificare"
+    "message": "Un solo metodo, fasce che si sfiorano senza toccarsi, o un riscontro che dissente"
   },
   "legendLow": {
-    "message": "I metodi divergono o un controllo è fallito: leggi l'intervallo, non il punto medio"
+    "message": "I metodi si contraddicono, o le fonti non hanno mai misurato un gioco di questa taglia: leggi l'intervallo, non il punto medio"
   },
   "legendNone": {
     "message": "Non è stato possibile produrre una stima"
@@ -46,6 +47,12 @@
   },
   "rBandSpans": {
     "message": "L'intervallo copre $1 volte"
+  },
+  "rBeyondMeasured": {
+    "message": "Più grande di qualsiasi gioco su cui è stato misurato il rapporto vendite per recensione: sopra circa $1 recensioni cala, e nessuno pubblica di quanto"
+  },
+  "rBelowMeasured": {
+    "message": "Sotto le $1 copie, una fascia esclusa dal test di accuratezza di questo metodo"
   },
   "rAgree": {
     "message": "Le fonti concordano entro l'intervallo atteso"

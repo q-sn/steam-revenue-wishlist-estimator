@@ -76,6 +76,8 @@ npm run calibrate:live   # units and revenue, against disclosed sales
 npm run check:model      # the wishlist model, against the announcement archive
 ```
 
+If you changed anything in the confidence scale, run `npm run calibrate` and paste the **accuracy by grade** table into the PR. A grade that does not separate outcomes is a decoration, and the only way anyone can tell is to look. That table also fails the run outright if a lower grade ever covers the truth significantly more often than a higher one — the rule it replaced did exactly that, so the harness now refuses it.
+
 ## The most valuable contribution
 
 Fixtures with frozen snapshots.

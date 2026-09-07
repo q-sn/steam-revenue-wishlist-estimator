@@ -18,13 +18,14 @@
     "message": "Sin datos"
   },
   "legendGood": {
-    "message": "Los métodos coinciden y el rango es estrecho"
+    "message": "Dos métodos admiten una cifra común, en un juego del tamaño que midieron las fuentes",
+    "description": "Deliberately says nothing about the band being narrow, and nothing about the answer being close. Band width no longer scores, and the grade has not been shown to predict accuracy. See the Confidence section of docs/METHODOLOGY.md."
   },
   "legendFair": {
-    "message": "Utilizable, pero el rango es amplio o no hubo con qué contrastarlo"
+    "message": "Un solo método, un desencuentro mínimo entre rangos, o un contraste que objeta"
   },
   "legendLow": {
-    "message": "Los métodos discrepan o falló una comprobación: mira el rango, no el punto medio"
+    "message": "Los métodos se contradicen, o las fuentes nunca midieron un juego de este tamaño: mira el rango, no el punto medio"
   },
   "legendNone": {
     "message": "No se pudo generar una estimación"
@@ -46,6 +47,12 @@
   },
   "rBandSpans": {
     "message": "El rango abarca $1 veces"
+  },
+  "rBeyondMeasured": {
+    "message": "Más grande que cualquier juego en el que se midió la relación ventas por reseña: por encima de unas $1 reseñas baja, y nadie publica cuánto"
+  },
+  "rBelowMeasured": {
+    "message": "Menos de $1 copias, un tramo que el estudio de precisión de este método excluyó"
   },
   "rAgree": {
     "message": "Las fuentes coinciden dentro del rango esperado"

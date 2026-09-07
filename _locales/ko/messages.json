@@ -18,13 +18,14 @@
     "message": "데이터 없음"
   },
   "legendGood": {
-    "message": "여러 방법이 일치하고 범위가 좁습니다"
+    "message": "두 방법이 같은 값을 허용하며, 출처가 실제로 측정한 규모의 게임입니다",
+    "description": "Deliberately says nothing about the band being narrow, and nothing about the answer being close. Band width no longer scores, and the grade has not been shown to predict accuracy. See the Confidence section of docs/METHODOLOGY.md."
   },
   "legendFair": {
-    "message": "사용할 수 있지만 범위가 넓거나 교차 검증할 방법이 없었습니다"
+    "message": "방법이 하나뿐이거나, 범위가 간신히 어긋나거나, 교차 검증이 이견을 냅니다"
   },
   "legendLow": {
-    "message": "방법 간 결과가 어긋나거나 검증에 실패했습니다. 중앙값이 아니라 범위를 보세요"
+    "message": "방법끼리 모순되거나, 출처가 이 규모의 게임을 측정한 적이 없습니다. 중앙값이 아니라 범위를 보세요"
   },
   "legendNone": {
     "message": "추정치를 만들 수 없습니다"
@@ -46,6 +47,12 @@
   },
   "rBandSpans": {
     "message": "범위 폭이 $1배"
+  },
+  "rBeyondMeasured": {
+    "message": "리뷰당 판매량을 측정한 어떤 게임보다도 큽니다. 약 $1개 리뷰를 넘으면 이 비율은 떨어지지만 그 폭은 공개된 바 없습니다"
+  },
+  "rBelowMeasured": {
+    "message": "$1장 미만으로, 이 방법의 정확도 검증에서 제외된 규모입니다"
   },
   "rAgree": {
     "message": "출처들이 예상 범위 안에서 일치합니다"
