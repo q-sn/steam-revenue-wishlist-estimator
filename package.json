@@ -1,6 +1,6 @@
 {
   "name": "steam-revenue-wishlist-estimator",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Chrome extension that estimates Steam game sales, revenue and wishlists on any store page, as ranges with cited coefficients.",
   "type": "module",
   "private": true,
@@ -10,6 +10,7 @@
     "url": "https://github.com/q-sn/steam-revenue-wishlist-estimator.git"
   },
   "scripts": {
+    "zip": "node tools/pack.mjs",
     "calibrate": "node tools/calibrate.mjs",
     "calibrate:live": "node tools/calibrate.mjs --live",
     "smoke": "node tools/smoke.mjs",

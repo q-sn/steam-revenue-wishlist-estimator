@@ -3,7 +3,7 @@
     "message": "Wishlytic — Estimador de ingresos y listas de deseos de Steam"
   },
   "extDesc": {
-    "message": "Estima ventas, ingresos y listas de deseos de juegos de Steam en cualquier página de la tienda. Rangos, no precisión falsa. Gratis, sin cuenta."
+    "message": "Estima ventas, ingresos y listas de deseos en cualquier página de Steam. Rangos, no precisión falsa. Gratis, sin cuenta."
   },
   "confReliable": {
     "message": "Fiable"

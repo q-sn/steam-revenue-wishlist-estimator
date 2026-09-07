@@ -22,6 +22,12 @@ const CHECK_ONLY = process.argv.includes('--check');
 
 const placeholdersIn = (s) => (s.match(/\$\d/g) ?? []).sort().join(',');
 
+// Chrome caps the two strings that leave the manifest for the store listing,
+// and rejects the upload in whichever locale happens to be over. Twelve
+// translations of one sentence do not come out the same length, so the cap is
+// checked here rather than discovered at submission.
+const STORE_LIMITS = { extName: 75, extDesc: 132 };
+
 async function main() {
   const src = JSON.parse(await readFile(join(HERE, 'locales.source.json'), 'utf8'));
   const locales = src._locales;
@@ -44,6 +50,10 @@ async function main() {
         problems.push(
           `${key} [${locale}]: placeholders are "${found || 'none'}" but English has "${reference || 'none'}"`
         );
+      }
+      const limit = STORE_LIMITS[key];
+      if (limit && value.length > limit) {
+        problems.push(`${key} [${locale}]: ${value.length} characters, Chrome allows ${limit}`);
       }
       // A lone $ that is not a placeholder would be swallowed by Chrome.
       if (/\$(?!\d|\$)/.test(value)) {

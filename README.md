@@ -1,8 +1,45 @@
-# Wishlytic — Steam Revenue & Wishlist Estimator
+<h1 align="center">Wishlytic</h1>
 
-A Chrome extension that estimates units sold, developer revenue and wishlists on any Steam store page.
+<p align="center">
+  <b>Units sold, developer revenue and wishlists, on any Steam store page.</b><br>
+  Ranges, not single numbers — and every coefficient traceable to a published study.
+</p>
 
-It shows ranges, not single numbers, and every coefficient it uses is traceable to a published study — or, where a study established an effect without sizing it, marked as our own judgement.
+<p align="center">
+  <img alt="Licence: MIT" src="https://img.shields.io/badge/licence-MIT-66c0f4?style=flat-square">
+  <img alt="Chrome, Manifest V3" src="https://img.shields.io/badge/Chrome-Manifest%20V3-c7d5e0?style=flat-square">
+  <img alt="Dependencies: none" src="https://img.shields.io/badge/dependencies-none-4ec9a5?style=flat-square">
+  <img alt="Languages: 12" src="https://img.shields.io/badge/languages-12-9aa4b6?style=flat-square">
+</p>
+
+![The collapsed pill on a Steam store page, reading 12K reviews, 331K units and $4.7M gross](screenshots/steam-page.png)
+
+A pill in the corner of the page carries the figures at a glance. Click it and the panel says where each number came from, how far apart the methods behind it landed, and what it is worth.
+
+## On screen
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+**A released game.** Units and both money figures, each on a scale marked with its low and high end, and a tick where every contributing method landed. Underneath, the measured inputs they were derived from — and the follower count, with the reason no wishlist number is offered after release.
+
+<img alt="The expanded panel on a released game" src="screenshots/released.png">
+
+</td>
+<td width="50%" valign="top">
+
+**An unreleased game.** Three independent marks — a figure the studio published, the game's place in Steam's wishlist ordering, its follower count — with the weight each earned and the overlap they leave. Agreement here means a common figure, not close midpoints.
+
+<img alt="The expanded panel on an unreleased game, with the wishlist marks broken out" src="screenshots/wishlists.png">
+
+</td>
+</tr>
+</table>
+
+<p align="center"><img width="620" alt="The revenue waterfall: list price, discount, regional pricing and VAT, refunds, Valve's tiered royalty, and what reaches the developer" src="screenshots/waterfall.png"></p>
+
+<p align="center"><b>Where the money goes.</b> Every deduction between the sticker price and the developer's bank account, named and sized.<br><sub>Screenshots show live figures for the games named in them, September 2026.</sub></p>
 
 ## Why another one of these
 
@@ -16,119 +53,63 @@ This one takes the opposite position on all three.
 
 ## What it does
 
-| Metric | Method | Availability                                                       |
-| --- | --- |--------------------------------------------------------------------|
-| Units sold, lifetime | Weighted ensemble of an adjusted review multiplier and the SteamSpy owner band | Released games with 10+ reviews                                    |
-| Developer net revenue | Full waterfall: discount → regional and VAT → refunds → tiered royalty | Paid games                                                         |
-| Wishlists, pre-launch | Three marks, each weighted by the width of its own band: a figure the developer published about this game, carried forward at the measured growth rate; the game's place in Steam's wishlist ordering through a curve measured on announced figures; followers × 9.6–32.8 | Unreleased games with a follower count, a ranked position, a published figure, or any of them |
-| Week-one sales | Two published routes shown side by side, never averaged | Unreleased games                                                   |
-| Player-count cross-check | All-time peak concurrent × 11.4, kept outside the average | Games whose peak was set at launch                                 |
-| Player-hours cross-check | Measured player-hours ÷ an assumed average playtime, kept outside the average | Games with a concurrent-player history                             |
-| Local trend | Snapshots of your own visits, stored on this device only | After two visits                                                   |
+| Metric | Method | Availability |
+| --- | --- | --- |
+| Units sold, lifetime | Weighted ensemble of an adjusted review multiplier and the SteamSpy owner band | Released games with 10+ reviews |
+| Gross and developer net revenue | Full waterfall: discount → regional pricing and VAT → refunds → tiered royalty | Paid games |
+| Wishlists, pre-launch | Three marks, each weighted by the width of its own band: a figure the developer published, carried forward at the measured growth rate; the game's place in Steam's wishlist ordering, read through a curve fitted to those figures; followers × 9.6–32.8 | Unreleased games with any of a follower count, a ranked position or a published figure |
+| Week-one sales | Two published routes shown side by side, never averaged | Unreleased games |
+| Player-count cross-check | All-time peak concurrent × 11.4, kept outside the average | Games whose peak was set at launch |
+| Player-hours cross-check | Measured player-hours ÷ an assumed average playtime, kept outside the average | Games with a concurrent-player history |
+| Local trend | Snapshots of your own visits, stored on this device only | After two visits |
 
-Every figure comes with a scale showing the low and high end. The width of that bar is the point. Where several methods contribute, each one leaves a tick mark on that scale, so you can see how far apart they landed before they were averaged.
+Every figure comes with a scale showing the low and high end. The width of that bar is the point.
 
 ## Honest limits
 
-**Where the ceiling is.** Published benchmarks put a flat review multiplier at 42.7% of games within 30% error, adjusted multipliers at 50.4%, concurrent players over playtime at 64.4%, and a full ensemble at 76.9%. Two legs of that ensemble need infrastructure a browser extension does not have: continuous sampling of millions of Steam profiles, and years of daily top-seller snapshots. A third is reachable only in half — the player-hours are exact and the average playtime they must be divided by is not published anywhere, so it runs as a cross-check with its assumption on show. That leaves two estimators in the average and puts the ceiling in the middle of that table, not at the top.
-
-**Disagreement is never averaged away.** When no figure satisfies every method, the band expands to cover all of them and the confidence drops. A tidy midpoint between sources that exclude each other is worse than no answer — but sources whose ranges overlap are not in disagreement, however far apart their centres sit, and treating them as though they were would collapse the whole scale onto one word.
-
-**Confidence scores the evidence, not the width of the bar.** Every band here is dominated by a fixed published range, so the width barely varies, and a verdict read off it would be a constant: units could never reach the top, revenue would read *unreliable* on every paid game ever released, and wishlists *rough* on every unreleased one. A rating that never varies is a label. The word reports how many independent methods agree, whether anything contradicts them, and whether the game is the size the sources were measured on. The width is the bar itself, which is already on screen.
-
-**And on the units figure it is not yet a prediction of accuracy.** `npm run calibrate` grades all 62 disclosed-sales fixtures and reports how each grade did. The two grades those fixtures can reach differ by 13 points on within-30% error and 27 on band coverage, at permutation p of 0.68 and 0.39 — the right direction, not a difference. The dimension carrying most of the grade is whether two methods agree, and a frozen snapshot carries only one of them, so that part is backed by a published benchmark rather than by anything measured here. The previous grade read the width of the band, and the fixtures showed it ranking coverage backwards; that rule is gone. See [Confidence](docs/METHODOLOGY.md#confidence) for the tables.
-
-**Wishlists are the softest number here.** Steam publishes no wishlist counts for anyone. Three marks answer. One is a fact about the game — a figure its own studio posted on its own store page, carried forward to today — and it exists for about one ranked game in nine. The other two are inference: the store's own ordering of unreleased games by wishlists, positions with no numbers attached, read through a curve fitted to those announced figures; and the member count of the hidden group you join by following a game. Held out of its own fit, the model's median error is 12.3% on a figure posted in the last month and 21.9% on one of any age.
-
-**After release the wishlist estimate is withheld entirely.** Wishlists are consumed by purchases while followers persist, and the total balance typically peaks at 2–4x the pre-launch count before decaying. No stable ratio survives that, so the extension shows the follower count and declines to convert it.
-
-**Under 10 reviews there is no estimate.** Ten is the point at which Steam itself begins scoring a game, and below it one more review moves the answer by a tenth. The extension says so instead of printing a number.
-
-**Only base games get numbers.** Steam serves DLC, soundtracks, videos, demos and hardware from the same `/app/` path, and the review multiple was measured on none of them. Each is declined with its own reason rather than a blanket "unsupported" — a soundtrack is unmeasured, a demo has no sales at all, and a Steam Deck is not sold under the revenue share. Demos are the one case with a better answer than a refusal: Steam names the game a demo belongs to, so the panel shows that game's figures and says it is doing so.
+- **The ceiling sits in the middle of the published table, not at the top.** Benchmarks put a flat review multiplier at 42.7% of games within 30% error, adjusted multipliers at 50.4%, concurrent players over playtime at 64.4%, and a full ensemble at 76.9%. Two legs of that ensemble need infrastructure a browser extension does not have — continuous sampling of millions of Steam profiles, and years of daily top-seller snapshots — and a third is only half reachable, since the average playtime its exact player-hours must be divided by is published nowhere. Two estimators enter the average here. → [The accuracy ceiling](docs/METHODOLOGY.md#the-accuracy-ceiling)
+- **Disagreement is never averaged away.** When no figure satisfies every method, the band expands to cover all of them and the confidence drops. A tidy midpoint between sources that exclude each other is worse than no answer.
+- **Confidence scores the evidence, not the width of the bar** — how many independent methods agree, whether anything contradicts them, and whether the game is the size the sources were measured on. On units it is not yet a *prediction* of accuracy: across the 62 disclosed-sales fixtures the grades separate in the right direction but not significantly, and `npm run calibrate` prints those tables rather than a claim. → [Confidence](docs/METHODOLOGY.md#confidence)
+- **Wishlists are the softest number here.** Steam publishes no counts for anyone. One mark is a fact about the game — a figure its own studio posted — and it exists for about one ranked game in nine; the other two are inference. Held out of its own fit, the model's median error is 12.3% on a figure posted in the last month and 21.9% on one of any age. After release the estimate is withheld entirely: wishlists are consumed by purchases while followers persist, and no stable ratio survives that. → [Wishlists](docs/METHODOLOGY.md#wishlists)
+- **Under ten reviews, and on anything that is not a base game, there is no number.** Ten is where Steam itself starts scoring a game; below it one more review moves the answer by a tenth. DLC, soundtracks, videos and hardware are each declined with their own reason rather than a blanket "unsupported" — and a demo, which Steam links to its parent game, shows that game's figures and says so. → [Gates and refusals](docs/METHODOLOGY.md#gates-and-refusals)
 
 ## Install
 
-Not on the Chrome Web Store yet. The release is gated on publishing an accuracy figure: shipping an uncalibrated estimator is how the existing tools ended up with reviews saying they underestimate by two to three times.
+Not on the Chrome Web Store yet: the release is gated on publishing an accuracy figure. Shipping an uncalibrated estimator is how the existing tools ended up with reviews saying they underestimate by two to three times.
 
 ```bash
 git clone https://github.com/q-sn/steam-revenue-wishlist-estimator.git
 ```
 
-Then open `chrome://extensions/`, enable Developer mode, click **Load unpacked**, and select the folder. Visit any `store.steampowered.com/app/...` page.
+Open `chrome://extensions/`, enable Developer mode, click **Load unpacked** and select the folder. Then visit any `store.steampowered.com/app/…` page. No build step, no bundler, no dependencies.
 
-No build step, no bundler, no dependencies.
+## Privacy
 
-## Layout
+No account, no telemetry, no analytics, and no network calls to anything but Steam, SteamSpy and SteamCharts. Every request sets `credentials: 'omit'`, so your Steam cookies are never attached to one. Visit snapshots and cached lookups live in `chrome.storage.local`, on your device only, and can be wiped from the options page. The whole of what it touches is in [PRIVACY.md](PRIVACY.md).
 
-```
-src/core/          pure estimators, no browser APIs — Node imports these unchanged
-  constants.js     every coefficient, with the study it came from
-  units.js         adjusted Boxleiter, owner bands, CCU and player-hours cross-checks
-  ensemble.js      weighted geometric combination and confidence scoring
-  revenue.js       the waterfall and Valve's tiered royalty
-  wishlists.js     the three wishlist marks, and both week-one routes
-  wishlist-rank.js a place in Steam's wishlist ordering, read as a count
-  wishlist-said.js a figure the developer announced, carried forward to today
-  history.js       local snapshot series and visit-to-visit diffs
-src/content/       page scraping and the Shadow DOM overlay
-src/background/    cross-origin fetches, caching, local history
-docs/METHODOLOGY.md  every formula and what it is worth
-.github/workflows/
-  wishlist-ranks.yml      the daily job that publishes both wishlist files
-tools/
-  calibrate.mjs                 accuracy harness
-  calibrate-wishlist-model.mjs  the whole wishlist model, refit from the archive
-  calibrate-follower-ratio.mjs  where the follower multiplier is measured
-  crawl-wishlist-ranks.mjs      one snapshot of Steam's wishlist ordering
-  harvest-anchors.mjs           wishlist numbers developers announced themselves
-  condense-anchors.mjs          the archive, cut to what a browser needs
-  merge-anchors.mjs             two copies of the archive, unioned on publish
-  build-locales.mjs             _locales/ from tools/locales.source.json
-  smoke.mjs                     offline checks
-```
+## Languages
 
-The wishlist-ranking tools run in CI, not on anyone's machine. `data/` is where they write locally and is git-ignored; the published files live on the `data` branch.
-
-The core deliberately has no browser dependencies. That is what lets the calibration harness test the exact code that ships, rather than a reimplementation of it that drifts.
+English, Russian, Simplified Chinese, Spanish, Brazilian Portuguese, German, French, Japanese, Korean, Turkish, Polish and Italian. The extension follows your browser's UI language, and numbers are formatted with `Intl` so they read naturally in each one. Translations live in one master table, `tools/locales.source.json`, and `node tools/build-locales.mjs` regenerates `_locales/` — refusing to run if a locale is missing a key or if a translation dropped a `$1` placeholder, which is how a number silently disappears from a sentence.
 
 ## Development
 
 ```bash
-npm run smoke                 # offline checks, run before every commit
-npm run calibrate:live        # accuracy against games with disclosed sales
-npm run ranks                 # snapshot Steam's wishlist ordering
-npm run anchors               # collect wishlist numbers developers posted
-npm run condense              # cut the archive to what a browser needs
-npm run check:model           # refit the wishlist model from that archive
-npm run check:ratio           # re-measure the follower multiplier
+npm run smoke        # offline checks, run before every commit
+npm run calibrate    # grade the estimator on 62 games with disclosed sales
+npm run check:model  # refit the wishlist model from the archive
+npm run locales      # rebuild _locales/ from the master table
+npm run zip          # the store upload, refusing to build what would be rejected
 ```
 
-`npm run check:model` exits non-zero when a constant in `src/core/constants.js` stops reproducing from the archive, so a drifting fit fails rather than passing quietly.
+`src/core/` holds the estimators and touches no browser API, which is what lets the calibration harness test the exact code that ships rather than a reimplementation of it that drifts. `check:model` exits non-zero when a constant stops reproducing from the archive, so a drifting fit fails instead of passing quietly. The wishlist-ranking jobs (`ranks`, `anchors`, `condense`, `check:ratio`) run in CI; `data/` is where they write locally and is git-ignored, and the published files live on the `data` branch.
 
-`test/fixtures.json` holds 62 games whose developers published real unit counts, each with the review count and positive share of its announcement day frozen into `snapshot`. Those come from `store.steampowered.com/appreviewhistogram/<appid>`, which returns a game's whole review history in one keyless request. Live mode still exists and still compares today's review count against a figure announced in the past, so it is biased toward overestimating and prints a warning saying so; the frozen run is the one to read. More games remain the single most valuable contribution to this project — the set is thin below a thousand copies and thinner still before 2020.
-
-## Languages
-
-English, Russian, Simplified Chinese, Spanish, Brazilian Portuguese, German, French, Japanese, Korean, Turkish, Polish and Italian. The extension follows your browser's UI language, and numbers are formatted with `Intl` so they read naturally in each one.
-
-Translations live in a single master table at `tools/locales.source.json`. Adding a string means editing one file, not twelve:
-
-```bash
-node tools/build-locales.mjs          # regenerate _locales/
-node tools/build-locales.mjs --check  # validate without writing
-```
-
-The build refuses to run if a locale is missing a key or if a translation dropped a `$1` placeholder, which is how a number silently disappears from a sentence.
-
-## Privacy
-
-No account, no telemetry, no analytics, no network calls to anything but Steam, SteamSpy and SteamCharts. Every lookup is cached before it is repeated, so a game costs a handful of requests per day rather than per page view. Visit snapshots and cached lookups live in `chrome.storage.local` and can be wiped from the options page.
+`test/fixtures.json` holds 62 games whose developers published real unit counts, each with the review count and positive share of its announcement day frozen in. **More games are the single most valuable contribution to this project** — the set is thin below a thousand copies and thinner still before 2020.
 
 ## Contributing
 
-One rule above the others: **no coefficient without a source.** `src/core/constants.js` pairs every number with the study it came from, and marks the ones whose *size* is our own judgement rather than a published figure. A number you cannot cite does not belong in a tool that claims to be honest about its uncertainty, and a number that looks cited when it is not is worse.
+One rule above the others: **no coefficient without a source.** `src/core/constants.js` pairs every number with the study it came from and marks the ones whose *size* is our own judgement rather than a published figure. A number you cannot cite does not belong in a tool that claims to be honest about its uncertainty, and a number that looks cited when it is not is worse.
 
-Full guidelines in [CONTRIBUTING.md](CONTRIBUTING.md). The methodology behind every formula is in [docs/METHODOLOGY.md](docs/METHODOLOGY.md).
+Full guidelines in [CONTRIBUTING.md](CONTRIBUTING.md). Every formula and what it is worth is in [docs/METHODOLOGY.md](docs/METHODOLOGY.md).
 
 ## Credits
 

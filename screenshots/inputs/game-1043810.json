@@ -1,0 +1,184 @@
+{
+  "appId": 1043810,
+  "name": "Tactical Breach Wizards",
+  "reviews": 12151,
+  "positivePct": 97.93432639288947,
+  "isFree": false,
+  "price": 19.99,
+  "listPrice": 19.99,
+  "discountPct": 0,
+  "dlcCount": 1,
+  "released": true,
+  "releaseYear": 2024,
+  "releaseDate": 1724270400000,
+  "storeReleaseYear": 2024,
+  "firstSaleCorrected": false,
+  "tags": [
+    "Adventure",
+    "Indie",
+    "RPG",
+    "Strategy"
+  ],
+  "followers": 51796,
+  "followersStale": false,
+  "wishlistRank": null,
+  "wishlistListing": {
+    "listed": 5600,
+    "upcoming": 15181,
+    "at": 1788769653103
+  },
+  "wishlistSaid": null,
+  "owners": "200,000 .. 500,000",
+  "ownerRecordReviews": 9467,
+  "peak24h": 72,
+  "peak24hSource": "charts",
+  "peakCcuYesterday": 159,
+  "currentPlayers": 42,
+  "allTimePeak": 4741,
+  "allTimePeakAt": 1722470400000,
+  "monthlyHistory": [
+    {
+      "year": 2026,
+      "monthIndex": 7,
+      "avgPlayers": 50.14
+    },
+    {
+      "year": 2026,
+      "monthIndex": 6,
+      "avgPlayers": 79.38
+    },
+    {
+      "year": 2026,
+      "monthIndex": 5,
+      "avgPlayers": 71.07
+    },
+    {
+      "year": 2026,
+      "monthIndex": 4,
+      "avgPlayers": 53.34
+    },
+    {
+      "year": 2026,
+      "monthIndex": 3,
+      "avgPlayers": 51.68
+    },
+    {
+      "year": 2026,
+      "monthIndex": 2,
+      "avgPlayers": 53.4
+    },
+    {
+      "year": 2026,
+      "monthIndex": 1,
+      "avgPlayers": 58.11
+    },
+    {
+      "year": 2026,
+      "monthIndex": 0,
+      "avgPlayers": 120.15
+    },
+    {
+      "year": 2025,
+      "monthIndex": 11,
+      "avgPlayers": 127.05
+    },
+    {
+      "year": 2025,
+      "monthIndex": 10,
+      "avgPlayers": 128.97
+    },
+    {
+      "year": 2025,
+      "monthIndex": 9,
+      "avgPlayers": 61.29
+    },
+    {
+      "year": 2025,
+      "monthIndex": 8,
+      "avgPlayers": 54.54
+    },
+    {
+      "year": 2025,
+      "monthIndex": 7,
+      "avgPlayers": 85.41
+    },
+    {
+      "year": 2025,
+      "monthIndex": 6,
+      "avgPlayers": 133.95
+    },
+    {
+      "year": 2025,
+      "monthIndex": 5,
+      "avgPlayers": 114.9
+    },
+    {
+      "year": 2025,
+      "monthIndex": 4,
+      "avgPlayers": 75.05
+    },
+    {
+      "year": 2025,
+      "monthIndex": 3,
+      "avgPlayers": 127.12
+    },
+    {
+      "year": 2025,
+      "monthIndex": 2,
+      "avgPlayers": 121.61
+    },
+    {
+      "year": 2025,
+      "monthIndex": 1,
+      "avgPlayers": 142.66
+    },
+    {
+      "year": 2025,
+      "monthIndex": 0,
+      "avgPlayers": 238.64
+    },
+    {
+      "year": 2024,
+      "monthIndex": 11,
+      "avgPlayers": 262.8
+    },
+    {
+      "year": 2024,
+      "monthIndex": 10,
+      "avgPlayers": 133.97
+    },
+    {
+      "year": 2024,
+      "monthIndex": 9,
+      "avgPlayers": 263.81
+    },
+    {
+      "year": 2024,
+      "monthIndex": 8,
+      "avgPlayers": 634.33
+    },
+    {
+      "year": 2024,
+      "monthIndex": 7,
+      "avgPlayers": 2486.1
+    }
+  ],
+  "trend": {
+    "changePct": -3.68,
+    "avgPlayers": 48
+  },
+  "reviewerMedianHours": 20.666666666666668,
+  "reviewerSampleSize": 100,
+  "steamPurchaseShare": 0.93,
+  "freeCopyShare": 0,
+  "languageMix": {
+    "discounted": 497,
+    "total": 12151
+  },
+  "reviewTrend": null,
+  "festivalContext": "unknown",
+  "appType": "game",
+  "fullGameId": null,
+  "fullGameName": null,
+  "collectedAt": 1788788485994
+}

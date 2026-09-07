@@ -1,0 +1,53 @@
+{
+  "appId": 2861080,
+  "name": "Haunted Paws",
+  "reviews": 0,
+  "positivePct": null,
+  "isFree": false,
+  "price": null,
+  "listPrice": null,
+  "discountPct": 0,
+  "dlcCount": 0,
+  "released": false,
+  "releaseYear": null,
+  "releaseDate": null,
+  "storeReleaseYear": null,
+  "firstSaleCorrected": false,
+  "tags": [
+    "Adventure",
+    "Indie"
+  ],
+  "followers": 38174,
+  "followersStale": false,
+  "wishlistRank": 54,
+  "wishlistListing": {
+    "listed": 5600,
+    "upcoming": 15181,
+    "at": 1788769653103
+  },
+  "wishlistSaid": {
+    "wishlists": 900000,
+    "announcedAt": "2026-09-01"
+  },
+  "owners": "0 .. 20,000",
+  "ownerRecordReviews": 0,
+  "peak24h": 0,
+  "peak24hSource": "steamspy",
+  "peakCcuYesterday": 0,
+  "currentPlayers": null,
+  "allTimePeak": null,
+  "allTimePeakAt": null,
+  "monthlyHistory": null,
+  "trend": null,
+  "reviewerMedianHours": null,
+  "reviewerSampleSize": null,
+  "steamPurchaseShare": null,
+  "freeCopyShare": null,
+  "languageMix": null,
+  "reviewTrend": null,
+  "festivalContext": "unknown",
+  "appType": "game",
+  "fullGameId": null,
+  "fullGameName": null,
+  "collectedAt": 1788788493282
+}

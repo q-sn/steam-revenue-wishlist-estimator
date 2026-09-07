@@ -31,17 +31,17 @@
   },
   "extDesc": {
     "en": "Estimate Steam game sales, revenue and wishlists on any store page. Ranges, not fake precision. Free, no account.",
-    "ru": "Оценка продаж, выручки и вишлистов игр Steam прямо на странице магазина. Диапазоны вместо ложной точности. Бесплатно, без аккаунта.",
+    "ru": "Оценка продаж, выручки и вишлистов на любой странице Steam. Диапазоны вместо ложной точности. Бесплатно, без аккаунта.",
     "zh_CN": "在任意商店页面估算 Steam 游戏的销量、收入和愿望单数量。给出区间，而非虚假的精确值。免费，无需账号。",
-    "es": "Estima ventas, ingresos y listas de deseos de juegos de Steam en cualquier página de la tienda. Rangos, no precisión falsa. Gratis, sin cuenta.",
-    "pt_BR": "Estime vendas, receita e listas de desejos de jogos da Steam em qualquer página da loja. Faixas, não precisão falsa. Grátis, sem conta.",
-    "de": "Schätze Verkäufe, Umsatz und Wunschlisten von Steam-Spielen auf jeder Shop-Seite. Bandbreiten statt vorgetäuschter Genauigkeit. Kostenlos, ohne Konto.",
-    "fr": "Estimez les ventes, les revenus et les listes de souhaits des jeux Steam sur n'importe quelle page boutique. Des fourchettes, pas une fausse précision. Gratuit, sans compte.",
+    "es": "Estima ventas, ingresos y listas de deseos en cualquier página de Steam. Rangos, no precisión falsa. Gratis, sin cuenta.",
+    "pt_BR": "Estime vendas, receita e listas de desejos em qualquer página da Steam. Faixas, não precisão falsa. Grátis, sem conta.",
+    "de": "Verkäufe, Umsatz und Wunschlisten auf jeder Steam-Shopseite. Bandbreiten statt falscher Genauigkeit. Kostenlos, ohne Konto.",
+    "fr": "Ventes, revenus et listes de souhaits estimés sur toute page Steam. Fourchettes, pas de fausse précision. Gratuit, sans compte.",
     "ja": "Steam のストアページで売上・収益・ウィッシュリストを推定します。見せかけの精度ではなく範囲を示します。無料、アカウント不要。",
     "ko": "Steam 상점 페이지에서 판매량, 수익, 위시리스트를 추정합니다. 거짓된 정밀도 대신 범위를 보여줍니다. 무료, 계정 불필요.",
-    "tr": "Herhangi bir Steam mağaza sayfasında satış, gelir ve istek listesi tahmini. Sahte kesinlik yerine aralıklar. Ücretsiz, hesap gerekmez.",
-    "pl": "Szacuj sprzedaż, przychody i listy życzeń gier na Steam na dowolnej stronie sklepu. Zakresy zamiast fałszywej precyzji. Za darmo, bez konta.",
-    "it": "Stima vendite, ricavi e liste dei desideri dei giochi Steam su qualsiasi pagina del negozio. Intervalli, non falsa precisione. Gratis, senza account."
+    "tr": "Her Steam mağaza sayfasında satış, gelir ve istek listesi tahmini. Sahte kesinlik yerine aralıklar. Ücretsiz, hesap gerekmez.",
+    "pl": "Szacuj sprzedaż, przychody i listy życzeń na dowolnej stronie Steam. Zakresy zamiast fałszywej precyzji. Za darmo, bez konta.",
+    "it": "Stima vendite, ricavi e liste dei desideri su ogni pagina Steam. Intervalli, non falsa precisione. Gratis, senza account."
   },
   "confReliable": {
     "en": "Reliable",

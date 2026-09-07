@@ -47,6 +47,39 @@ All code, comments, commit messages, documentation and user-facing strings are i
 
 ## Architecture rules
 
+### Where things live
+
+```
+src/core/          pure estimators, no browser APIs — Node imports these unchanged
+  constants.js     every coefficient, with the study it came from
+  units.js         adjusted Boxleiter, owner bands, CCU and player-hours cross-checks
+  ensemble.js      weighted geometric combination and confidence scoring
+  revenue.js       the waterfall and Valve's tiered royalty
+  wishlists.js     the three wishlist marks, and both week-one routes
+  wishlist-rank.js a place in Steam's wishlist ordering, read as a count
+  wishlist-said.js a figure the developer announced, carried forward to today
+  history.js       local snapshot series and visit-to-visit diffs
+src/content/       page scraping and the Shadow DOM overlay
+src/background/    cross-origin fetches, caching, local history
+docs/METHODOLOGY.md  every formula and what it is worth
+.github/workflows/
+  wishlist-ranks.yml      the daily job that publishes both wishlist files
+tools/
+  calibrate.mjs                 accuracy harness
+  calibrate-wishlist-model.mjs  the whole wishlist model, refit from the archive
+  calibrate-follower-ratio.mjs  where the follower multiplier is measured
+  crawl-wishlist-ranks.mjs      one snapshot of Steam's wishlist ordering
+  harvest-anchors.mjs           wishlist numbers developers announced themselves
+  condense-anchors.mjs          the archive, cut to what a browser needs
+  merge-anchors.mjs             two copies of the archive, unioned on publish
+  build-locales.mjs             _locales/ from tools/locales.source.json
+  smoke.mjs                     offline checks
+```
+
+The wishlist-ranking tools run in CI, not on anyone's machine. `data/` is where they write locally and is git-ignored; the published files live on the `data` branch.
+
+### The rules
+
 **`src/core/` must not touch browser APIs.** No `chrome.*`, no `document`, no `window`, no `fetch`. The core is imported unchanged by `tools/calibrate.mjs` running in Node, and that is the only thing keeping the calibration harness honest — the moment the core needs a browser, the harness starts testing a reimplementation that quietly drifts from what ships.
 
 Network access belongs in `src/background/`. DOM access belongs in `src/content/`.

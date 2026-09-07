@@ -1,0 +1,203 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Chrome Web Store tiles</title>
+<!--
+  The five listing screenshots, at the size the store demands: 1280 x 800,
+  rendered one at a time by store.mjs with ?tile=<n>.
+
+  The artwork is the PNGs one directory up, which are photographs of the real
+  overlay on a real store page. Nothing here draws a figure of its own: the
+  headlines say what the picture shows and the picture is the evidence.
+-->
+<style>
+  :root {
+    --ink: #e9eef6;
+    --muted: #97a1b3;
+    --faint: #5b6577;
+    --accent: #66c0f4;
+    --good: #4ec9a5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { width: 1280px; height: 800px; overflow: hidden; }
+
+  body {
+    background:
+      radial-gradient(900px 520px at 88% -8%, rgba(43, 92, 133, .38), transparent 62%),
+      radial-gradient(700px 460px at 4% 108%, rgba(30, 58, 89, .30), transparent 60%),
+      linear-gradient(155deg, #131923 0%, #0c1016 52%, #0a0e14 100%);
+    color: var(--ink);
+    font-family: "Segoe UI Variable Text", "Segoe UI", -apple-system,
+      BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    font-synthesis-weight: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .tile { display: none; width: 1280px; height: 800px; padding: 54px 56px; }
+  .tile.on { display: grid; }
+
+  /* Four of the five put the words beside the picture; the first one puts
+     them above it, because its picture is a whole store page. */
+  .tile.beside { grid-template-columns: 1fr auto; gap: 54px; align-items: center; }
+  /* Words above the picture, and the picture pinned to the bottom of what is
+     left, so a longer headline eats the gap rather than the screenshot. */
+  .tile.above { grid-template-rows: auto 1fr; gap: 22px; }
+
+  .brand { display: flex; align-items: center; gap: 11px; margin-bottom: 26px; }
+  .brand img { width: 30px; height: 30px; }
+  .brand b {
+    font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+    font-size: 19px; font-weight: 600; letter-spacing: .1px;
+  }
+  .brand span {
+    font-size: 12.5px; color: var(--faint); letter-spacing: .15em;
+    text-transform: uppercase; font-weight: 600; padding-left: 11px;
+    border-left: 1px solid rgba(255, 255, 255, .12);
+  }
+
+  h1 {
+    font-family: "Segoe UI Variable Display", "Segoe UI Variable Text", "Segoe UI",
+      -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 44px; line-height: 1.1; font-weight: 600; letter-spacing: -.9px;
+    /* Chrome evens out the lines rather than leaving one word on the last. */
+    text-wrap: balance;
+  }
+  .above h1 { font-size: 42px; }
+
+  p, li { font-size: 18.5px; line-height: 1.58; color: var(--muted); max-width: 33em; }
+  p { margin-top: 18px; }
+  .above p { margin-top: 12px; max-width: 78ch; }
+
+  ul { margin-top: 22px; list-style: none; display: grid; gap: 13px; }
+  li { position: relative; padding-left: 22px; }
+  li::before {
+    content: ''; position: absolute; left: 2px; top: .62em;
+    width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+  }
+
+  em { font-style: normal; color: var(--ink); }
+  .green { color: var(--good); }
+
+  /* One shared frame, so the five pictures sit on the page the same way. */
+  .shot {
+    overflow: hidden; border-radius: 13px;
+    border: 1px solid rgba(255, 255, 255, .08);
+    box-shadow: 0 26px 64px rgba(0, 0, 0, .55), 0 2px 0 rgba(255, 255, 255, .04) inset;
+    background: #0f131a;
+  }
+  .shot img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  /* Per tile: how much of a tall panel is in frame, and from which end. */
+  /* 2.43:1, the ratio steam-page-wide.png was framed at, so the layout
+     never re-crops what the shot already chose. */
+  .shot.page   { width: 1168px; height: 480px; align-self: end; }
+  .shot.page img { object-position: 100% 100%; }
+  /*
+   * The panel shots keep 12 CSS px of store page down each side, which is
+   * what makes them read as an overlay in the README and what reads as a
+   * smudge inside a frame here. So the image is laid out wider than its frame
+   * and pulled left by half the difference, which crops both slivers: a 445px
+   * panel inside a 469px picture, scaled until the panel alone fills the
+   * width.
+   *
+   * The heights are chosen the same way — 540 CSS px of panel at 1.213x, and
+   * the whole 729px one at 0.949x — so the crop lands under the divider below
+   * the follower note rather than through a row of figures.
+   */
+  .shot.panel  { width: 540px; height: 687px; }
+  .shot.panel img { width: 575px; margin-left: -17.5px; object-position: 50% 0; }
+  .shot.whole  { width: 422px; height: 692px; }
+  .shot.whole img { width: 450px; margin-left: -14px; }
+  .shot.card   { width: 604px; height: auto; }
+  .shot.card.big { width: 688px; }
+  .shot.card img { height: auto; }
+</style>
+
+<section class="tile above" data-tile="1">
+  <div>
+    <div class="brand">
+      <img src="../../icons/icon-128.png" alt="">
+      <b>Wishlytic</b>
+      <span>Steam revenue &amp; wishlist estimator</span>
+    </div>
+    <h1>The numbers, on the page you are already reading</h1>
+    <p>A pill in the corner of every Steam store page: reviews, units sold, gross revenue.</p>
+  </div>
+  <div class="shot page"><img src="../steam-page-wide.png" alt=""></div>
+</section>
+
+<section class="tile beside" data-tile="2">
+  <div>
+    <div class="brand">
+      <img src="../../icons/icon-128.png" alt="">
+      <b>Wishlytic</b>
+      <span>Units &amp; revenue</span>
+    </div>
+    <h1>A range, not a number pretending to be exact</h1>
+    <ul>
+      <li><em>Units sold, gross revenue, and what reaches the developer</em> — each on a scale
+        with its low and high end.</li>
+      <li>A tick mark for <em>every method that contributed</em>, so you can see how far apart
+        they landed before they were averaged.</li>
+      <li>A verdict that scores <em>the evidence</em>: how many independent methods agree, and
+        whether anything contradicts them.</li>
+    </ul>
+  </div>
+  <div class="shot panel"><img src="../released.png" alt=""></div>
+</section>
+
+<section class="tile beside" data-tile="3">
+  <div>
+    <div class="brand">
+      <img src="../../icons/icon-128.png" alt="">
+      <b>Wishlytic</b>
+      <span>The revenue waterfall</span>
+    </div>
+    <h1>Valve's cut is tiered, not a flat 30%</h1>
+    <p>Discount, regional pricing and VAT, refunds, and only then a <em>30/25/20 royalty on
+      adjusted gross</em> — every deduction between the sticker price and the developer's bank
+      account, named and sized.</p>
+    <p>Taking a flat 30% off the list price instead inflates the answer by roughly 60%.</p>
+  </div>
+  <div class="shot card"><img src="../waterfall.png" alt=""></div>
+</section>
+
+<section class="tile beside" data-tile="4">
+  <div>
+    <div class="brand">
+      <img src="../../icons/icon-128.png" alt="">
+      <b>Wishlytic</b>
+      <span>Before launch</span>
+    </div>
+    <h1>Wishlists, from three independent marks</h1>
+    <p>A figure the studio published, the store's own ordering of unreleased games, and the
+      follower count — each weighted by the width of its own band.</p>
+    <p>Agreement means <em>a figure every method allows</em>, not two midpoints that happen to
+      sit close together.</p>
+  </div>
+  <div class="shot whole"><img src="../wishlists.png" alt=""></div>
+</section>
+
+<section class="tile beside" data-tile="5">
+  <div>
+    <div class="brand">
+      <img src="../../icons/icon-128.png" alt="">
+      <b>Wishlytic</b>
+      <span>Sources</span>
+    </div>
+    <h1>No coefficient without a source</h1>
+    <p>Every multiplier traces to a published study, and the panel shows the chain: the band
+      for the release year, what moved it, and what it came to.</p>
+    <p>Where a study established an effect but never sized it, <em>our own figure is marked as
+      ours</em> rather than dressed up as research.</p>
+  </div>
+  <div class="shot card big"><img src="../multiplier.png" alt=""></div>
+</section>
+
+<script>
+  const wanted = new URL(location.href).searchParams.get('tile') ?? '1';
+  const tile = document.querySelector(`.tile[data-tile="${wanted}"]`);
+  if (!tile) throw new Error(`no tile ${wanted}`);
+  tile.classList.add('on');
+</script>

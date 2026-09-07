@@ -1,0 +1,297 @@
+{
+  "appId": 1121640,
+  "name": "The Wandering Village",
+  "reviews": 8460,
+  "positivePct": 91.95035460992908,
+  "isFree": false,
+  "price": 14.99,
+  "listPrice": 29.99,
+  "discountPct": 50,
+  "dlcCount": 4,
+  "released": true,
+  "releaseYear": 2022,
+  "releaseDate": 1663113600000,
+  "storeReleaseYear": 2025,
+  "firstSaleCorrected": true,
+  "tags": [
+    "Simulation",
+    "Strategy"
+  ],
+  "followers": 112259,
+  "followersStale": false,
+  "wishlistRank": null,
+  "wishlistListing": {
+    "listed": 5600,
+    "upcoming": 15181,
+    "at": 1788769653103
+  },
+  "wishlistSaid": null,
+  "owners": "200,000 .. 500,000",
+  "ownerRecordReviews": 5986,
+  "peak24h": 288,
+  "peak24hSource": "charts",
+  "peakCcuYesterday": 164,
+  "currentPlayers": 242,
+  "allTimePeak": 5711,
+  "allTimePeakAt": 1661990400000,
+  "monthlyHistory": [
+    {
+      "year": 2026,
+      "monthIndex": 7,
+      "avgPlayers": 135.67
+    },
+    {
+      "year": 2026,
+      "monthIndex": 6,
+      "avgPlayers": 190.34
+    },
+    {
+      "year": 2026,
+      "monthIndex": 5,
+      "avgPlayers": 236.01
+    },
+    {
+      "year": 2026,
+      "monthIndex": 4,
+      "avgPlayers": 144.9
+    },
+    {
+      "year": 2026,
+      "monthIndex": 3,
+      "avgPlayers": 147.63
+    },
+    {
+      "year": 2026,
+      "monthIndex": 2,
+      "avgPlayers": 180.08
+    },
+    {
+      "year": 2026,
+      "monthIndex": 1,
+      "avgPlayers": 158.67
+    },
+    {
+      "year": 2026,
+      "monthIndex": 0,
+      "avgPlayers": 249.15
+    },
+    {
+      "year": 2025,
+      "monthIndex": 11,
+      "avgPlayers": 388.45
+    },
+    {
+      "year": 2025,
+      "monthIndex": 10,
+      "avgPlayers": 159.8
+    },
+    {
+      "year": 2025,
+      "monthIndex": 9,
+      "avgPlayers": 234.3
+    },
+    {
+      "year": 2025,
+      "monthIndex": 8,
+      "avgPlayers": 286.72
+    },
+    {
+      "year": 2025,
+      "monthIndex": 7,
+      "avgPlayers": 382.17
+    },
+    {
+      "year": 2025,
+      "monthIndex": 6,
+      "avgPlayers": 609.5
+    },
+    {
+      "year": 2025,
+      "monthIndex": 5,
+      "avgPlayers": 164.8
+    },
+    {
+      "year": 2025,
+      "monthIndex": 4,
+      "avgPlayers": 206.73
+    },
+    {
+      "year": 2025,
+      "monthIndex": 3,
+      "avgPlayers": 182.14
+    },
+    {
+      "year": 2025,
+      "monthIndex": 2,
+      "avgPlayers": 186.44
+    },
+    {
+      "year": 2025,
+      "monthIndex": 1,
+      "avgPlayers": 114.86
+    },
+    {
+      "year": 2025,
+      "monthIndex": 0,
+      "avgPlayers": 175.51
+    },
+    {
+      "year": 2024,
+      "monthIndex": 11,
+      "avgPlayers": 141.97
+    },
+    {
+      "year": 2024,
+      "monthIndex": 10,
+      "avgPlayers": 203.47
+    },
+    {
+      "year": 2024,
+      "monthIndex": 9,
+      "avgPlayers": 107.16
+    },
+    {
+      "year": 2024,
+      "monthIndex": 8,
+      "avgPlayers": 132.73
+    },
+    {
+      "year": 2024,
+      "monthIndex": 7,
+      "avgPlayers": 128.58
+    },
+    {
+      "year": 2024,
+      "monthIndex": 6,
+      "avgPlayers": 147.6
+    },
+    {
+      "year": 2024,
+      "monthIndex": 5,
+      "avgPlayers": 179.25
+    },
+    {
+      "year": 2024,
+      "monthIndex": 4,
+      "avgPlayers": 158.35
+    },
+    {
+      "year": 2024,
+      "monthIndex": 3,
+      "avgPlayers": 136.68
+    },
+    {
+      "year": 2024,
+      "monthIndex": 2,
+      "avgPlayers": 190.01
+    },
+    {
+      "year": 2024,
+      "monthIndex": 1,
+      "avgPlayers": 143.04
+    },
+    {
+      "year": 2024,
+      "monthIndex": 0,
+      "avgPlayers": 160.09
+    },
+    {
+      "year": 2023,
+      "monthIndex": 11,
+      "avgPlayers": 141.74
+    },
+    {
+      "year": 2023,
+      "monthIndex": 10,
+      "avgPlayers": 120.29
+    },
+    {
+      "year": 2023,
+      "monthIndex": 9,
+      "avgPlayers": 136.41
+    },
+    {
+      "year": 2023,
+      "monthIndex": 8,
+      "avgPlayers": 192.01
+    },
+    {
+      "year": 2023,
+      "monthIndex": 7,
+      "avgPlayers": 240.08
+    },
+    {
+      "year": 2023,
+      "monthIndex": 6,
+      "avgPlayers": 393.34
+    },
+    {
+      "year": 2023,
+      "monthIndex": 5,
+      "avgPlayers": 131.56
+    },
+    {
+      "year": 2023,
+      "monthIndex": 4,
+      "avgPlayers": 90.92
+    },
+    {
+      "year": 2023,
+      "monthIndex": 3,
+      "avgPlayers": 116
+    },
+    {
+      "year": 2023,
+      "monthIndex": 2,
+      "avgPlayers": 131.3
+    },
+    {
+      "year": 2023,
+      "monthIndex": 1,
+      "avgPlayers": 141.76
+    },
+    {
+      "year": 2023,
+      "monthIndex": 0,
+      "avgPlayers": 185.22
+    },
+    {
+      "year": 2022,
+      "monthIndex": 11,
+      "avgPlayers": 171.66
+    },
+    {
+      "year": 2022,
+      "monthIndex": 10,
+      "avgPlayers": 160.51
+    },
+    {
+      "year": 2022,
+      "monthIndex": 9,
+      "avgPlayers": 342.12
+    },
+    {
+      "year": 2022,
+      "monthIndex": 8,
+      "avgPlayers": 1990.3
+    }
+  ],
+  "trend": {
+    "changePct": 7.07,
+    "avgPlayers": 145
+  },
+  "reviewerMedianHours": 24.633333333333333,
+  "reviewerSampleSize": 100,
+  "steamPurchaseShare": 0.95,
+  "freeCopyShare": 0.02,
+  "languageMix": {
+    "discounted": 2216,
+    "total": 8460
+  },
+  "reviewTrend": null,
+  "festivalContext": "unknown",
+  "appType": "game",
+  "fullGameId": null,
+  "fullGameName": null,
+  "collectedAt": 1788792890133
+}
