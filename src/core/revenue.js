@@ -149,6 +149,37 @@ export function estimateRevenue(units, listPrice, settingsIn = {}, context = {})
   return {
     ok: true,
     steps,
+    /**
+     * What buyers actually paid, which is the figure a developer calls gross.
+     *
+     * It is neither end of the waterfall. `listGross` is a sticker price
+     * nobody pays worldwide, and `adjustedGross` has already lost refunds. The
+     * useful line is between them: list, less the discounts copies really sold
+     * at, at the prices the game's regions really charge.
+     *
+     * Developers who publish both figures confirm the refund and royalty legs
+     * exactly: Tiny Terraces said $26,790 gross and $17,363 net, which
+     * back-solves to $26,522 here, inside 1%.
+     *
+     * They do not confirm the regional leg, and a previous version of this
+     * comment claimed they did. It read The Ember Guardian's $16.55 on a
+     * $19.99 list and TetherGeist's $11.33 on a $16.99 list as the same 0.83
+     * of list after their discounts. Only the second is: TetherGeist's is
+     * 0.834 of the $13.59 its 20% launch discount actually charged, while The
+     * Ember Guardian ran 10% off for the two weeks its figure covers, making
+     * its ratio 0.920 of the $17.99 charged — above every profile here. The
+     * discount had been folded into the regional factor and the result then
+     * read as evidence about the regional factor.
+     *
+     * Across the games where the discount is known exactly the regional
+     * residual runs 0.73 to 0.92, wider than anything else in the chain.
+     *
+     * Steamworks names its own lines differently — its "Gross Steam Sales"
+     * still carries VAT, which `regionalFactor` has already removed — so this
+     * matches what developers say rather than what Valve's report prints.
+     */
+    gross: afterRegional,
+    grossPerUnit: units > 0 ? afterRegional / units : 0,
     adjustedGross: afterRefunds,
     royalty,
     net,
@@ -211,8 +242,12 @@ export function estimateRevenueRange(unitRange, listPrice, settingsIn = {}, cont
 
   return {
     ok: true,
+    // Both figures walk the same envelope, so the pessimistic gross and the
+    // pessimistic net describe one scenario rather than two.
+    gross: { lo: lo.gross, mid: mid.gross, hi: hi.gross },
     net: { lo: lo.net, mid: mid.net, hi: hi.net },
     steps: mid.steps,
+    grossPerUnit: mid.grossPerUnit,
     netPerUnit: mid.netPerUnit,
     takeHomeRatio: mid.takeHomeRatio,
     takeHomeBand: { lo: lo.takeHomeRatio, mid: mid.takeHomeRatio, hi: hi.takeHomeRatio },

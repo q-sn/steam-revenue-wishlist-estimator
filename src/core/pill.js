@@ -2,9 +2,16 @@
  * What the collapsed pill shows.
  *
  * The order is fixed and deliberate: reviews are the measured input, units and
- * net revenue are derived from them, and wishlists come from a separate signal
+ * the money are derived from them, and wishlists come from a separate signal
  * entirely. Read left to right the pill is a chain, not a pile of numbers, so
  * users choose which links to show rather than rearranging them.
+ *
+ * Of the two money figures, gross is the one that ships. It is what buyers
+ * paid, so it is the figure a stranger to the store page can compare against
+ * every "we made $X" post a developer has ever written; net answers a narrower
+ * question — what this particular developer took home — and it depends on
+ * assumptions the reader has not seen yet at pill width. Both are available,
+ * and a reader who wants the pair can switch net back on beside it.
  *
  * Kept in core rather than the overlay so the selection logic is testable in
  * Node without a DOM.
@@ -15,7 +22,8 @@
 export const PILL_ITEMS = [
   { key: 'reviews', labelKey: 'pillReviews', optionKey: 'optPillReviews', format: 'compact', defaultOn: true },
   { key: 'units', labelKey: 'pillUnits', optionKey: 'optPillUnits', format: 'compact', defaultOn: true },
-  { key: 'net', labelKey: 'pillNet', optionKey: 'optPillNet', format: 'money', defaultOn: true },
+  { key: 'gross', labelKey: 'pillGross', optionKey: 'optPillGross', format: 'money', defaultOn: true },
+  { key: 'net', labelKey: 'pillNet', optionKey: 'optPillNet', format: 'money', defaultOn: false },
   { key: 'wishlists', labelKey: 'pillWishlists', optionKey: 'optPillWishlists', format: 'compact', defaultOn: true },
   { key: 'players', labelKey: 'pillPlayers', optionKey: 'optPillPlayers', format: 'compact', defaultOn: false }
 ];
@@ -34,6 +42,10 @@ function valueFor(key, result) {
       return Number.isFinite(game?.reviews) && game.reviews > 0 ? game.reviews : null;
     case 'units':
       return units?.ok ? units.range.mid : null;
+    // Both walk the same envelope, so showing the pair describes one scenario
+    // read at two points rather than two competing estimates.
+    case 'gross':
+      return revenue?.ok ? revenue.gross.mid : null;
     case 'net':
       return revenue?.ok ? revenue.net.mid : null;
     case 'wishlists':

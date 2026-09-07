@@ -59,6 +59,12 @@
   "mRevenue": {
     "message": "Developer net revenue"
   },
+  "mGross": {
+    "message": "Gross revenue"
+  },
+  "mGrossNote": {
+    "message": "What buyers paid, about $1 per copy — before refunds and Valve’s cut."
+  },
   "mWishlists": {
     "message": "Wishlists, pre-launch"
   },
@@ -194,6 +200,9 @@
   "mPlayers": {
     "message": "Players right now"
   },
+  "pillGross": {
+    "message": "gross"
+  },
   "pillNet": {
     "message": "net"
   },
@@ -315,13 +324,16 @@
     "message": "Figures shown before expanding"
   },
   "hintPillItems": {
-    "message": "Order is fixed. An item is skipped when there is no data for it, so nothing shows a dash."
+    "message": "Order is fixed. An item is skipped when there is no data for it, so nothing shows a dash. Gross is what buyers paid and net what the developer keeps — show either, or both."
   },
   "optPillReviews": {
     "message": "Reviews"
   },
   "optPillUnits": {
     "message": "Units sold"
+  },
+  "optPillGross": {
+    "message": "Gross revenue"
   },
   "optPillNet": {
     "message": "Net revenue"

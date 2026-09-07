@@ -59,6 +59,12 @@
   "mRevenue": {
     "message": "Geliştiricinin net geliri"
   },
+  "mGross": {
+    "message": "Brüt gelir"
+  },
+  "mGrossNote": {
+    "message": "Alıcıların ödediği tutar, kopya başına yaklaşık $1 — iadeler ve Valve payı öncesi."
+  },
   "mWishlists": {
     "message": "Çıkış öncesi istek listesi"
   },
@@ -194,6 +200,9 @@
   "mPlayers": {
     "message": "Şu anki oyuncu"
   },
+  "pillGross": {
+    "message": "brüt"
+  },
   "pillNet": {
     "message": "net"
   },
@@ -315,13 +324,16 @@
     "message": "Genişletmeden önce gösterilenler"
   },
   "hintPillItems": {
-    "message": "Sıra sabittir. Verisi olmayan öğe atlanır, tire görünmez."
+    "message": "Sıra sabittir. Verisi olmayan öğe atlanır, tire görünmez. Brüt, alıcıların ödediği tutardır; net ise geliştiriciye kalan. Birini ya da ikisini birden gösterebilirsiniz."
   },
   "optPillReviews": {
     "message": "Değerlendirmeler"
   },
   "optPillUnits": {
     "message": "Satış adedi"
+  },
+  "optPillGross": {
+    "message": "Brüt gelir"
   },
   "optPillNet": {
     "message": "Net gelir"

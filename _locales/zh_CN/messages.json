@@ -59,6 +59,12 @@
   "mRevenue": {
     "message": "开发者净收入"
   },
+  "mGross": {
+    "message": "总收入"
+  },
+  "mGrossNote": {
+    "message": "买家实付金额，每份约 $1 —— 未扣退款和 Valve 分成。"
+  },
   "mWishlists": {
     "message": "发售前愿望单数量"
   },
@@ -194,6 +200,9 @@
   "mPlayers": {
     "message": "当前在线"
   },
+  "pillGross": {
+    "message": "总收入"
+  },
   "pillNet": {
     "message": "净收入"
   },
@@ -315,13 +324,16 @@
     "message": "展开前显示的数据"
   },
   "hintPillItems": {
-    "message": "顺序固定。没有数据的项会被跳过，不会显示破折号。"
+    "message": "顺序固定。没有数据的项会被跳过，不会显示破折号。总收入是买家实付金额，净收入是开发者最终留下的部分——可任选一项或同时显示。"
   },
   "optPillReviews": {
     "message": "评测"
   },
   "optPillUnits": {
     "message": "销量"
+  },
+  "optPillGross": {
+    "message": "总收入"
   },
   "optPillNet": {
     "message": "净收入"

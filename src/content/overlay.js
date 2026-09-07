@@ -289,7 +289,7 @@ function figureClass(key, game) {
   if (key === 'players') return 'fig-players';
   if (key === 'wishlists') return 'fig-wishlists';
   if (key === 'units') return 'fig-units';
-  if (key === 'net') return 'fig-revenue';
+  if (key === 'gross' || key === 'net') return 'fig-revenue';
   return null;
 }
 
@@ -789,8 +789,10 @@ export function renderOverlay(result, opts = {}) {
     const FORMATTERS = { compact, money, integer };
     const items = pillFigures(result, pillConfig);
 
-    // Which figures carry a verdict; measured facts take none.
-    const CONF_FOR = { units: 'units', net: 'revenue', wishlists: 'wishlists' };
+    // Which figures carry a verdict; measured facts take none. Gross and net
+    // share one: the width of either is set by the unit estimate feeding them,
+    // not by the two deductions that separate them.
+    const CONF_FOR = { units: 'units', gross: 'revenue', net: 'revenue', wishlists: 'wishlists' };
 
     for (const item of items) {
       if (figs.childNodes.length) figs.append(el('span', 'pill-sep', SEPARATOR_CHAR));
@@ -995,6 +997,12 @@ export function renderOverlay(result, opts = {}) {
       }
 
       if (revenue.ok) {
+        // Gross above net, in the order the waterfall runs. Both carry the
+        // same confidence: the width of either is set by the unit estimate
+        // feeding them, not by the two deductions that separate them.
+        panel.append(metric(t('mGross'), revenue.gross, money,
+          { valueClass: 'fig-revenue', confidence: confidence.revenue,
+            note: t('mGrossNote', [money(revenue.grossPerUnit)]) }));
         panel.append(metric(t('mRevenue'), revenue.net, money,
           { valueClass: 'fig-revenue', confidence: confidence.revenue }));
       } else {

@@ -296,6 +296,34 @@
     "pl": "Przychód netto dewelopera",
     "it": "Ricavo netto dello sviluppatore"
   },
+  "mGross": {
+    "en": "Gross revenue",
+    "ru": "Валовая выручка",
+    "zh_CN": "总收入",
+    "es": "Ingresos brutos",
+    "pt_BR": "Receita bruta",
+    "de": "Bruttoumsatz",
+    "fr": "Revenus bruts",
+    "ja": "総収益",
+    "ko": "총수익",
+    "tr": "Brüt gelir",
+    "pl": "Przychód brutto",
+    "it": "Ricavo lordo"
+  },
+  "mGrossNote": {
+    "en": "What buyers paid, about $1 per copy — before refunds and Valve’s cut.",
+    "ru": "Сколько заплатили покупатели, примерно $1 за копию — до возвратов и доли Valve.",
+    "zh_CN": "买家实付金额，每份约 $1 —— 未扣退款和 Valve 分成。",
+    "es": "Lo que pagaron los compradores, unos $1 por copia: antes de reembolsos y de la parte de Valve.",
+    "pt_BR": "O que os compradores pagaram, cerca de $1 por cópia — antes de reembolsos e da parte da Valve.",
+    "de": "Was Käufer gezahlt haben, etwa $1 pro Kopie — vor Rückerstattungen und Valves Anteil.",
+    "fr": "Ce que les acheteurs ont payé, environ $1 par copie — avant remboursements et part de Valve.",
+    "ja": "購入者が支払った金額、1 本あたり約 $1 — 返金と Valve の取り分を差し引く前。",
+    "ko": "구매자가 지불한 금액, 개당 약 $1 — 환불과 Valve 몫을 빼기 전.",
+    "tr": "Alıcıların ödediği tutar, kopya başına yaklaşık $1 — iadeler ve Valve payı öncesi.",
+    "pl": "Ile zapłacili kupujący, około $1 za kopię — przed zwrotami i prowizją Valve.",
+    "it": "Quanto hanno pagato gli acquirenti, circa $1 a copia — prima di rimborsi e quota Valve."
+  },
   "mWishlists": {
     "en": "Wishlists, pre-launch",
     "ru": "Вишлисты до релиза",
@@ -930,6 +958,20 @@
     "pl": "Graczy teraz",
     "it": "Giocatori ora"
   },
+  "pillGross": {
+    "en": "gross",
+    "ru": "валовыми",
+    "zh_CN": "总收入",
+    "es": "bruto",
+    "pt_BR": "bruto",
+    "de": "brutto",
+    "fr": "brut",
+    "ja": "総収益",
+    "ko": "총수익",
+    "tr": "brüt",
+    "pl": "brutto",
+    "it": "lordo"
+  },
   "pillNet": {
     "en": "net",
     "ru": "чистыми",
@@ -1496,18 +1538,18 @@
   },
   "hintPillItems": {
     "_ph": 0,
-    "en": "Order is fixed. An item is skipped when there is no data for it, so nothing shows a dash.",
-    "ru": "Порядок фиксированный. Пункт пропускается, если данных нет, — прочерков не будет.",
-    "zh_CN": "顺序固定。没有数据的项会被跳过，不会显示破折号。",
-    "es": "El orden es fijo. Un elemento se omite si no hay datos, así que nunca verás un guion.",
-    "pt_BR": "A ordem é fixa. Um item é omitido quando não há dados, então nada aparece como traço.",
-    "de": "Die Reihenfolge ist fest. Ein Eintrag ohne Daten entfällt, es erscheint kein Strich.",
-    "fr": "L'ordre est fixe. Un élément sans données est omis, aucun tiret n'apparaît.",
-    "ja": "並び順は固定です。データがない項目は省略され、ダッシュは表示されません。",
-    "ko": "순서는 고정입니다. 데이터가 없는 항목은 생략되므로 대시가 표시되지 않습니다.",
-    "tr": "Sıra sabittir. Verisi olmayan öğe atlanır, tire görünmez.",
-    "pl": "Kolejność jest stała. Pozycja bez danych jest pomijana, więc nie zobaczysz myślnika.",
-    "it": "L'ordine è fisso. Una voce senza dati viene saltata, quindi non compaiono trattini."
+    "en": "Order is fixed. An item is skipped when there is no data for it, so nothing shows a dash. Gross is what buyers paid and net what the developer keeps — show either, or both.",
+    "ru": "Порядок фиксированный. Пункт пропускается, если данных нет, — прочерков не будет. Валовая — сколько заплатили покупатели, чистая — сколько остаётся разработчику: можно показывать любую или обе.",
+    "zh_CN": "顺序固定。没有数据的项会被跳过，不会显示破折号。总收入是买家实付金额，净收入是开发者最终留下的部分——可任选一项或同时显示。",
+    "es": "El orden es fijo. Un elemento se omite si no hay datos, así que nunca verás un guion. El bruto es lo que pagaron los compradores y el neto lo que se queda el desarrollador: muestra uno, otro o ambos.",
+    "pt_BR": "A ordem é fixa. Um item é omitido quando não há dados, então nada aparece como traço. O bruto é o que os compradores pagaram e o líquido o que fica com o desenvolvedor: mostre um, outro ou os dois.",
+    "de": "Die Reihenfolge ist fest. Ein Eintrag ohne Daten entfällt, es erscheint kein Strich. Brutto ist, was Käufer gezahlt haben, netto, was dem Entwickler bleibt — zeige eines von beiden oder beide.",
+    "fr": "L'ordre est fixe. Un élément sans données est omis, aucun tiret n'apparaît. Le brut est ce que les acheteurs ont payé, le net ce qui reste au développeur : affichez l'un, l'autre ou les deux.",
+    "ja": "並び順は固定です。データがない項目は省略され、ダッシュは表示されません。総収益は購入者が支払った金額、純収益は開発者の手元に残る金額です。どちらか一方でも両方でも表示できます。",
+    "ko": "순서는 고정입니다. 데이터가 없는 항목은 생략되므로 대시가 표시되지 않습니다. 총수익은 구매자가 지불한 금액, 순수익은 개발자에게 남는 금액입니다. 둘 중 하나만, 또는 둘 다 표시할 수 있습니다.",
+    "tr": "Sıra sabittir. Verisi olmayan öğe atlanır, tire görünmez. Brüt, alıcıların ödediği tutardır; net ise geliştiriciye kalan. Birini ya da ikisini birden gösterebilirsiniz.",
+    "pl": "Kolejność jest stała. Pozycja bez danych jest pomijana, więc nie zobaczysz myślnika. Brutto to kwota zapłacona przez kupujących, netto to, co zostaje deweloperowi — pokaż jedno, drugie albo oba.",
+    "it": "L'ordine è fisso. Una voce senza dati viene saltata, quindi non compaiono trattini. Il lordo è quanto hanno pagato gli acquirenti, il netto quanto resta allo sviluppatore: mostra l'uno, l'altro o entrambi."
   },
   "optPillReviews": {
     "_ph": 0,
@@ -1538,6 +1580,21 @@
     "tr": "Satış adedi",
     "pl": "Sprzedaż",
     "it": "Copie vendute"
+  },
+  "optPillGross": {
+    "_ph": 0,
+    "en": "Gross revenue",
+    "ru": "Валовая выручка",
+    "zh_CN": "总收入",
+    "es": "Ingresos brutos",
+    "pt_BR": "Receita bruta",
+    "de": "Bruttoumsatz",
+    "fr": "Revenu brut",
+    "ja": "総収益",
+    "ko": "총수익",
+    "tr": "Brüt gelir",
+    "pl": "Przychód brutto",
+    "it": "Ricavi lordi"
   },
   "optPillNet": {
     "_ph": 0,

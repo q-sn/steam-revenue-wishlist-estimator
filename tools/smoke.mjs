@@ -428,19 +428,34 @@ const shipped = estimateAll({
 
 const defaultFigures = pillFigures(shipped).map((f) => f.key);
 check('defaults show the estimate chain',
-  defaultFigures.join(' ') === 'reviews units net', defaultFigures.join(' '));
+  defaultFigures.join(' ') === 'reviews units gross', defaultFigures.join(' '));
+check('the money figure shipped is the one buyers paid',
+  PILL_DEFAULTS.gross === true && PILL_DEFAULTS.net === false,
+  'net is a second reading of the same waterfall, offered in options');
 check('players are off by default', PILL_DEFAULTS.players === false);
+
+const bothMoney = pillFigures(shipped, { net: true }).map((f) => f.key);
+check('turning net on puts it beside gross, in waterfall order',
+  bothMoney.join(' ') === 'reviews units gross net', bothMoney.join(' '));
+
+const netInstead = pillFigures(shipped, { gross: false, net: true }).map((f) => f.key);
+check('and gross can be switched off in its favour',
+  netInstead.join(' ') === 'reviews units net', netInstead.join(' '));
 
 const withPlayers = pillFigures(shipped, { players: true }).map((f) => f.key);
 check('turning players on appends them', withPlayers.includes('players'));
 check('order stays canonical regardless of config',
-  withPlayers.join(' ') === 'reviews units net players', withPlayers.join(' '));
+  withPlayers.join(' ') === 'reviews units gross players', withPlayers.join(' '));
 
-const onlyNet = pillFigures(shipped, { reviews: false, units: false, wishlists: false });
+const onlyNet = pillFigures(shipped, {
+  reviews: false, units: false, gross: false, net: true, wishlists: false
+});
 check('unchecking hides items', onlyNet.map((f) => f.key).join(' ') === 'net');
 
 check('everything off yields nothing to render',
-  pillFigures(shipped, { reviews: false, units: false, net: false, wishlists: false, players: false }).length === 0,
+  pillFigures(shipped, {
+    reviews: false, units: false, gross: false, net: false, wishlists: false, players: false
+  }).length === 0,
   'overlay falls back to a label');
 
 const noData = estimateAll({ appId: 12, reviews: 8, price: 9.99, released: true, releaseYear: 2025 });
@@ -1274,6 +1289,45 @@ check('the regional leg steps to neighbouring published profiles only',
   money20.envelope.regional.best === 'us-eu' && money20.envelope.regional.worst === 'emerging');
 check('the midpoint is untouched by the envelope',
   Math.abs(money20.net.mid - estimateRevenue(20_000, 20, { regionalProfile: 'mixed' }).net) < 0.01);
+
+group('Gross, the figure a developer recognises');
+
+const gross20 = estimateRevenue(20_000, 20, { regionalProfile: 'mixed' });
+
+// The panel shows both, and showing a gross below its own net would be a
+// visible nonsense rather than a quiet drift.
+check('gross sits between the sticker price and the net',
+  gross20.gross < gross20.steps[0].value && gross20.gross > gross20.net,
+  `${gross20.steps[0].value} > ${gross20.gross.toFixed(0)} > ${gross20.net.toFixed(0)}`);
+
+// Refunds and Valve's cut are the only things between them, so the ratio is
+// fixed by two published constants and nothing else may creep in.
+check('and exactly the refund and royalty steps separate them',
+  Math.abs(gross20.net / gross20.gross - (1 - REFUNDS.mid) * 0.7) < 1e-9,
+  `${(gross20.net / gross20.gross).toFixed(4)}`);
+
+// What developers actually report, once each game's own launch discount is
+// divided out rather than folded into the regional factor: TetherGeist 0.834
+// of the price it charged, The Ember Guardian 0.920 of the price it charged.
+// They do not agree, so the test is the weaker true thing — the published
+// profiles have to span that residual — and not the stronger false thing an
+// earlier version asserted, that both games landed on 0.83.
+const realised = (key) => estimateRevenue(1, 20, { regionalProfile: key }).gross / (20 * 0.8);
+check('the published profiles span the realised residuals developers report',
+  realised('emerging') < 0.834 && realised('us-eu') > 0.834,
+  `${realised('emerging').toFixed(2)} .. ${realised('us-eu').toFixed(2)}, against 0.834 and 0.920`);
+// 0.920 sits above the best profile this ships. That is a known gap, not a
+// bug, and it is the largest unexplained factor in the waterfall.
+check('and the top profile is still short of the highest one measured',
+  realised('us-eu') < 0.920);
+
+check('the band walks gross and net through the same envelope',
+  money20.gross.lo < money20.gross.mid && money20.gross.mid < money20.gross.hi
+  && Math.abs(money20.gross.mid - gross20.gross) < 0.01);
+
+check('per-unit gross is the gross divided by the units, not the list price',
+  Math.abs(gross20.grossPerUnit - gross20.gross / 20_000) < 1e-9
+  && gross20.grossPerUnit < 20);
 
 // The documented sanity figure has to be the one the defaults produce. It
 // said 44% while defaulting to a profile that gives 40%, which made a healthy

@@ -59,6 +59,12 @@
   "mRevenue": {
     "message": "Receita líquida do desenvolvedor"
   },
+  "mGross": {
+    "message": "Receita bruta"
+  },
+  "mGrossNote": {
+    "message": "O que os compradores pagaram, cerca de $1 por cópia — antes de reembolsos e da parte da Valve."
+  },
   "mWishlists": {
     "message": "Listas de desejos antes do lançamento"
   },
@@ -194,6 +200,9 @@
   "mPlayers": {
     "message": "Jogadores agora"
   },
+  "pillGross": {
+    "message": "bruto"
+  },
   "pillNet": {
     "message": "líquido"
   },
@@ -315,13 +324,16 @@
     "message": "Números exibidos antes de expandir"
   },
   "hintPillItems": {
-    "message": "A ordem é fixa. Um item é omitido quando não há dados, então nada aparece como traço."
+    "message": "A ordem é fixa. Um item é omitido quando não há dados, então nada aparece como traço. O bruto é o que os compradores pagaram e o líquido o que fica com o desenvolvedor: mostre um, outro ou os dois."
   },
   "optPillReviews": {
     "message": "Análises"
   },
   "optPillUnits": {
     "message": "Unidades vendidas"
+  },
+  "optPillGross": {
+    "message": "Receita bruta"
   },
   "optPillNet": {
     "message": "Receita líquida"

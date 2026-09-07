@@ -59,6 +59,12 @@
   "mRevenue": {
     "message": "Revenus nets du développeur"
   },
+  "mGross": {
+    "message": "Revenus bruts"
+  },
+  "mGrossNote": {
+    "message": "Ce que les acheteurs ont payé, environ $1 par copie — avant remboursements et part de Valve."
+  },
   "mWishlists": {
     "message": "Listes de souhaits avant la sortie"
   },
@@ -194,6 +200,9 @@
   "mPlayers": {
     "message": "Joueurs en ce moment"
   },
+  "pillGross": {
+    "message": "brut"
+  },
   "pillNet": {
     "message": "net"
   },
@@ -315,13 +324,16 @@
     "message": "Chiffres affichés avant dépliage"
   },
   "hintPillItems": {
-    "message": "L'ordre est fixe. Un élément sans données est omis, aucun tiret n'apparaît."
+    "message": "L'ordre est fixe. Un élément sans données est omis, aucun tiret n'apparaît. Le brut est ce que les acheteurs ont payé, le net ce qui reste au développeur : affichez l'un, l'autre ou les deux."
   },
   "optPillReviews": {
     "message": "Évaluations"
   },
   "optPillUnits": {
     "message": "Ventes"
+  },
+  "optPillGross": {
+    "message": "Revenu brut"
   },
   "optPillNet": {
     "message": "Revenu net"

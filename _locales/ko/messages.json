@@ -59,6 +59,12 @@
   "mRevenue": {
     "message": "개발자 순수익"
   },
+  "mGross": {
+    "message": "총수익"
+  },
+  "mGrossNote": {
+    "message": "구매자가 지불한 금액, 개당 약 $1 — 환불과 Valve 몫을 빼기 전."
+  },
   "mWishlists": {
     "message": "출시 전 위시리스트"
   },
@@ -194,6 +200,9 @@
   "mPlayers": {
     "message": "현재 플레이어"
   },
+  "pillGross": {
+    "message": "총수익"
+  },
   "pillNet": {
     "message": "순수익"
   },
@@ -315,13 +324,16 @@
     "message": "펼치기 전에 표시할 값"
   },
   "hintPillItems": {
-    "message": "순서는 고정입니다. 데이터가 없는 항목은 생략되므로 대시가 표시되지 않습니다."
+    "message": "순서는 고정입니다. 데이터가 없는 항목은 생략되므로 대시가 표시되지 않습니다. 총수익은 구매자가 지불한 금액, 순수익은 개발자에게 남는 금액입니다. 둘 중 하나만, 또는 둘 다 표시할 수 있습니다."
   },
   "optPillReviews": {
     "message": "평가"
   },
   "optPillUnits": {
     "message": "판매량"
+  },
+  "optPillGross": {
+    "message": "총수익"
   },
   "optPillNet": {
     "message": "순수익"

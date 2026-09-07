@@ -59,6 +59,12 @@
   "mRevenue": {
     "message": "開発者の純収益"
   },
+  "mGross": {
+    "message": "総収益"
+  },
+  "mGrossNote": {
+    "message": "購入者が支払った金額、1 本あたり約 $1 — 返金と Valve の取り分を差し引く前。"
+  },
   "mWishlists": {
     "message": "発売前ウィッシュリスト"
   },
@@ -194,6 +200,9 @@
   "mPlayers": {
     "message": "現在のプレイヤー"
   },
+  "pillGross": {
+    "message": "総収益"
+  },
   "pillNet": {
     "message": "純収益"
   },
@@ -315,13 +324,16 @@
     "message": "展開前に表示する数値"
   },
   "hintPillItems": {
-    "message": "並び順は固定です。データがない項目は省略され、ダッシュは表示されません。"
+    "message": "並び順は固定です。データがない項目は省略され、ダッシュは表示されません。総収益は購入者が支払った金額、純収益は開発者の手元に残る金額です。どちらか一方でも両方でも表示できます。"
   },
   "optPillReviews": {
     "message": "レビュー"
   },
   "optPillUnits": {
     "message": "販売本数"
+  },
+  "optPillGross": {
+    "message": "総収益"
   },
   "optPillNet": {
     "message": "純収益"

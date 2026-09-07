@@ -227,6 +227,22 @@ On the shipped defaults this lands near **0.40 × list price**, and near **0.45*
 
 ### The revenue band
 
+### Gross as well as net, and which gross
+
+The panel shows two figures, in the order the waterfall runs. Net is what the developer banks. Gross is what buyers paid — list, less the discounts copies really sold at, at the prices the game's regions really charge — and it is the figure a developer recognises from their own reporting.
+
+It is deliberately neither end of the chain. `units × list price` is a sticker nobody pays worldwide and would read as roughly 2.5× the truth; adjusted gross has already lost refunds and is a tax base rather than a takings figure. The useful line is the one after discounting and regional pricing and before anything is deducted back out.
+
+That line can be partly checked, because developers who publish both figures publish enough to back-solve some of it. Tiny Terraces reported $26,790 gross and $17,363 net; running our refund and royalty steps backwards from their net gives **$26,522**, inside 1%. Those two legs are therefore confirmed.
+
+The regional leg is not, and an earlier draft of this paragraph claimed it was. It said The Ember Guardian and TetherGeist both realised 0.83 of list *after* their launch discounts. TetherGeist did: $11.33 on a $16.99 list under a 20% discount is 0.834 of the $13.59 actually charged. The Ember Guardian did not — its launch post states a 10% discount for the two weeks its 8,400 copies sold in, so its $16.55 is 0.920 of the $17.99 charged, above every profile this ships. The two do not agree, and the sentence claiming they did had folded the discount into the regional factor and then read the result as evidence about the regional factor.
+
+Two mundane explanations fit the gap and neither is established. Steamworks' "Gross Steam Sales" carries VAT, and removing a 9% blended rate from The Ember Guardian's figure gives 0.837 of the charged price — TetherGeist's number to three decimals. Its launch post also sells supporter bundles that contain the base game, so a revenue figure covering those against a unit count of base-game copies would read high by an unknown amount. **The residual on the regional leg runs 0.73 to 0.92 across the games where the discount is known exactly, which is wider than any other assumption in the chain.**
+
+One naming trap is worth stating. Steamworks prints its own "Gross Steam Sales" **with VAT still in it**, and the regional factor here has already taken VAT out. So this figure matches what developers say in postmortems, not the top line of Valve's report. The two developers quoted above also used "net" for two different things — one after Valve's cut, one before it — which is why the panel labels both figures rather than trusting the word.
+
+Both figures walk the same envelope, so the pessimistic gross and the pessimistic net describe one scenario rather than two, and both carry the same confidence: what sets their width is the unit estimate feeding them, not the two deductions between them.
+
 The band is not the unit band converted into money. Every step of the waterfall has a range of its own, and drawing the revenue figure exactly as wide as the sales estimate would leave the confidence score marked down a step for uncertainty the band never shows.
 
 The low end is the low unit count under a pessimistic waterfall and the high end the high count under an optimistic one: discount 10–30%, refunds 6–13%, and the regional factor one published profile either side of the chosen one. The sliders set the midpoint of each assumption; they do not make it certain, so a developer who moves one keeps their own midpoint and still gets the published width around it.

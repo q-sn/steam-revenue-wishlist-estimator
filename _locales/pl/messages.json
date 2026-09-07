@@ -59,6 +59,12 @@
   "mRevenue": {
     "message": "Przychód netto dewelopera"
   },
+  "mGross": {
+    "message": "Przychód brutto"
+  },
+  "mGrossNote": {
+    "message": "Ile zapłacili kupujący, około $1 za kopię — przed zwrotami i prowizją Valve."
+  },
   "mWishlists": {
     "message": "Listy życzeń przed premierą"
   },
@@ -194,6 +200,9 @@
   "mPlayers": {
     "message": "Graczy teraz"
   },
+  "pillGross": {
+    "message": "brutto"
+  },
   "pillNet": {
     "message": "netto"
   },
@@ -315,13 +324,16 @@
     "message": "Wartości widoczne przed rozwinięciem"
   },
   "hintPillItems": {
-    "message": "Kolejność jest stała. Pozycja bez danych jest pomijana, więc nie zobaczysz myślnika."
+    "message": "Kolejność jest stała. Pozycja bez danych jest pomijana, więc nie zobaczysz myślnika. Brutto to kwota zapłacona przez kupujących, netto to, co zostaje deweloperowi — pokaż jedno, drugie albo oba."
   },
   "optPillReviews": {
     "message": "Recenzje"
   },
   "optPillUnits": {
     "message": "Sprzedaż"
+  },
+  "optPillGross": {
+    "message": "Przychód brutto"
   },
   "optPillNet": {
     "message": "Przychód netto"

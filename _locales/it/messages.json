@@ -59,6 +59,12 @@
   "mRevenue": {
     "message": "Ricavo netto dello sviluppatore"
   },
+  "mGross": {
+    "message": "Ricavo lordo"
+  },
+  "mGrossNote": {
+    "message": "Quanto hanno pagato gli acquirenti, circa $1 a copia — prima di rimborsi e quota Valve."
+  },
   "mWishlists": {
     "message": "Liste dei desideri prima dell'uscita"
   },
@@ -194,6 +200,9 @@
   "mPlayers": {
     "message": "Giocatori ora"
   },
+  "pillGross": {
+    "message": "lordo"
+  },
   "pillNet": {
     "message": "netto"
   },
@@ -315,13 +324,16 @@
     "message": "Valori mostrati prima di espandere"
   },
   "hintPillItems": {
-    "message": "L'ordine è fisso. Una voce senza dati viene saltata, quindi non compaiono trattini."
+    "message": "L'ordine è fisso. Una voce senza dati viene saltata, quindi non compaiono trattini. Il lordo è quanto hanno pagato gli acquirenti, il netto quanto resta allo sviluppatore: mostra l'uno, l'altro o entrambi."
   },
   "optPillReviews": {
     "message": "Recensioni"
   },
   "optPillUnits": {
     "message": "Copie vendute"
+  },
+  "optPillGross": {
+    "message": "Ricavi lordi"
   },
   "optPillNet": {
     "message": "Ricavi netti"

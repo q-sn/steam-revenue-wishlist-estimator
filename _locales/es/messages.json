@@ -59,6 +59,12 @@
   "mRevenue": {
     "message": "Ingresos netos del desarrollador"
   },
+  "mGross": {
+    "message": "Ingresos brutos"
+  },
+  "mGrossNote": {
+    "message": "Lo que pagaron los compradores, unos $1 por copia: antes de reembolsos y de la parte de Valve."
+  },
   "mWishlists": {
     "message": "Listas de deseos antes del lanzamiento"
   },
@@ -194,6 +200,9 @@
   "mPlayers": {
     "message": "Jugadores ahora"
   },
+  "pillGross": {
+    "message": "bruto"
+  },
   "pillNet": {
     "message": "neto"
   },
@@ -315,13 +324,16 @@
     "message": "Cifras visibles antes de expandir"
   },
   "hintPillItems": {
-    "message": "El orden es fijo. Un elemento se omite si no hay datos, así que nunca verás un guion."
+    "message": "El orden es fijo. Un elemento se omite si no hay datos, así que nunca verás un guion. El bruto es lo que pagaron los compradores y el neto lo que se queda el desarrollador: muestra uno, otro o ambos."
   },
   "optPillReviews": {
     "message": "Reseñas"
   },
   "optPillUnits": {
     "message": "Unidades vendidas"
+  },
+  "optPillGross": {
+    "message": "Ingresos brutos"
   },
   "optPillNet": {
     "message": "Ingresos netos"

@@ -59,6 +59,12 @@
   "mRevenue": {
     "message": "Nettoumsatz des Entwicklers"
   },
+  "mGross": {
+    "message": "Bruttoumsatz"
+  },
+  "mGrossNote": {
+    "message": "Was Käufer gezahlt haben, etwa $1 pro Kopie — vor Rückerstattungen und Valves Anteil."
+  },
   "mWishlists": {
     "message": "Wunschlisten vor Release"
   },
@@ -194,6 +200,9 @@
   "mPlayers": {
     "message": "Spieler gerade"
   },
+  "pillGross": {
+    "message": "brutto"
+  },
   "pillNet": {
     "message": "netto"
   },
@@ -315,13 +324,16 @@
     "message": "Werte vor dem Aufklappen"
   },
   "hintPillItems": {
-    "message": "Die Reihenfolge ist fest. Ein Eintrag ohne Daten entfällt, es erscheint kein Strich."
+    "message": "Die Reihenfolge ist fest. Ein Eintrag ohne Daten entfällt, es erscheint kein Strich. Brutto ist, was Käufer gezahlt haben, netto, was dem Entwickler bleibt — zeige eines von beiden oder beide."
   },
   "optPillReviews": {
     "message": "Reviews"
   },
   "optPillUnits": {
     "message": "Verkäufe"
+  },
+  "optPillGross": {
+    "message": "Bruttoumsatz"
   },
   "optPillNet": {
     "message": "Nettoumsatz"
