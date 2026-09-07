@@ -51,6 +51,18 @@ Base bands by release year, blending VGI's per-year distributions with GameDisco
 
 Pre-2017 rows are the softest. Gamalytic points out the ratio really tracks *the year each review was written*, and old games kept accumulating reviews after the 2019 prompt landed, so their lifetime ratios drift downward over time.
 
+#### The release year Steam reports is not the year the game went on sale
+
+`appdetails` returns the **1.0 date**. For an Early Access title that can be years late — KeeperRL's store page says 2024 and it first took money in March 2015 — and since the base multiple is chosen by release year, the game is priced as a newer one and the multiple comes out low. The error runs one way only: a game can be reported later than it went on sale, never earlier.
+
+Measured over 930 games drawn across five SteamSpy owner-rank pages, each with 10+ reviews: **62 of the 920 that answered — one game in fifteen — land in the wrong band**, every one of them understating the multiple, by ×1.08 to ×2.47 with a median of ×1.45. Space Engineers, The Forest, Raft, Squad, Starbound and Quake Champions are all in it.
+
+Two sources fix it and they agree with each other. `IStoreBrowseService` returns `original_steam_release_date`, which is present for only 78 of 920 games but sits a median 1.3 years and up to 9.5 years before the shipped date where it exists. `appreviewhistogram` returns `results.start_date`, which matches that field within 45 days on 76 of those 78 — **97%** — and finds the date for 55 more games the field omits entirely. Of the 62 corrections, 30 come from the field and 32 from the review history alone.
+
+The extension reads the review history, because it covers both populations in one request. It overrides the store only when it starts more than 180 days earlier. That floor is not sensitive — 30 days corrects 64 games, 90 corrects 63, 180 corrects 62, 270 corrects 62 — and the wide setting is chosen because the 30-to-180-day window holds 22 games whose early reviews come from pre-release beta access rather than a sale. Two extra corrections are not worth adopting that ambiguity.
+
+Steam floors `start_date` at October 2010. Everything before that is already in the oldest band, so the clamp cannot move one.
+
 Multiplicative adjustments on top:
 
 - **Free to play, ×2.0.** Free games get roughly twice as many downloads per review.

@@ -1,6 +1,6 @@
 import {
   BASE_MULTIPLIER, ADJUSTMENTS, REVIEW_COUNT_BANDS, REVIEW_GATES,
-  OWNERS_TO_UNITS, ENSEMBLE, CCU, PLAYTIME, RECENT_REVIEW_WINDOW_DAYS
+  OWNERS_TO_UNITS, ENSEMBLE, CCU, PLAYTIME, RECENT_REVIEW_WINDOW_DAYS, FIRST_SALE
 } from './constants.js';
 import { matchTagRule } from './tags.js';
 
@@ -61,6 +61,36 @@ export function collectAdjustments(game) {
   }
 
   return { factor, applied };
+}
+
+/**
+ * The date a game first took money, given what the store says and where its
+ * review history starts.
+ *
+ * `appdetails` reports the 1.0 date, so an Early Access title reads younger
+ * than it is and `baseFor` picks a multiplier from the wrong band. The error
+ * runs one way only: a game can be reported later than it went on sale, never
+ * earlier. So this only ever moves a date back.
+ *
+ * The review history is allowed to win only by a wide margin. A few weeks
+ * between the two is a disagreement about which day 1.0 landed on and cannot
+ * change a band; more than FIRST_SALE.minLeadMs is a disagreement about which
+ * year the game went on sale, which can. Measured over 930 games the exact
+ * floor barely matters — 30 days corrects 64 games and 270 corrects 62 — and
+ * the wider one avoids reading a paid beta's reviews as a sale.
+ *
+ * @param {number|null} storeDate    ms, the store's own release date
+ * @param {number|null} historyStart ms, where the review history begins
+ * @returns {{at:number, corrected:boolean}|null}
+ */
+export function firstSaleDate(storeDate, historyStart) {
+  const store = Number.isFinite(storeDate) ? storeDate : null;
+  const history = Number.isFinite(historyStart) ? historyStart : null;
+  if (store == null) return history == null ? null : { at: history, corrected: false };
+  if (history == null) return { at: store, corrected: false };
+  return store - history > FIRST_SALE.minLeadMs
+    ? { at: history, corrected: true }
+    : { at: store, corrected: false };
 }
 
 /**

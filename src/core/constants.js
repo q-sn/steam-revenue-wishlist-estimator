@@ -130,6 +130,11 @@ export const SOURCES = {
     url: 'https://github.com/q-sn/steam-revenue-wishlist-estimator/blob/main/tools/calibrate-follower-ratio.mjs',
     note: 'Run `node tools/calibrate-follower-ratio.mjs` to reproduce. Divides a wishlist figure a studio posted on its own store page by that game\'s public follower count, one game per disclosure, restricted to figures announced within the window so the two readings describe the same week. Over 83 games announced within 30 days: min 4.5x, p10 9.6x, median 16.2x, p90 32.8x, max 79.7x. Stable across windows and ranks — 16.6x at 14 days (n=38), 15.3x at 90 days (n=200), 15.7x for ranks 201-1000 and 15.3x below rank 3000. Not stable by size, and no longer claimed to be: a 60-game re-measurement puts the slope of ln(ratio) on ln(wishlists) at +0.073 with a standard error of 0.049, indistinguishable from flat. Follower counts in the sample run from 132 to 12,036, so this is measured on small and mid-size games rather than on the head of the chart. Cross-checked against GDC_FOLLOWERS_2026, which measures 16.1x on a different population by a different method.'
   },
+  OURS_FIRST_SALE_DATE: {
+    label: 'Measured in this repository — what Steam calls a release date against when a game first went on sale',
+    url: 'https://github.com/q-sn/steam-revenue-wishlist-estimator/blob/main/src/content/scrape.js',
+    note: 'appdetails returns the 1.0 date, not the date a game first took money, so every Early Access title reads younger than it is and picks a base multiplier from the wrong band. Measured over 930 games drawn across SteamSpy owner pages 0, 3, 7, 12 and 18 with 10+ reviews each: 62 of the 920 that answered — 6.7%, one game in fifteen — land in the wrong BASE_MULTIPLIER band, and every one of them in the same direction, understating the multiple by x1.08 to x2.47 with a median of x1.45. Space Engineers, The Forest, Raft, Squad, Starbound and Quake Champions are all in it. Two sources fix it and agree with each other: IStoreBrowseService returns original_steam_release_date, which is present for only 78 of 920 games but where present sits a median 1.3 years and up to 9.5 years before the shipped date; and appreviewhistogram returns results.start_date, which matches that field within 45 days on 76 of those 78 (97%) and catches a further 55 games the field omits entirely. Of the 62 corrections, 30 come from the field and 32 from the histogram alone. The 180-day floor is not sensitive: 30 days moves 64 games, 90 moves 63, 180 moves 62, 270 moves 62. It is set at 180 because the 30-to-180-day window holds 22 games whose early reviews come from pre-release beta access rather than a sale, and buying two extra corrections is not worth adopting that ambiguity.'
+  },
   OURS_PLAYTIME_BIAS: {
     label: 'Measured in this repository — reviewer playtime against average playtime',
     url: 'https://github.com/q-sn/steam-revenue-wishlist-estimator/blob/main/test/fixtures.json',
@@ -426,6 +431,28 @@ export const WISHLIST_RANK = {
 export const WEEK_ONE = {
   fromWishlists: { factor: 0.11, label: 'Wishlists x 0.11', source: 'GDC_CONVERSION_2025' },
   fromFollowers: { factor: 2.5, label: 'Followers x 2.5', source: 'GDC_FOLLOWERS_2019' }
+};
+
+/**
+ * Turning Steam's release date into the date a game first took money.
+ *
+ * `appdetails` reports the 1.0 date. For an Early Access title that can be
+ * years late — KeeperRL by nine of them — and the base multiple is chosen by
+ * release year, so the game is priced as a newer one and the multiple comes
+ * out low. Always low: the error only ever makes a game look younger.
+ *
+ * See OURS_FIRST_SALE_DATE for the 930-game measurement behind the threshold.
+ */
+export const FIRST_SALE = {
+  /**
+   * How much earlier the review history has to start before it overrides the
+   * store's date. Under this the two disagree about which day 1.0 landed on,
+   * which cannot move a band; over it they disagree about which year the game
+   * went on sale, which can.
+   */
+  minLeadMs: 180 * 24 * 60 * 60 * 1000,
+  source: 'OURS_FIRST_SALE_DATE',
+  derived: true
 };
 
 /** Confidence thresholds, as the ratio of a band's high end to its low end. */

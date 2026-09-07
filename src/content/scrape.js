@@ -7,7 +7,7 @@
  * costs the release year, the list price and the revenue figure at once.
  */
 
-import { parseReviewSummary, medianHours } from '../core/units.js';
+import { parseReviewSummary, medianHours, firstSaleDate } from '../core/units.js';
 import { LANGUAGE_REGIONS, HISTORY } from '../core/constants.js';
 
 export function readAppId() {
@@ -162,6 +162,27 @@ async function fetchAppDetails(appId) {
  * With `l=en` the store returns dates as "Feb 26, 2016". Date.parse gives NaN
  * for the "Coming soon" and "Q2 2026" forms, which is the wanted answer.
  */
+/**
+ * When the game first took money, which is not what `appdetails` reports.
+ *
+ * The store's release date is the 1.0 date. `appreviewhistogram` carries the
+ * whole review history and its `start_date` is where that history begins,
+ * which for an Early Access title is years earlier — measured over 930 games
+ * it agrees with Steam's own `original_steam_release_date` on 97% of the games
+ * that have one, and finds the date for 55 more that do not. See
+ * OURS_FIRST_SALE_DATE.
+ *
+ * Steam floors this field at October 2010. Everything before that is already
+ * in the oldest multiplier band, so the clamp cannot move one.
+ */
+async function fetchFirstSale(appId) {
+  return cachedJson(`sFirstSale:${appId}`, TTL.details, async () => {
+    const data = await getJson(`https://store.steampowered.com/appreviewhistogram/${appId}?l=english`);
+    const start = data?.results?.start_date;
+    return Number.isFinite(start) ? start * 1000 : null;
+  });
+}
+
 function parseDate(dateStr) {
   if (!dateStr) return null;
   const ms = Date.parse(dateStr);
@@ -276,11 +297,16 @@ export async function collectGame(appId) {
  * otherwise silently feed the wrong app's tags and review trend.
  */
 async function collect(appId, { useDom = true } = {}) {
-  const [reviewSummary, details, external] = await Promise.all([
+  const [reviewSummary, details, external, firstSale] = await Promise.all([
     fetchReviewSummary(appId).catch(() => null),
     fetchAppDetails(appId).catch(() => null),
-    requestExternal(appId)
+    requestExternal(appId),
+    fetchFirstSale(appId).catch(() => null)
   ]);
+
+  // The store's date is the 1.0 date; the review history knows when the game
+  // actually went on sale. `firstSaleDate` decides between them.
+  const sale = firstSaleDate(details?.releaseDate ?? null, firstSale);
 
   const reviews = reviewSummary ?? (useDom ? readReviewsFromDom() : null);
   const totalReviews = reviews?.reviews ?? null;
@@ -309,8 +335,14 @@ async function collect(appId, { useDom = true } = {}) {
     discountPct: details?.discountPct ?? 0,
     dlcCount: details?.dlcCount ?? 0,
     released: details?.released ?? (useDom ? readReleasedFromDom() : null) ?? true,
-    releaseYear: details?.releaseYear ?? null,
-    releaseDate: details?.releaseDate ?? null,
+    releaseYear: sale?.corrected
+      ? new Date(sale.at).getUTCFullYear()
+      : details?.releaseYear ?? null,
+    releaseDate: sale?.at ?? null,
+    // Kept apart so the panel can say the game has been selling since before
+    // the date its own store page shows, rather than silently contradicting it.
+    storeReleaseYear: details?.releaseYear ?? null,
+    firstSaleCorrected: Boolean(sale?.corrected),
     tags: domTags.length ? domTags : (details?.tags ?? []),
     followers: external?.followers ?? null,
     followersStale: Boolean(external?.followersStale),

@@ -20,7 +20,7 @@ export {
   estimateUnits, weekOneFromCcu, unitsFromOwners, unitsFromPlaytime,
   parseOwnersBand, parseAllTimePeak, parseChartsStats, parseMonthlyHistory,
   parseRecentTrend, parseReviewSummary, allTimePeakMonth, medianHours,
-  collectAdjustments
+  collectAdjustments, firstSaleDate
 } from './units.js';
 export {
   estimateRevenue, estimateRevenueRange, steamRoyalty, resolveSettings,

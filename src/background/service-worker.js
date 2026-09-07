@@ -356,7 +356,7 @@ async function recordHistory(appId, snapshot) {
  */
 const CACHE_PREFIXES = [
   'followers:', 'steamspy:', 'ccu:', 'charts:',
-  'sReviews:', 'sDetails:', 'sLang:', 'sSample:',
+  'sReviews:', 'sDetails:', 'sLang:', 'sSample:', 'sFirstSale:',
   'history:',
   // Not per-game, but still cached from somebody's server.
   RANKS_KEY,

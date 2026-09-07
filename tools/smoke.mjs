@@ -16,7 +16,7 @@ import {
   wishlistsFromRank, curveAt, wishlistsFromAnnouncement,
   makeSnapshot, appendSnapshot, diffSince, sparklinePoints,
   WISHLIST, WISHLIST_RANK, WISHLIST_CURVE, CCU, OWNERS_TO_UNITS, PLAYTIME, REGIONAL_PROFILES, REGIONAL_ORDER, REFUNDS, HISTORY,
-  CONFIDENCE, ENSEMBLE, APP_TYPES, REVIEW_GATES, scoreConfidence
+  CONFIDENCE, ENSEMBLE, APP_TYPES, REVIEW_GATES, scoreConfidence, firstSaleDate
 } from '../src/core/index.js';
 import { compact, money, setLocale } from '../src/core/format.js';
 import { comparableScopes } from '../src/content/scrape.js';
@@ -1677,6 +1677,116 @@ check('what the harvester keeps, the condenser keeps',
     return hit && !rejectStoredQuote(hit.quoted.slice(0, 240), hit.wishlists, { inTitle: hit.inTitle });
   })(),
   'the stored quote was cut shorter than the window the decision was made on');
+
+group('When a game first took money');
+
+// appdetails reports the 1.0 date. Over 930 games that puts 62 of them — one
+// in fifteen — in the wrong BASE_MULTIPLIER band, every one of them reading
+// younger and so cheaper than it is. See OURS_FIRST_SALE_DATE.
+const jan = (y) => Date.UTC(y, 0, 15);
+check('a review history starting years earlier wins',
+  firstSaleDate(jan(2022), jan(2018))?.corrected === true
+  && new Date(firstSaleDate(jan(2022), jan(2018)).at).getUTCFullYear() === 2018);
+
+// A few weeks apart is the two sources disagreeing about which day 1.0 landed
+// on. That cannot move a band, and acting on it would read a paid beta's
+// reviews as a sale — 22 of the 930 sit in that window.
+check('a few weeks earlier does not',
+  firstSaleDate(jan(2022), jan(2022) - 40 * 86_400_000)?.corrected === false);
+
+// The error only ever runs one way: a game can be reported later than it went
+// on sale, never earlier. A title nobody reviewed for a year is not a title
+// released a year late.
+check('a history starting later never moves the date forward',
+  firstSaleDate(jan(2018), jan(2022))?.at === jan(2018));
+
+check('either source alone is used as it stands, and neither is a correction',
+  firstSaleDate(jan(2020), null)?.at === jan(2020)
+  && firstSaleDate(jan(2020), null)?.corrected === false
+  && firstSaleDate(null, jan(2020))?.at === jan(2020)
+  && firstSaleDate(null, jan(2020))?.corrected === false);
+
+check('with nothing to go on it declines rather than inventing a year',
+  firstSaleDate(null, null) === null);
+
+// The correction is worthless if the collector cannot call it. `scrape.js` is
+// browser code that no offline test executes, so a missing import here is
+// invisible until it reaches a real store page — which is how this one shipped
+// undetected for a few minutes.
+const contentImports = new Set(
+  [...scrapeSrc.matchAll(/import \{([^}]*)\} from '[^']+';/g)]
+    .flatMap((m) => m[1].split(',').map((n) => n.trim().split(/\s+as\s+/)[0]))
+);
+const contentCalls = [...scrapeSrc.matchAll(/\b([a-z][A-Za-z0-9]*)\s*\(/g)].map((m) => m[1]);
+const coreSrcAll = ['units.js', 'revenue.js', 'wishlists.js', 'ensemble.js', 'index.js', 'history.js', 'format.js']
+  .map((f) => readFileSync(join(REPO, 'src/core', f), 'utf8')).join('\n');
+const coreExports = new Set(
+  [...coreSrcAll.matchAll(/export function (\w+)/g)].map((m) => m[1])
+);
+const uncalled = [...new Set(contentCalls)]
+  .filter((n) => coreExports.has(n) && !contentImports.has(n));
+check('every core function the collector calls is imported there',
+  uncalled.length === 0,
+  uncalled.length ? `used without importing: ${uncalled.join(', ')}` : `${contentImports.size} names imported`);
+
+group('The collector actually runs');
+
+// Every other test here builds the game object by hand, so nothing executes
+// `collect()` and a stale identifier in it reaches a store page before anyone
+// notices. That is exactly what happened: a rename left `earlierSale` behind
+// and the extension died with a ReferenceError on every page. This runs the
+// real function against stubs.
+const stubbed = await (async () => {
+  const realFetch = globalThis.fetch;
+  const realChrome = globalThis.chrome;
+  const realDocument = globalThis.document;
+
+  // Everything answers, and answers plausibly: a bad stub that makes every
+  // request fail would exercise only the catch paths.
+  globalThis.fetch = async (url) => {
+    const body = String(url).includes('appreviewhistogram')
+      ? { results: { start_date: Math.floor(Date.UTC(2018, 4, 1) / 1000), rollups: [], recent: [] } }
+      : String(url).includes('/appreviews/')
+        ? { query_summary: { total_reviews: 4000, total_positive: 3600, total_negative: 400 }, reviews: [] }
+        : { 99: { success: true, data: {
+            name: 'Stub', is_free: false, type: 'game',
+            price_overview: { final: 1999, initial: 1999, discount_percent: 0 },
+            release_date: { coming_soon: false, date: 'Jun 20, 2022' },
+            genres: [{ description: 'Action' }], dlc: []
+          } } };
+    return { ok: true, json: async () => body };
+  };
+  globalThis.chrome = {
+    storage: { local: { get: async () => ({}), set: async () => {} } },
+    // The real one is callback-style; a promise-returning stub never calls
+    // back and the whole collector hangs.
+    runtime: { sendMessage: (_payload, cb) => cb?.({}), lastError: null, getURL: (p) => p }
+  };
+  globalThis.document = { querySelectorAll: () => [], querySelector: () => null, title: 'Stub on Steam' };
+
+  try {
+    const { collectGame } = await import('../src/content/scrape.js');
+    return { game: await collectGame(99), err: null };
+  } catch (err) {
+    return { game: null, err };
+  } finally {
+    globalThis.fetch = realFetch;
+    globalThis.chrome = realChrome;
+    globalThis.document = realDocument;
+  }
+})();
+
+check('collectGame runs end to end without throwing',
+  stubbed.err === null, stubbed.err ? `${stubbed.err.name}: ${stubbed.err.message}` : 'ok');
+check('and hands back the fields the core reads off it',
+  stubbed.game?.reviews === 4000 && stubbed.game?.listPrice === 19.99
+  && stubbed.game?.appType === 'game');
+// The store says Jun 2022; the stubbed review history starts May 2018, which
+// is the whole point of the correction.
+check('with the release year taken from the review history, not the store',
+  stubbed.game?.releaseYear === 2018 && stubbed.game?.storeReleaseYear === 2022
+  && stubbed.game?.firstSaleCorrected === true,
+  `${stubbed.game?.storeReleaseYear} -> ${stubbed.game?.releaseYear}`);
 
 group('The seam between the collector and the core');
 
