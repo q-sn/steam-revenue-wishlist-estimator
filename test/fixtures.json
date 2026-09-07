@@ -1,42 +1,1790 @@
 {
-  "_readme": "Games whose developers or publishers disclosed real unit sales publicly. Seeded from the sample Gamalytic published alongside its accuracy benchmark, so our numbers are comparable to theirs. `reportedAt` is when the figure was announced. `snapshot` freezes the estimator inputs as of that date; where it is null the harness falls back to live review counts, which biases results — see the warning the harness prints.",
+  "_readme": "Games whose developers or publishers disclosed real unit sales publicly. Seeded from the sample Gamalytic published alongside its accuracy benchmark, so our numbers are comparable to theirs. `reportedAt` is when the figure was announced. `snapshot` freezes the estimator inputs as of that date; where it is null the harness falls back to live review counts, which biases results — see the warning the harness prints. Snapshots are now filled for every row from `store.steampowered.com/appreviewhistogram/<appid>`, which returns per-bucket review counts for a game's whole life and so gives the review count and positive share on the day of the disclosure. That histogram counts Steam purchasers and excludes externally-activated keys, while the extension reads `appreviews` with `purchase_type=all`; `snapshot.reviews` is therefore the historical histogram count scaled by `k`, today's ratio between the two populations for that game. `reviewsAsRead` keeps every raw number so the scaling can be checked or undone. `k` runs 0.75 to 1.69 across these games and tracks key giveaways, so it is an estimate and not a measurement.",
   "_schema": {
     "appId": "Steam app id",
     "name": "display name",
     "reportedUnits": "units sold as publicly disclosed",
     "reportedAt": "ISO date of the disclosure",
-    "snapshot": "optional frozen inputs: { reviews, positivePct, listPrice, releaseYear, isFree, tags }"
+    "snapshot": "optional frozen inputs: { reviews, positivePct, listPrice, releaseYear, isFree, tags }",
+    "source": "URL of the disclosure, for rows gathered after the original thirty",
+    "quote": "the sentence the figure was read from",
+    "scopeNote": "how confident the collector was that the figure is Steam units rather than all platforms",
+    "foundBy": "which search produced the row",
+    "reviewsAsRead": "raw histogram and API review counts behind `snapshot.reviews`, and the k that scaled them"
+  },
+  "_excluded": {
+    "what": "Disclosures found and deliberately not scored, each with its reason. Kept because a row dropped silently is indistinguishable from a row never found.",
+    "rows": [
+      {
+        "appId": 1004770,
+        "name": "Maiden and Spell",
+        "reportedUnits": 20000,
+        "reportedAt": "2024-05-22",
+        "why": "the figure is a cross-platform total, not Steam units",
+        "url": "https://newsletter.gamediscover.co/p/how-rabbit-and-steel-raided-its-way",
+        "quote": "my last game, Maiden & Spell, was released in 2020 and sold around 20k copies total; which was enough to skirt by until I released this game."
+      },
+      {
+        "appId": 1790330,
+        "name": "The Spanish Privateer",
+        "reportedUnits": 162,
+        "reportedAt": "2023-01-11",
+        "why": "only 6 reviews on the disclosure date, below this project's own ten-review gate",
+        "url": "https://sinsisters.itch.io/the-spanish-privateer/devlog/478213/postmortem-launching-a-kickstarter-or-two-as-a-first-time-dev",
+        "quote": "we have sold 162 copies of The Spanish Privateer on Steam"
+      },
+      {
+        "appId": 1003560,
+        "name": "Crumbling World",
+        "reportedUnits": 132,
+        "reportedAt": "2020-06-21",
+        "why": "only 6 reviews on the disclosure date, below this project's own ten-review gate",
+        "url": "https://danimarti.itch.io/crumbling-world/devlog/160435/crumbling-world-post-mortem-the-story-of-a-failure",
+        "quote": "Steam: 132 units, yielding $1,242"
+      },
+      {
+        "appId": 1808820,
+        "name": "Alien Shepherd",
+        "reportedUnits": 11,
+        "reportedAt": "2022-02-27",
+        "why": "only 2 reviews on the disclosure date, below this project's own ten-review gate",
+        "url": "https://volnt.itch.io/alien-shepherd/devlog/351914/release-postmortem",
+        "quote": "Since release, we have sold 11 copies of the game for a gross revenue of $46 and a net revenue of $36."
+      },
+      {
+        "appId": 3020370,
+        "name": "Archetype and the Four Winds of Hell",
+        "reportedUnits": 24,
+        "reportedAt": "2025-01-05",
+        "why": "only 3 reviews on the disclosure date, below this project's own ten-review gate",
+        "url": "https://serfofcinder.itch.io/archetype-portal-to-hell/devlog/866477/a-retrospective",
+        "quote": "I have 24 sales so far."
+      }
+    ]
+  },
+  "_revenueOnly": {
+    "what": "Developers who published revenue but no unit count. Nothing here can score the units estimator; they are kept for a revenue check that does not exist yet.",
+    "rows": [
+      {
+        "appId": 3136330,
+        "name": "Tiny Terraces",
+        "reportedUnits": null,
+        "reportedAt": "2025-11-02",
+        "why": "revenue disclosed, no unit count",
+        "url": null,
+        "quote": "developer video, 2 Nov 2025: gross $26,790, net $17,363 — revenue only, no unit count"
+      },
+      {
+        "appId": 3262100,
+        "name": "Mighty Meow",
+        "reportedUnits": null,
+        "reportedAt": "2026-07-19",
+        "why": "revenue disclosed, no unit count",
+        "url": null,
+        "quote": "developer video, 12 Jul 2026: gross $1,300, net $1,096 — revenue only, no unit count"
+      }
+    ]
   },
   "games": [
-    { "appId": 1957990, "name": "Tile Cities", "reportedUnits": 14000, "reportedAt": "2022-07-10", "snapshot": null },
-    { "appId": 1062520, "name": "Dinkum", "reportedUnits": 350000, "reportedAt": "2022-08-17", "snapshot": null },
-    { "appId": 252490, "name": "Rust", "reportedUnits": 12400000, "reportedAt": "2021-12-07", "snapshot": null },
-    { "appId": 413150, "name": "Stardew Valley", "reportedUnits": 13000000, "reportedAt": "2022-05-15", "snapshot": null },
-    { "appId": 4000, "name": "Garry's Mod", "reportedUnits": 20000000, "reportedAt": "2021-09-20", "snapshot": null },
-    { "appId": 280160, "name": "Aragami", "reportedUnits": 320000, "reportedAt": "2019-10-04", "snapshot": null },
-    { "appId": 2171690, "name": "Handshakes", "reportedUnits": 60000, "reportedAt": "2023-02-21", "snapshot": null },
-    { "appId": 1055850, "name": "Inspector Waffles", "reportedUnits": 3500, "reportedAt": "2022-03-23", "snapshot": null },
-    { "appId": 1404560, "name": "Yerba Mate Tycoon", "reportedUnits": 2000, "reportedAt": "2022-06-15", "snapshot": null },
-    { "appId": 1999360, "name": "Placid Plastic Duck Simulator", "reportedUnits": 76300, "reportedAt": "2022-12-07", "snapshot": null },
-    { "appId": 1269950, "name": "Buddy Simulator 1984", "reportedUnits": 75000, "reportedAt": "2022-10-17", "snapshot": null },
-    { "appId": 1284190, "name": "The Planet Crafter", "reportedUnits": 500000, "reportedAt": "2023-03-24", "snapshot": null },
-    { "appId": 1106840, "name": "Hydroneer", "reportedUnits": 500000, "reportedAt": "2022-07-27", "snapshot": null },
-    { "appId": 1121640, "name": "The Wandering Village", "reportedUnits": 224000, "reportedAt": "2023-03-25", "snapshot": null },
-    { "appId": 1326470, "name": "Sons Of The Forest", "reportedUnits": 2000000, "reportedAt": "2023-02-24", "snapshot": null },
-    { "appId": 975370, "name": "Dwarf Fortress", "reportedUnits": 500000, "reportedAt": "2023-01-04", "snapshot": null },
-    { "appId": 1527950, "name": "Wartales", "reportedUnits": 600000, "reportedAt": "2023-04-27", "snapshot": null },
-    { "appId": 1948280, "name": "Stacklands", "reportedUnits": 450000, "reportedAt": "2022-07-10", "snapshot": null },
-    { "appId": 262060, "name": "Darkest Dungeon", "reportedUnits": 1000000, "reportedAt": "2016-11-03", "snapshot": null },
-    { "appId": 1621690, "name": "Core Keeper", "reportedUnits": 1000000, "reportedAt": "2022-06-10", "snapshot": null },
-    { "appId": 892970, "name": "Valheim", "reportedUnits": 10000000, "reportedAt": "2022-04-25", "snapshot": null },
-    { "appId": 1092790, "name": "Inscryption", "reportedUnits": 1000000, "reportedAt": "2022-01-05", "snapshot": null },
-    { "appId": 1282730, "name": "Loop Hero", "reportedUnits": 1000000, "reportedAt": "2021-12-09", "snapshot": null },
-    { "appId": 548430, "name": "Deep Rock Galactic", "reportedUnits": 500000, "reportedAt": "2018-12-31", "snapshot": null },
-    { "appId": 433340, "name": "Slime Rancher", "reportedUnits": 5000000, "reportedAt": "2022-01-13", "snapshot": null },
-    { "appId": 1158310, "name": "Crusader Kings III", "reportedUnits": 2000000, "reportedAt": "2022-03-17", "snapshot": null },
-    { "appId": 1331550, "name": "Big Ambitions", "reportedUnits": 150000, "reportedAt": "2023-03-25", "snapshot": null },
-    { "appId": 602960, "name": "Barotrauma", "reportedUnits": 800000, "reportedAt": "2021-06-04", "snapshot": null },
-    { "appId": 1435790, "name": "Escape Simulator", "reportedUnits": 1000000, "reportedAt": "2022-05-04", "snapshot": null },
-    { "appId": 756800, "name": "Contraband Police", "reportedUnits": 250000, "reportedAt": "2023-04-04", "snapshot": null }
+    {
+      "appId": 4000,
+      "name": "Garry's Mod",
+      "reportedUnits": 20000000,
+      "reportedAt": "2021-09-20",
+      "snapshot": {
+        "reviews": 665418,
+        "positivePct": 96.6,
+        "listPrice": 9.99,
+        "isFree": false,
+        "releaseYear": 2006,
+        "tags": [
+          "Casual",
+          "Indie",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 634972,
+        "histogramToday": 1205277,
+        "apiToday": 1263068,
+        "k": 1.048,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 413150,
+      "name": "Stardew Valley",
+      "reportedUnits": 13000000,
+      "reportedAt": "2022-05-15",
+      "snapshot": {
+        "reviews": 434769,
+        "positivePct": 98,
+        "listPrice": 14.99,
+        "isFree": false,
+        "releaseYear": 2016,
+        "tags": [
+          "Indie",
+          "RPG",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 398413,
+        "histogramToday": 950017,
+        "apiToday": 1036709,
+        "k": 1.091,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 252490,
+      "name": "Rust",
+      "reportedUnits": 12400000,
+      "reportedAt": "2021-12-07",
+      "snapshot": {
+        "reviews": 642524,
+        "positivePct": 87.3,
+        "listPrice": 39.99,
+        "isFree": false,
+        "releaseYear": 2018,
+        "tags": [
+          "Action",
+          "Adventure",
+          "Indie",
+          "Massively Multiplayer",
+          "RPG"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 587646,
+        "histogramToday": 1277098,
+        "apiToday": 1396361,
+        "k": 1.093,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 892970,
+      "name": "Valheim",
+      "reportedUnits": 10000000,
+      "reportedAt": "2022-04-25",
+      "snapshot": {
+        "reviews": 335709,
+        "positivePct": 95.7,
+        "listPrice": 29.99,
+        "isFree": false,
+        "releaseYear": 2021,
+        "tags": [
+          "Action",
+          "Adventure",
+          "Indie",
+          "RPG",
+          "Early Access"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 299569,
+        "histogramToday": 483270,
+        "apiToday": 541572,
+        "k": 1.121,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 433340,
+      "name": "Slime Rancher",
+      "reportedUnits": 5000000,
+      "reportedAt": "2022-01-13",
+      "snapshot": {
+        "reviews": 76266,
+        "positivePct": 97.8,
+        "listPrice": 19.99,
+        "isFree": false,
+        "releaseYear": 2017,
+        "tags": [
+          "Action",
+          "Adventure",
+          "Indie",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 74586,
+        "histogramToday": 153438,
+        "apiToday": 156894,
+        "k": 1.023,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 1326470,
+      "name": "Sons Of The Forest",
+      "reportedUnits": 2000000,
+      "reportedAt": "2023-02-24",
+      "snapshot": {
+        "reviews": 62899,
+        "positivePct": 82,
+        "listPrice": 29.99,
+        "isFree": false,
+        "releaseYear": 2024,
+        "tags": [
+          "Action",
+          "Adventure",
+          "Indie",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 59894,
+        "histogramToday": 303686,
+        "apiToday": 318920,
+        "k": 1.05,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 1158310,
+      "name": "Crusader Kings III",
+      "reportedUnits": 2000000,
+      "reportedAt": "2022-03-17",
+      "snapshot": {
+        "reviews": 67582,
+        "positivePct": 92.8,
+        "listPrice": 49.99,
+        "isFree": false,
+        "releaseYear": 2020,
+        "tags": [
+          "RPG",
+          "Simulation",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 48399,
+        "histogramToday": 102740,
+        "apiToday": 143461,
+        "k": 1.396,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 262060,
+      "name": "Darkest Dungeon",
+      "reportedUnits": 1000000,
+      "reportedAt": "2016-11-03",
+      "snapshot": {
+        "reviews": 17201,
+        "positivePct": 88.3,
+        "listPrice": 24.99,
+        "isFree": false,
+        "releaseYear": 2016,
+        "tags": [
+          "Indie",
+          "RPG",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 15773,
+        "histogramToday": 148719,
+        "apiToday": 162185,
+        "k": 1.091,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 1621690,
+      "name": "Core Keeper",
+      "reportedUnits": 1000000,
+      "reportedAt": "2022-06-10",
+      "snapshot": {
+        "reviews": 13640,
+        "positivePct": 89.5,
+        "listPrice": 19.99,
+        "isFree": false,
+        "releaseYear": 2024,
+        "tags": [
+          "Action",
+          "Adventure",
+          "Indie",
+          "RPG",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 10828,
+        "histogramToday": 52638,
+        "apiToday": 66309,
+        "k": 1.26,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 1092790,
+      "name": "Inscryption",
+      "reportedUnits": 1000000,
+      "reportedAt": "2022-01-05",
+      "snapshot": {
+        "reviews": 56651,
+        "positivePct": 96.8,
+        "listPrice": 19.99,
+        "isFree": false,
+        "releaseYear": 2021,
+        "tags": [
+          "Adventure",
+          "Indie",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 54031,
+        "histogramToday": 141466,
+        "apiToday": 148326,
+        "k": 1.048,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 1282730,
+      "name": "Loop Hero",
+      "reportedUnits": 1000000,
+      "reportedAt": "2021-12-09",
+      "snapshot": {
+        "reviews": 24818,
+        "positivePct": 94.3,
+        "listPrice": 14.99,
+        "isFree": false,
+        "releaseYear": 2021,
+        "tags": [
+          "Indie",
+          "RPG",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 24057,
+        "histogramToday": 35408,
+        "apiToday": 36528,
+        "k": 1.032,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 1435790,
+      "name": "Escape Simulator",
+      "reportedUnits": 1000000,
+      "reportedAt": "2022-05-04",
+      "snapshot": {
+        "reviews": 6235,
+        "positivePct": 93.8,
+        "listPrice": 19.99,
+        "isFree": false,
+        "releaseYear": 2021,
+        "tags": [
+          "Adventure",
+          "Casual",
+          "Indie",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 5600,
+        "histogramToday": 17376,
+        "apiToday": 19346,
+        "k": 1.113,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 602960,
+      "name": "Barotrauma",
+      "reportedUnits": 800000,
+      "reportedAt": "2021-06-04",
+      "snapshot": {
+        "reviews": 13186,
+        "positivePct": 92,
+        "listPrice": 39.99,
+        "isFree": false,
+        "releaseYear": 2023,
+        "tags": [
+          "Action",
+          "Indie",
+          "Simulation",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 9776,
+        "histogramToday": 66396,
+        "apiToday": 89558,
+        "k": 1.349,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 1527950,
+      "name": "Wartales",
+      "reportedUnits": 600000,
+      "reportedAt": "2023-04-27",
+      "snapshot": {
+        "reviews": 14657,
+        "positivePct": 89.4,
+        "listPrice": 34.99,
+        "isFree": false,
+        "releaseYear": 2023,
+        "tags": [
+          "Adventure",
+          "Indie",
+          "RPG",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 13589,
+        "histogramToday": 33018,
+        "apiToday": 35613,
+        "k": 1.079,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 1284190,
+      "name": "The Planet Crafter",
+      "reportedUnits": 500000,
+      "reportedAt": "2023-03-24",
+      "snapshot": {
+        "reviews": 19766,
+        "positivePct": 96.3,
+        "listPrice": 23.99,
+        "isFree": false,
+        "releaseYear": 2024,
+        "tags": [
+          "Adventure"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 19056,
+        "histogramToday": 70871,
+        "apiToday": 73512,
+        "k": 1.037,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 1106840,
+      "name": "Hydroneer",
+      "reportedUnits": 500000,
+      "reportedAt": "2022-07-27",
+      "snapshot": {
+        "reviews": 12783,
+        "positivePct": 86.3,
+        "listPrice": 14.99,
+        "isFree": false,
+        "releaseYear": 2020,
+        "tags": [
+          "Adventure",
+          "Casual",
+          "Indie",
+          "Simulation",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 12922,
+        "histogramToday": 28749,
+        "apiToday": 28440,
+        "k": 0.989,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 975370,
+      "name": "Dwarf Fortress",
+      "reportedUnits": 500000,
+      "reportedAt": "2023-01-04",
+      "snapshot": {
+        "reviews": 17945,
+        "positivePct": 95.5,
+        "listPrice": 29.99,
+        "isFree": false,
+        "releaseYear": 2022,
+        "tags": [
+          "Indie",
+          "Simulation",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 17399,
+        "histogramToday": 30512,
+        "apiToday": 31469,
+        "k": 1.031,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 548430,
+      "name": "Deep Rock Galactic",
+      "reportedUnits": 500000,
+      "reportedAt": "2018-12-31",
+      "snapshot": {
+        "reviews": 7674,
+        "positivePct": 93.8,
+        "listPrice": 29.99,
+        "isFree": false,
+        "releaseYear": 2020,
+        "tags": [
+          "Action"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 6455,
+        "histogramToday": 319290,
+        "apiToday": 379611,
+        "k": 1.189,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 1948280,
+      "name": "Stacklands",
+      "reportedUnits": 450000,
+      "reportedAt": "2022-07-10",
+      "snapshot": {
+        "reviews": 8272,
+        "positivePct": 96.2,
+        "listPrice": 7.99,
+        "isFree": false,
+        "releaseYear": 2022,
+        "tags": [
+          "Casual",
+          "Indie",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 8356,
+        "histogramToday": 30583,
+        "apiToday": 30277,
+        "k": 0.99,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 1062520,
+      "name": "Dinkum",
+      "reportedUnits": 350000,
+      "reportedAt": "2022-08-17",
+      "snapshot": {
+        "reviews": 8172,
+        "positivePct": 95.1,
+        "listPrice": 19.99,
+        "isFree": false,
+        "releaseYear": 2025,
+        "tags": [
+          "Adventure",
+          "Casual",
+          "Indie",
+          "RPG",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 7287,
+        "histogramToday": 25955,
+        "apiToday": 29108,
+        "k": 1.121,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 280160,
+      "name": "Aragami",
+      "reportedUnits": 320000,
+      "reportedAt": "2019-10-04",
+      "snapshot": {
+        "reviews": 4082,
+        "positivePct": 89.5,
+        "listPrice": 19.99,
+        "isFree": false,
+        "releaseYear": 2016,
+        "tags": [
+          "Action",
+          "Adventure",
+          "Indie"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 3547,
+        "histogramToday": 11288,
+        "apiToday": 12990,
+        "k": 1.151,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 756800,
+      "name": "Contraband Police",
+      "reportedUnits": 250000,
+      "reportedAt": "2023-04-04",
+      "snapshot": {
+        "reviews": 5020,
+        "positivePct": 93.5,
+        "listPrice": 29.99,
+        "isFree": false,
+        "releaseYear": 2023,
+        "tags": [
+          "Action",
+          "Adventure",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 5171,
+        "histogramToday": 26478,
+        "apiToday": 25707,
+        "k": 0.971,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 1121640,
+      "name": "The Wandering Village",
+      "reportedUnits": 224000,
+      "reportedAt": "2023-03-25",
+      "snapshot": {
+        "reviews": 3229,
+        "positivePct": 89.6,
+        "listPrice": 29.99,
+        "isFree": false,
+        "releaseYear": 2025,
+        "tags": [
+          "Simulation",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 3059,
+        "histogramToday": 8013,
+        "apiToday": 8458,
+        "k": 1.056,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 1331550,
+      "name": "Big Ambitions",
+      "reportedUnits": 150000,
+      "reportedAt": "2023-03-25",
+      "snapshot": {
+        "reviews": 3302,
+        "positivePct": 95.3,
+        "listPrice": 25.99,
+        "isFree": false,
+        "releaseYear": 2026,
+        "tags": [
+          "Indie",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 3472,
+        "histogramToday": 14930,
+        "apiToday": 14197,
+        "k": 0.951,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 2060160,
+      "name": "The Farmer Was Replaced",
+      "reportedUnits": 140000,
+      "reportedAt": "2025-06-30",
+      "snapshot": {
+        "reviews": 1531,
+        "positivePct": 96.4,
+        "listPrice": 9.99,
+        "isFree": false,
+        "releaseYear": 2025,
+        "tags": [
+          "Casual",
+          "Indie",
+          "Simulation",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 1544,
+        "histogramToday": 9304,
+        "apiToday": 9225,
+        "k": 0.992,
+        "rollupType": "month"
+      },
+      "source": "https://newsletter.gamediscover.co/p/how-the-farmer-was-replaced-hit-39000",
+      "quote": "The Farmer Was Replaced actually had sold ~140k copies by mid-2025 after a very slow EA start, due to some unexpected post-launch organic virality during Early Access.",
+      "scopeNote": "high - Steam-only game, article is about its Steam revenue",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 2132850,
+      "name": "Rabbit and Steel",
+      "reportedUnits": 125000,
+      "reportedAt": "2024-05-21",
+      "snapshot": {
+        "reviews": 4122,
+        "positivePct": 97,
+        "listPrice": 14.99,
+        "isFree": false,
+        "releaseYear": 2024,
+        "tags": [
+          "Action",
+          "Adventure",
+          "Indie",
+          "RPG"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 3759,
+        "histogramToday": 10520,
+        "apiToday": 11537,
+        "k": 1.097,
+        "rollupType": "month"
+      },
+      "source": "https://newsletter.gamediscover.co/p/how-rabbit-and-steel-raided-its-way",
+      "quote": "And here's Rabbit and Steel's real LTD Steam sales (>125k units), refunds (4.3%, low!) & median playtime (4 hours 6 minutes - pretty good?) after just under two weeks on sale",
+      "scopeNote": "high - explicitly 'LTD Steam sales'",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 1473350,
+      "name": "(the) Gnorp Apologue",
+      "reportedUnits": 120000,
+      "reportedAt": "2024-01-14",
+      "snapshot": {
+        "reviews": 2930,
+        "positivePct": 97,
+        "listPrice": 6.99,
+        "isFree": false,
+        "releaseYear": 2023,
+        "tags": [
+          "Casual",
+          "Indie",
+          "Simulation",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 2912,
+        "histogramToday": 9886,
+        "apiToday": 9947,
+        "k": 1.006,
+        "rollupType": "month"
+      },
+      "source": "https://newsletter.gamediscover.co/p/how-this-solo-dev-incremental-game",
+      "quote": "How (the) Gnorp Apologue sold 120k+ in a month!",
+      "scopeNote": "high - Steam-only game at this date; the post is about its Steam performance",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 1783560,
+      "name": "The Last Caretaker",
+      "reportedUnits": 120000,
+      "reportedAt": "2025-12-02",
+      "snapshot": {
+        "reviews": 4232,
+        "positivePct": 83.4,
+        "listPrice": 34.99,
+        "isFree": false,
+        "releaseYear": 2025,
+        "tags": [
+          "Action",
+          "Adventure",
+          "Indie",
+          "Simulation",
+          "Early Access"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 4310,
+        "histogramToday": 13666,
+        "apiToday": 13418,
+        "k": 0.982,
+        "rollupType": "week"
+      },
+      "source": "https://newsletter.gamediscover.co/p/how-the-last-caretaker-journeyed",
+      "quote": "Antti Ilvessuo, who confirmed that the game has sold >120,000 copies in Early Access in just under a month.",
+      "scopeNote": "high - Steam Early Access exclusive at this date",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 1043810,
+      "name": "Tactical Breach Wizards",
+      "reportedUnits": 100000,
+      "reportedAt": "2024-09-15",
+      "snapshot": {
+        "reviews": 5431,
+        "positivePct": 98.4,
+        "listPrice": 19.99,
+        "isFree": false,
+        "releaseYear": 2024,
+        "tags": [
+          "Adventure",
+          "Indie",
+          "RPG",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 5203,
+        "histogramToday": 11637,
+        "apiToday": 12148,
+        "k": 1.044,
+        "rollupType": "month"
+      },
+      "source": "https://newsletter.gamediscover.co/p/tactical-breach-wizards-how-this",
+      "quote": "Tactical Breach Wizards, which topped out at an impressive 4,700 CCU (concurrent users), has already sold 100,000 copies - as of a couple of days ago - according to its creator Tom Francis.",
+      "scopeNote": "medium-high - PC-only release at this date, sold on Steam and GOG/Humble, so a small non-Steam share is possible",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 1296610,
+      "name": "Peglin",
+      "reportedUnits": 80204,
+      "reportedAt": "2022-05-02",
+      "snapshot": {
+        "reviews": 2709,
+        "positivePct": 79.3,
+        "listPrice": 19.99,
+        "isFree": false,
+        "releaseYear": 2024,
+        "tags": [
+          "Casual",
+          "Indie",
+          "RPG",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 2655,
+        "histogramToday": 17325,
+        "apiToday": 17677,
+        "k": 1.02,
+        "rollupType": "month"
+      },
+      "source": "https://howtomarketagame.com/2022/05/04/how-peglin-made-1049413-in-1-week/",
+      "quote": "80204 units sold ... at $17.99 each ... $1,049,413",
+      "scopeNote": "high - stated as Steam sales, before Steam's cut",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 1999360,
+      "name": "Placid Plastic Duck Simulator",
+      "reportedUnits": 76300,
+      "reportedAt": "2022-12-07",
+      "snapshot": {
+        "reviews": 4731,
+        "positivePct": 98.3,
+        "listPrice": 1.99,
+        "isFree": false,
+        "releaseYear": 2022,
+        "tags": [
+          "Casual",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 4487,
+        "histogramToday": 19173,
+        "apiToday": 20217,
+        "k": 1.054,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 1269950,
+      "name": "Buddy Simulator 1984",
+      "reportedUnits": 75000,
+      "reportedAt": "2022-10-17",
+      "snapshot": {
+        "reviews": 3028,
+        "positivePct": 94.3,
+        "listPrice": 9.99,
+        "isFree": false,
+        "releaseYear": 2021,
+        "tags": [
+          "Adventure",
+          "Casual",
+          "Indie",
+          "RPG",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 2860,
+        "histogramToday": 4109,
+        "apiToday": 4350,
+        "k": 1.059,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 2703850,
+      "name": "Rooftops & Alleys: The Parkour Game",
+      "reportedUnits": 70000,
+      "reportedAt": "2024-06-21",
+      "snapshot": {
+        "reviews": 2403,
+        "positivePct": 97,
+        "listPrice": 24.99,
+        "isFree": false,
+        "releaseYear": 2025,
+        "tags": [
+          "Indie",
+          "Simulation",
+          "Sports"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 2389,
+        "histogramToday": 6941,
+        "apiToday": 6982,
+        "k": 1.006,
+        "rollupType": "month"
+      },
+      "source": "https://newsletter.gamediscover.co/p/how-this-solo-dev-parkour-game-sold",
+      "quote": "Rooftops & Alleys sold 70,000 units on Steam in its first month, according to Losch",
+      "scopeNote": "high - stated 'on Steam'; game was PC-only at this date",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 2004080,
+      "name": "Furnish Master",
+      "reportedUnits": 65800,
+      "reportedAt": "2025-02-20",
+      "snapshot": {
+        "reviews": 618,
+        "positivePct": 81.6,
+        "listPrice": 14.99,
+        "isFree": false,
+        "releaseYear": 2024,
+        "tags": [
+          "Casual",
+          "Indie",
+          "Simulation",
+          "Early Access"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 613,
+        "histogramToday": 1164,
+        "apiToday": 1174,
+        "k": 1.009,
+        "rollupType": "month"
+      },
+      "source": "https://gameworldobserver.com/2025/02/24/furnish-master-revenue-787k-sales-wishlists-alex-blintsov",
+      "quote": "Furnish Master has sold over 65.8k units to date",
+      "scopeNote": "high - the game is Steam-exclusive at this date and the article states the figures as Steam figures ('grossed over $787k on Steam')",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 2171690,
+      "name": "Handshakes",
+      "reportedUnits": 60000,
+      "reportedAt": "2023-02-21",
+      "snapshot": {
+        "reviews": 952,
+        "positivePct": 99.5,
+        "listPrice": 0,
+        "isFree": true,
+        "releaseYear": 2023,
+        "tags": [
+          "Casual",
+          "Free To Play"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 1047,
+        "histogramToday": 3215,
+        "apiToday": 2924,
+        "k": 0.909,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 2424010,
+      "name": "Parcel Simulator",
+      "reportedUnits": 55000,
+      "reportedAt": "2025-07-15",
+      "snapshot": {
+        "reviews": 807,
+        "positivePct": 94.4,
+        "listPrice": 17.99,
+        "isFree": false,
+        "releaseYear": 2025,
+        "tags": [
+          "Casual",
+          "Indie",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 825,
+        "histogramToday": 2890,
+        "apiToday": 2827,
+        "k": 0.978,
+        "rollupType": "week"
+      },
+      "source": "https://newsletter.gamediscover.co/p/how-parcel-simulator-stealthily-racked",
+      "quote": "Parcel Simulator, which debuted on Steam on Jun 20th, and has already sold >55k units and garnered Overwhelmingly Positive reviews.",
+      "scopeNote": "high - 'debuted on Steam', PC-only",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 2124120,
+      "name": "SULFUR",
+      "reportedUnits": 52000,
+      "reportedAt": "2024-11-12",
+      "snapshot": {
+        "reviews": 1758,
+        "positivePct": 83.4,
+        "listPrice": 24.99,
+        "isFree": false,
+        "releaseYear": 2024,
+        "tags": [
+          "Action",
+          "Adventure",
+          "Indie",
+          "RPG",
+          "Simulation",
+          "Early Access"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 1751,
+        "histogramToday": 10117,
+        "apiToday": 10159,
+        "k": 1.004,
+        "rollupType": "week"
+      },
+      "source": "https://newsletter.gamediscover.co/p/how-sulfur-sold-50k-real-fast-and",
+      "quote": "Anton Albiin, who revealed that the game has sold >50k units on Steam as of this time last week ... Steam wishlists are now just over 250,000, with just under 29k of its 52k units being bought directly an already-wishlisted player account.",
+      "scopeNote": "high - stated 'units on Steam'",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 1771980,
+      "name": "The Operator",
+      "reportedUnits": 50000,
+      "reportedAt": "2024-08-19",
+      "snapshot": {
+        "reviews": 3272,
+        "positivePct": 93.2,
+        "listPrice": 13.99,
+        "isFree": false,
+        "releaseYear": 2024,
+        "tags": [
+          "Adventure",
+          "Indie",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 3227,
+        "histogramToday": 8732,
+        "apiToday": 8853,
+        "k": 1.014,
+        "rollupType": "month"
+      },
+      "source": "https://newsletter.gamediscover.co/p/how-this-tiny-dev-narrative-game",
+      "quote": "How did The Operator sell nearly 50k in Month 1?",
+      "scopeNote": "medium - Steam is the only PC store it was on at the time, but the post's free portion does not say 'on Steam' explicitly",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 3376990,
+      "name": "Kabuto Park",
+      "reportedUnits": 35000,
+      "reportedAt": "2025-06-28",
+      "snapshot": {
+        "reviews": 1771,
+        "positivePct": 99.7,
+        "listPrice": 4.99,
+        "isFree": false,
+        "releaseYear": 2025,
+        "tags": [
+          "Casual",
+          "Indie",
+          "RPG",
+          "Simulation",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 1726,
+        "histogramToday": 4494,
+        "apiToday": 4611,
+        "k": 1.026,
+        "rollupType": "week"
+      },
+      "source": "https://newsletter.gamediscover.co/p/how-parcel-simulator-stealthily-racked",
+      "quote": "Here's an excellent postmortem post on 'tiny bug collection game' Kabuto Park, which sold ~35k units at $5 in Month 1",
+      "scopeNote": "medium - the game is on Steam and itch.io; the '$5' price matches the Steam list price, but the postmortem's own scope could not be checked",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 1996010,
+      "name": "Crow Country",
+      "reportedUnits": 32000,
+      "reportedAt": "2024-06-03",
+      "snapshot": {
+        "reviews": 2463,
+        "positivePct": 98.6,
+        "listPrice": 19.99,
+        "isFree": false,
+        "releaseYear": 2024,
+        "tags": [
+          "Action",
+          "Indie"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 2399,
+        "histogramToday": 8036,
+        "apiToday": 8252,
+        "k": 1.027,
+        "rollupType": "month"
+      },
+      "source": "https://newsletter.gamediscover.co/p/how-crow-country-spooked-its-way",
+      "quote": "Tom Vian tells us Crow Country just hit 50,000 sales across Steam (64% of sales), PlayStation 5 (28% of sales), and Xbox Series (8% of sales.)",
+      "scopeNote": "high for the split, medium for the arithmetic - the 50,000 is all-platform and 32,000 is 64% of it, the Steam share the developer himself gave",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 3298940,
+      "name": "Static Dread: The Lighthouse",
+      "reportedUnits": 22500,
+      "reportedAt": "2025-09-08",
+      "snapshot": {
+        "reviews": 609,
+        "positivePct": 92.2,
+        "listPrice": 10.9,
+        "isFree": false,
+        "releaseYear": 2025,
+        "tags": [
+          "Action",
+          "Adventure",
+          "Casual",
+          "Indie",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 599,
+        "histogramToday": 1482,
+        "apiToday": 1507,
+        "k": 1.017,
+        "rollupType": "week"
+      },
+      "source": null,
+      "quote": null,
+      "scopeNote": null,
+      "foundBy": "video-and-non-english"
+    },
+    {
+      "appId": 2744010,
+      "name": "Urban Jungle",
+      "reportedUnits": 20000,
+      "reportedAt": "2025-05-29",
+      "snapshot": {
+        "reviews": 351,
+        "positivePct": 94.1,
+        "listPrice": 11.99,
+        "isFree": false,
+        "releaseYear": 2025,
+        "tags": [
+          "Casual",
+          "Indie",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 305,
+        "histogramToday": 686,
+        "apiToday": 790,
+        "k": 1.152,
+        "rollupType": "week"
+      },
+      "source": null,
+      "quote": null,
+      "scopeNote": null,
+      "foundBy": "video-and-non-english"
+    },
+    {
+      "appId": 1957990,
+      "name": "Tile Cities",
+      "reportedUnits": 14000,
+      "reportedAt": "2022-07-10",
+      "snapshot": {
+        "reviews": 215,
+        "positivePct": 96.8,
+        "listPrice": 2.99,
+        "isFree": false,
+        "releaseYear": 2022,
+        "tags": [
+          "Casual",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 218,
+        "histogramToday": 582,
+        "apiToday": 575,
+        "k": 0.988,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 3772240,
+      "name": "Void Miner - Incremental Asteroids Roguelite",
+      "reportedUnits": 10000,
+      "reportedAt": "2025-11-28",
+      "snapshot": {
+        "reviews": 194,
+        "positivePct": 86.6,
+        "listPrice": 5.99,
+        "isFree": false,
+        "releaseYear": 2025,
+        "tags": [
+          "Action",
+          "Adventure",
+          "Casual",
+          "Indie",
+          "Simulation",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 202,
+        "histogramToday": 741,
+        "apiToday": 711,
+        "k": 0.96,
+        "rollupType": "week"
+      },
+      "source": "https://howtomarketagame.com/2026/04/28/void-miner/",
+      "quote": "In the first 12 days, Void Miner sold 10,000 copies",
+      "scopeNote": "high - Steam-only release, the post is a Steam launch case study",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 3151380,
+      "name": "Small Spaces",
+      "reportedUnits": 9980,
+      "reportedAt": "2025-06-03",
+      "snapshot": {
+        "reviews": 141,
+        "positivePct": 92.7,
+        "listPrice": 12.99,
+        "isFree": false,
+        "releaseYear": 2025,
+        "tags": [
+          "Casual",
+          "Simulation",
+          "Early Access"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 137,
+        "histogramToday": 1576,
+        "apiToday": 1622,
+        "k": 1.029,
+        "rollupType": "week"
+      },
+      "source": "https://newsletter.gamediscover.co/p/how-small-spaces-sold-15x-its-week",
+      "quote": "Specifically, Small Spaces - which launched into Early Access in late May 2025 - did 9,980 units and $97k gross in Week 1, and 18k units and $180k in Month 1, but stretched all the way to 141k units and $1.4m gross in Year 1, an amazing result for a tiny title.",
+      "scopeNote": "high - GameDiscoverCo's W1/Y1 multipliers are Steam figures and the game is Steam-only",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 1378890,
+      "name": "Indoorlands",
+      "reportedUnits": 9000,
+      "reportedAt": "2023-12-07",
+      "snapshot": {
+        "reviews": 194,
+        "positivePct": 79.9,
+        "listPrice": 18.99,
+        "isFree": false,
+        "releaseYear": 2022,
+        "tags": [
+          "Casual",
+          "Indie",
+          "Simulation",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 174,
+        "histogramToday": 250,
+        "apiToday": 279,
+        "k": 1.116,
+        "rollupType": "month"
+      },
+      "source": "https://gameworldobserver.com/2023/12/07/indoorlands-indie-park-sim-bad-roi-right-genre-steam",
+      "quote": "Indoorlands has sold just over 9,000 copies lifetime with net revenue of roughly EUR100k",
+      "scopeNote": "high - the article works entirely from the game's Steam data and the game is Steam-only",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 2804680,
+      "name": "Only Way is Down",
+      "reportedUnits": 8656,
+      "reportedAt": "2026-01-26",
+      "snapshot": {
+        "reviews": 162,
+        "positivePct": 56.5,
+        "listPrice": 9.99,
+        "isFree": false,
+        "releaseYear": 2025,
+        "tags": [
+          "Action",
+          "Adventure",
+          "Casual",
+          "Indie",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 115,
+        "histogramToday": 148,
+        "apiToday": 208,
+        "k": 1.405,
+        "rollupType": "week"
+      },
+      "source": null,
+      "quote": null,
+      "scopeNote": null,
+      "foundBy": "video-and-non-english"
+    },
+    {
+      "appId": 3570060,
+      "name": "The Ember Guardian",
+      "reportedUnits": 8400,
+      "reportedAt": "2026-06-04",
+      "snapshot": {
+        "reviews": 203,
+        "positivePct": 79.6,
+        "listPrice": 19.99,
+        "isFree": false,
+        "releaseYear": 2026,
+        "tags": [
+          "Action",
+          "Adventure",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 206,
+        "histogramToday": 296,
+        "apiToday": 291,
+        "k": 0.983,
+        "rollupType": "week"
+      },
+      "source": null,
+      "quote": "developer video, 4 Jun 2026: 8,400 copies in the first two weeks",
+      "scopeNote": null,
+      "foundBy": "supplied-by-the-repo-owner"
+    },
+    {
+      "appId": 676240,
+      "name": "TAURONOS",
+      "reportedUnits": 6000,
+      "reportedAt": "2024-09-30",
+      "snapshot": {
+        "reviews": 56,
+        "positivePct": 91.5,
+        "listPrice": 4.99,
+        "isFree": false,
+        "releaseYear": 2017,
+        "tags": [
+          "Adventure",
+          "Indie"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 47,
+        "histogramToday": 53,
+        "apiToday": 63,
+        "k": 1.189,
+        "rollupType": "month"
+      },
+      "source": "https://itch.io/t/4157634/tauronos-post-mortem",
+      "quote": "Currently, in 2024, TAURONOS sold a total of around 6000 units on Steam",
+      "scopeNote": "high - explicitly 'on Steam'",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 1055850,
+      "name": "Inspector Waffles",
+      "reportedUnits": 3500,
+      "reportedAt": "2022-03-23",
+      "snapshot": {
+        "reviews": 149,
+        "positivePct": 95.7,
+        "listPrice": 12.99,
+        "isFree": false,
+        "releaseYear": 2021,
+        "tags": [
+          "Adventure",
+          "Indie"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 117,
+        "histogramToday": 235,
+        "apiToday": 299,
+        "k": 1.272,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 2474430,
+      "name": "TetherGeist",
+      "reportedUnits": 3000,
+      "reportedAt": "2026-06-23",
+      "snapshot": {
+        "reviews": 264,
+        "positivePct": 97.9,
+        "listPrice": 16.99,
+        "isFree": false,
+        "releaseYear": 2026,
+        "tags": [
+          "Action",
+          "Adventure",
+          "Indie"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 236,
+        "histogramToday": 313,
+        "apiToday": 350,
+        "k": 1.118,
+        "rollupType": "week"
+      },
+      "source": null,
+      "quote": "developer video, 23 Jun 2026: ~3,000 copies — the video says \"on Steam or Switch\", so scope is not certain",
+      "scopeNote": null,
+      "foundBy": "supplied-by-the-repo-owner"
+    },
+    {
+      "appId": 1999140,
+      "name": "Extraneum",
+      "reportedUnits": 2400,
+      "reportedAt": "2025-09-25",
+      "snapshot": {
+        "reviews": 93,
+        "positivePct": 97.8,
+        "listPrice": 14.99,
+        "isFree": false,
+        "releaseYear": 2024,
+        "tags": [
+          "Action",
+          "Indie"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 91,
+        "histogramToday": 116,
+        "apiToday": 118,
+        "k": 1.017,
+        "rollupType": "month"
+      },
+      "source": "https://davidjalbert.itch.io/extraneum/devlog/1090186/extraneum-post-mortem-one-year-later",
+      "quote": "it sold about 2,400 units and made roughly $12,000 USD",
+      "scopeNote": "medium-high - the post is about the Steam release and the wishlist figures alongside it are Steam wishlists; a small itch.io share is possible",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 1568970,
+      "name": "Torn Away",
+      "reportedUnits": 2178,
+      "reportedAt": "2023-11-22",
+      "snapshot": {
+        "reviews": 300,
+        "positivePct": 94.5,
+        "listPrice": 14.99,
+        "isFree": false,
+        "releaseYear": 2023,
+        "tags": [
+          "Adventure",
+          "Indie"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 271,
+        "histogramToday": 634,
+        "apiToday": 702,
+        "k": 1.107,
+        "rollupType": "month"
+      },
+      "source": null,
+      "quote": null,
+      "scopeNote": null,
+      "foundBy": "video-and-non-english"
+    },
+    {
+      "appId": 1404560,
+      "name": "Yerba Mate Tycoon",
+      "reportedUnits": 2000,
+      "reportedAt": "2022-06-15",
+      "snapshot": {
+        "reviews": 71,
+        "positivePct": 83.9,
+        "listPrice": 4.99,
+        "isFree": false,
+        "releaseYear": 2021,
+        "tags": [
+          "Casual",
+          "Indie",
+          "Simulation",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 56,
+        "histogramToday": 95,
+        "apiToday": 120,
+        "k": 1.263,
+        "rollupType": "month"
+      }
+    },
+    {
+      "appId": 1803600,
+      "name": "Gone Rogue",
+      "reportedUnits": 2000,
+      "reportedAt": "2023-03-31",
+      "snapshot": {
+        "reviews": 60,
+        "positivePct": 96.4,
+        "listPrice": 14.99,
+        "isFree": false,
+        "releaseYear": 2023,
+        "tags": [
+          "Adventure",
+          "RPG",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 56,
+        "histogramToday": 295,
+        "apiToday": 315,
+        "k": 1.068,
+        "rollupType": "month"
+      },
+      "source": null,
+      "quote": null,
+      "scopeNote": null,
+      "foundBy": "video-and-non-english"
+    },
+    {
+      "appId": 2578290,
+      "name": "Stop and Smell the Flowers",
+      "reportedUnits": 1001,
+      "reportedAt": "2026-09-04",
+      "snapshot": {
+        "reviews": 47,
+        "positivePct": 90.5,
+        "listPrice": 4.99,
+        "isFree": false,
+        "releaseYear": 2026,
+        "tags": [
+          "Casual",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 63,
+        "histogramToday": 63,
+        "apiToday": 47,
+        "k": 0.746,
+        "rollupType": "week"
+      },
+      "source": null,
+      "quote": null,
+      "scopeNote": null,
+      "foundBy": "video-and-non-english"
+    },
+    {
+      "appId": 2517870,
+      "name": "Experimentation",
+      "reportedUnits": 648,
+      "reportedAt": "2023-12-02",
+      "snapshot": {
+        "reviews": 59,
+        "positivePct": 82.9,
+        "listPrice": 2.99,
+        "isFree": false,
+        "releaseYear": 2023,
+        "tags": [
+          "Adventure",
+          "Casual",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 35,
+        "histogramToday": 58,
+        "apiToday": 98,
+        "k": 1.69,
+        "rollupType": "month"
+      },
+      "source": null,
+      "quote": null,
+      "scopeNote": null,
+      "foundBy": "video-and-non-english"
+    },
+    {
+      "appId": 1747220,
+      "name": "Neverspring Chronicles",
+      "reportedUnits": 550,
+      "reportedAt": "2026-04-29",
+      "snapshot": {
+        "reviews": 20,
+        "positivePct": 95.2,
+        "listPrice": 7.99,
+        "isFree": false,
+        "releaseYear": 2025,
+        "tags": [
+          "Adventure",
+          "Indie",
+          "RPG"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 21,
+        "histogramToday": 23,
+        "apiToday": 22,
+        "k": 0.957,
+        "rollupType": "month"
+      },
+      "source": "https://itch.io/t/6253991/new-indie-game-dev-how-should-i-release-my-game",
+      "quote": "The game has been out 1 year as of March and is somewhere between 500-600 units sold.",
+      "scopeNote": "medium-high - the surrounding post talks about Steam wishlists and Steam units; the developer does not rule out other stores",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 2759760,
+      "name": "Prickle",
+      "reportedUnits": 500,
+      "reportedAt": "2024-12-06",
+      "snapshot": {
+        "reviews": 57,
+        "positivePct": 100,
+        "listPrice": 6.99,
+        "isFree": false,
+        "releaseYear": 2024,
+        "tags": [
+          "Indie"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 55,
+        "histogramToday": 89,
+        "apiToday": 92,
+        "k": 1.034,
+        "rollupType": "week"
+      },
+      "source": "https://sunbirdstudio.itch.io/prickle-jam/devlog/845342/steam-release-postmortem",
+      "quote": "Copies sold (two weeks since release): ~500",
+      "scopeNote": "high - the devlog is titled 'Steam Release Postmortem' and reports Steam wishlists and Steam reviews alongside",
+      "foundBy": "written-postmortems"
+    },
+    {
+      "appId": 1677090,
+      "name": "Godless",
+      "reportedUnits": 472,
+      "reportedAt": "2024-08-29",
+      "snapshot": {
+        "reviews": 57,
+        "positivePct": 80.9,
+        "listPrice": 9.99,
+        "isFree": false,
+        "releaseYear": 2024,
+        "tags": [
+          "Indie",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 47,
+        "histogramToday": 102,
+        "apiToday": 123,
+        "k": 1.206,
+        "rollupType": "month"
+      },
+      "source": null,
+      "quote": null,
+      "scopeNote": null,
+      "foundBy": "video-and-non-english"
+    },
+    {
+      "appId": 2608440,
+      "name": "Sunlight Scream",
+      "reportedUnits": 300,
+      "reportedAt": "2023-12-02",
+      "snapshot": {
+        "reviews": 38,
+        "positivePct": 100,
+        "listPrice": 6.99,
+        "isFree": false,
+        "releaseYear": 2023,
+        "tags": [
+          "Adventure",
+          "Casual",
+          "Indie",
+          "Simulation"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 28,
+        "histogramToday": 60,
+        "apiToday": 81,
+        "k": 1.35,
+        "rollupType": "month"
+      },
+      "source": null,
+      "quote": null,
+      "scopeNote": null,
+      "foundBy": "video-and-non-english"
+    },
+    {
+      "appId": 2225430,
+      "name": "V-Hunter Puzzler Dx",
+      "reportedUnits": 46,
+      "reportedAt": "2023-06-15",
+      "snapshot": {
+        "reviews": 15,
+        "positivePct": 100,
+        "listPrice": 2.99,
+        "isFree": false,
+        "releaseYear": 2023,
+        "tags": [
+          "Action",
+          "Indie",
+          "Strategy"
+        ]
+      },
+      "reviewsAsRead": {
+        "histogramAtDate": 10,
+        "histogramToday": 15,
+        "apiToday": 22,
+        "k": 1.467,
+        "rollupType": "month"
+      },
+      "source": "https://yatchstudios.itch.io/v-hunter-puzzler-dx/devlog/543861/hunting-vampires-and-writing-postmortems",
+      "quote": "Sales: 46 ... Returns: 2 ... Lifetime Unique Users: 59 ... I launched with ~130 wishlists",
+      "scopeNote": "high - the figures are read off Steamworks (impressions, click-through rate, visits, lifetime unique users) and the itch.io wishlist figure is reported separately",
+      "foundBy": "written-postmortems"
+    }
   ]
 }

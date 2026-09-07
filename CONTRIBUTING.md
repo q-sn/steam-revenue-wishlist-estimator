@@ -80,7 +80,7 @@ npm run check:model      # the wishlist model, against the announcement archive
 
 Fixtures with frozen snapshots.
 
-`test/fixtures.json` holds games whose developers disclosed real unit counts. Most entries have `snapshot: null`, which forces the harness into live mode, comparing today's review count against a figure announced years ago — biased and clearly labelled as such.
+`test/fixtures.json` holds games whose developers disclosed real unit counts. Every entry now carries a snapshot, reconstructed from `store.steampowered.com/appreviewhistogram/<appid>`, so the harness scores each game on what its store page showed the day the figure was published rather than on today's review count. `reviewsAsRead` on each row keeps the raw histogram and API counts and the `k` that scaled between them, because that scaling is an estimate and a reader should be able to undo it.
 
 A snapshot captured at the moment a developer announces their numbers fixes that permanently:
 

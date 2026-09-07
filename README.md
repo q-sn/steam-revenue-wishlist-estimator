@@ -103,7 +103,7 @@ npm run check:ratio           # re-measure the follower multiplier
 
 `npm run check:model` exits non-zero when a constant in `src/core/constants.js` stops reproducing from the archive, so a drifting fit fails rather than passing quietly.
 
-`test/fixtures.json` holds games whose developers published real unit counts. Live mode compares today's review count against a figure announced in the past, so it is biased toward overestimating and prints a warning saying so. Freezing inputs into the `snapshot` field at announcement time is the correct fix, and pull requests adding snapshots are the single most valuable contribution to this project.
+`test/fixtures.json` holds 62 games whose developers published real unit counts, each with the review count and positive share of its announcement day frozen into `snapshot`. Those come from `store.steampowered.com/appreviewhistogram/<appid>`, which returns a game's whole review history in one keyless request. Live mode still exists and still compares today's review count against a figure announced in the past, so it is biased toward overestimating and prints a warning saying so; the frozen run is the one to read. More games remain the single most valuable contribution to this project — the set is thin below a thousand copies and thinner still before 2020.
 
 ## Languages
 

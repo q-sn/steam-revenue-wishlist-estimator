@@ -96,7 +96,7 @@ Weight scales with size — zero below 20,000 owners, rising to 0.8 above 200,00
 
 It is the only leg here with no published accuracy figure. SteamSpy states its method — extrapolation from a sample of public profiles at 98% confidence — and that the April 2018 privacy change cost it most of its sample, but nobody has published a post-2018 error rate for it. So it is measured here, the same way the playtime correction is.
 
-SteamSpy's bucket was compared against the units the developer disclosed, for each of the 30 games in `test/fixtures.json`. Owners can only ever exceed units sold, and a mean of 4.5 years has passed since those announcements, so the current bucket should comfortably contain or exceed every figure. What comes back:
+SteamSpy's bucket was compared against the units the developer disclosed, for each of the 30 games `test/fixtures.json` held at the time. Owners can only ever exceed units sold, and a mean of 4.5 years has passed since those announcements, so the current bucket should comfortably contain or exceed every figure. What comes back:
 
 | disclosed size | n | min | median | max |
 | --- | --- | --- | --- | --- |
