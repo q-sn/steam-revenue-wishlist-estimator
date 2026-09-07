@@ -2,8 +2,15 @@
 <meta charset="utf-8">
 <title>Chrome Web Store tiles</title>
 <!--
-  The five listing screenshots, at the size the store demands: 1280 x 800,
-  rendered one at a time by store.mjs with ?tile=<n>.
+  Everything the store listing shows, at the sizes the store demands, rendered
+  one at a time by store.mjs with ?tile=<id>:
+
+    1..5      the listing screenshots, 1280 x 800
+    small     the small promotional tile, 440 x 280 — required by the store
+    marquee   the featured-placement tile, 1400 x 560 — optional
+
+  Each section carries its own canvas size in data-w / data-h; the script at
+  the bottom sizes the page to the one being rendered.
 
   The artwork is the PNGs one directory up, which are photographs of the real
   overlay on a real store page. Nothing here draws a figure of its own: the
@@ -12,15 +19,28 @@
 <style>
   :root {
     --ink: #e9eef6;
-    --muted: #97a1b3;
+    --muted: #9aa6b8;
     --faint: #5b6577;
     --accent: #66c0f4;
     --good: #4ec9a5;
+
+    /*
+     * The shots next door, measured in the CSS pixels the overlay was laid
+     * out in: released.png is 469 x 1184 of them, steam-page-wide.png
+     * 740 x 304. The crops below are expressed in the same units.
+     *
+     * Inside released.png the panel starts 12px in from the left, and its
+     * blocks run head 0-64, units 64-165, gross 165-318, net 318-419,
+     * followers 419-555, reviews 555-679, players 679-833. Every crop and
+     * every frame height below lands on one of those boundaries.
+     */
+    --panel-w: 469px;   --panel-h: 1184px;
+    --page-w: 740px;    --page-h: 304px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  html, body { width: 1280px; height: 800px; overflow: hidden; }
+  html, body { overflow: hidden; }
 
   body {
     background:
@@ -34,52 +54,51 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  .tile { display: none; width: 1280px; height: 800px; padding: 54px 56px; }
+  .tile { display: none; width: 100%; height: 100%; padding: 52px 50px; }
   .tile.on { display: grid; }
 
   /* Four of the five put the words beside the picture; the first one puts
      them above it, because its picture is a whole store page. */
-  .tile.beside { grid-template-columns: 1fr auto; gap: 54px; align-items: center; }
+  .tile.beside { grid-template-columns: 1fr auto; gap: 44px; align-items: center; }
   /* Words above the picture, and the picture pinned to the bottom of what is
      left, so a longer headline eats the gap rather than the screenshot. */
-  .tile.above { grid-template-rows: auto 1fr; gap: 22px; }
+  .tile.above { grid-template-rows: auto 1fr; gap: 20px; }
 
-  .brand { display: flex; align-items: center; gap: 11px; margin-bottom: 26px; }
-  .brand img { width: 30px; height: 30px; }
+  .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+  .brand img { width: 34px; height: 34px; }
   .brand b {
     font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
-    font-size: 19px; font-weight: 600; letter-spacing: .1px;
+    font-size: 22px; font-weight: 600; letter-spacing: .1px;
   }
   .brand span {
-    font-size: 12.5px; color: var(--faint); letter-spacing: .15em;
-    text-transform: uppercase; font-weight: 600; padding-left: 11px;
-    border-left: 1px solid rgba(255, 255, 255, .12);
+    font-size: 13.5px; color: var(--faint); letter-spacing: .15em;
+    text-transform: uppercase; font-weight: 600; padding-left: 12px;
+    border-left: 1px solid rgba(255, 255, 255, .13);
   }
 
   h1 {
     font-family: "Segoe UI Variable Display", "Segoe UI Variable Text", "Segoe UI",
       -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 44px; line-height: 1.1; font-weight: 600; letter-spacing: -.9px;
+    font-size: 56px; line-height: 1.08; font-weight: 600; letter-spacing: -1.4px;
     /* Chrome evens out the lines rather than leaving one word on the last. */
     text-wrap: balance;
   }
-  .above h1 { font-size: 42px; }
+  .above h1 { font-size: 54px; }
 
-  p, li { font-size: 18.5px; line-height: 1.58; color: var(--muted); max-width: 33em; }
-  p { margin-top: 18px; }
-  .above p { margin-top: 12px; max-width: 78ch; }
+  p, li { font-size: 21px; line-height: 1.5; color: var(--muted); max-width: 30em; }
+  p { margin-top: 20px; }
+  .above p { margin-top: 14px; max-width: 900px; }
 
-  ul { margin-top: 22px; list-style: none; display: grid; gap: 13px; }
-  li { position: relative; padding-left: 22px; }
+  ul { margin-top: 26px; list-style: none; display: grid; gap: 16px; }
+  li { position: relative; padding-left: 26px; }
   li::before {
-    content: ''; position: absolute; left: 2px; top: .62em;
-    width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+    content: ''; position: absolute; left: 2px; top: .6em;
+    width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
   }
 
   em { font-style: normal; color: var(--ink); }
-  .green { color: var(--good); }
 
-  /* One shared frame, so the five pictures sit on the page the same way. */
+  /* One shared frame, so the pictures sit on the page the same way. */
   .shot {
     overflow: hidden; border-radius: 13px;
     border: 1px solid rgba(255, 255, 255, .08);
@@ -88,33 +107,74 @@
   }
   .shot img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
-  /* Per tile: how much of a tall panel is in frame, and from which end. */
   /* 2.43:1, the ratio steam-page-wide.png was framed at, so the layout
      never re-crops what the shot already chose. */
-  .shot.page   { width: 1168px; height: 480px; align-self: end; }
+  .shot.page   { width: 1180px; height: 486px; align-self: end; }
   .shot.page img { object-position: 100% 100%; }
+
   /*
    * The panel shots keep 12 CSS px of store page down each side, which is
    * what makes them read as an overlay in the README and what reads as a
    * smudge inside a frame here. So the image is laid out wider than its frame
-   * and pulled left by half the difference, which crops both slivers: a 445px
-   * panel inside a 469px picture, scaled until the panel alone fills the
-   * width.
+   * and pulled left by half the difference, which crops both slivers.
    *
-   * The heights are chosen the same way — 540 CSS px of panel at 1.213x, and
-   * the whole 729px one at 0.949x — so the crop lands under the divider below
-   * the follower note rather than through a row of figures.
+   * The heights are chosen the same way, so the crop lands under a divider
+   * rather than through a row of figures.
    */
-  .shot.panel  { width: 540px; height: 687px; }
-  .shot.panel img { width: 575px; margin-left: -17.5px; object-position: 50% 0; }
-  .shot.whole  { width: 422px; height: 692px; }
-  .shot.whole img { width: 450px; margin-left: -14px; }
-  .shot.card   { width: 604px; height: auto; }
-  .shot.card.big { width: 688px; }
+  .shot.panel  { width: 500px; height: 624px; }
+  .shot.panel img { width: 532px; margin-left: -16px; object-position: 50% 0; }
+  .shot.whole  { width: 404px; height: 662px; }
+  .shot.whole img { width: 431px; margin-left: -13.5px; }
+  .shot.card   { width: 556px; height: auto; }
+  .shot.card.big { width: 620px; }
   .shot.card img { height: auto; }
+
+  /*
+   * A window onto one block of a shot: the frame is the size that block
+   * should appear at, and the picture behind it is scaled by --k and slid so
+   * the block lands in the frame. Cropping this way keeps the promotional
+   * tiles on the same photographs as everything else.
+   */
+  .crop {
+    border-radius: 12px; border: 1px solid rgba(255, 255, 255, .08);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, .5);
+    background-repeat: no-repeat;
+  }
+  .crop.pill {
+    /* The collapsed glance row, out of the wide page shot. */
+    --k: 1.3;
+    width: calc(295px * var(--k)); height: calc(67px * var(--k));
+    background-image: url(../steam-page-wide.png);
+    background-size: calc(var(--page-w) * var(--k)) calc(var(--page-h) * var(--k));
+    background-position: calc(-425px * var(--k)) calc(-217px * var(--k));
+  }
+  .crop.figures {
+    /* Units and gross, cut at the divider above the net row: two blocks large
+       enough to read at half size beat three that are not. */
+    --k: 1.55;
+    width: calc(445px * var(--k)); height: calc(254px * var(--k));
+    background-image: url(../released.png);
+    background-size: calc(var(--panel-w) * var(--k)) calc(var(--panel-h) * var(--k));
+    background-position: calc(-12px * var(--k)) calc(-64px * var(--k));
+  }
+
+  /* The two promotional tiles are their own layouts; neither is a screenshot,
+     and both have to survive being shown at half size. */
+  .promo.small { padding: 26px 28px; align-content: center; }
+  .promo.small .brand { margin-bottom: 18px; gap: 10px; }
+  .promo.small .brand img { width: 30px; height: 30px; }
+  .promo.small .brand b { font-size: 21px; }
+  .promo.small .tag { margin-top: 16px; font-size: 15.5px; color: var(--muted); }
+  .promo.marquee {
+    padding: 56px 60px; grid-template-columns: 1fr auto; gap: 56px;
+    align-items: center;
+  }
+  .promo.marquee h1 { font-size: 50px; }
+  .promo.marquee .brand img { width: 38px; height: 38px; }
+  .promo.marquee .brand b { font-size: 25px; }
 </style>
 
-<section class="tile above" data-tile="1">
+<section class="tile above" data-tile="1" data-w="1280" data-h="800">
   <div>
     <div class="brand">
       <img src="../../icons/icon-128.png" alt="">
@@ -127,27 +187,26 @@
   <div class="shot page"><img src="../steam-page-wide.png" alt=""></div>
 </section>
 
-<section class="tile beside" data-tile="2">
+<section class="tile beside" data-tile="2" data-w="1280" data-h="800">
   <div>
     <div class="brand">
       <img src="../../icons/icon-128.png" alt="">
       <b>Wishlytic</b>
       <span>Units &amp; revenue</span>
     </div>
-    <h1>A range, not a number pretending to be exact</h1>
+    <h1>A range, not fake precision</h1>
     <ul>
-      <li><em>Units sold, gross revenue, and what reaches the developer</em> — each on a scale
-        with its low and high end.</li>
-      <li>A tick mark for <em>every method that contributed</em>, so you can see how far apart
-        they landed before they were averaged.</li>
-      <li>A verdict that scores <em>the evidence</em>: how many independent methods agree, and
-        whether anything contradicts them.</li>
+      <li><em>Units sold, gross revenue and what reaches the developer</em>, each with a low
+        and a high end.</li>
+      <li>A tick for <em>every method that contributed</em>, so you see how far apart they
+        landed before they were averaged.</li>
+      <li>A verdict that scores <em>the evidence</em>, not the width of the bar.</li>
     </ul>
   </div>
   <div class="shot panel"><img src="../released.png" alt=""></div>
 </section>
 
-<section class="tile beside" data-tile="3">
+<section class="tile beside" data-tile="3" data-w="1280" data-h="800">
   <div>
     <div class="brand">
       <img src="../../icons/icon-128.png" alt="">
@@ -156,14 +215,13 @@
     </div>
     <h1>Valve's cut is tiered, not a flat 30%</h1>
     <p>Discount, regional pricing and VAT, refunds, and only then a <em>30/25/20 royalty on
-      adjusted gross</em> — every deduction between the sticker price and the developer's bank
-      account, named and sized.</p>
+      adjusted gross</em> — every deduction named and sized.</p>
     <p>Taking a flat 30% off the list price instead inflates the answer by roughly 60%.</p>
   </div>
   <div class="shot card"><img src="../waterfall.png" alt=""></div>
 </section>
 
-<section class="tile beside" data-tile="4">
+<section class="tile beside" data-tile="4" data-w="1280" data-h="800">
   <div>
     <div class="brand">
       <img src="../../icons/icon-128.png" alt="">
@@ -173,13 +231,13 @@
     <h1>Wishlists, from three independent marks</h1>
     <p>A figure the studio published, the store's own ordering of unreleased games, and the
       follower count — each weighted by the width of its own band.</p>
-    <p>Agreement means <em>a figure every method allows</em>, not two midpoints that happen to
-      sit close together.</p>
+    <p>Agreement means <em>a figure every method allows</em>, not two midpoints sitting close
+      together.</p>
   </div>
   <div class="shot whole"><img src="../wishlists.png" alt=""></div>
 </section>
 
-<section class="tile beside" data-tile="5">
+<section class="tile beside" data-tile="5" data-w="1280" data-h="800">
   <div>
     <div class="brand">
       <img src="../../icons/icon-128.png" alt="">
@@ -189,10 +247,34 @@
     <h1>No coefficient without a source</h1>
     <p>Every multiplier traces to a published study, and the panel shows the chain: the band
       for the release year, what moved it, and what it came to.</p>
-    <p>Where a study established an effect but never sized it, <em>our own figure is marked as
-      ours</em> rather than dressed up as research.</p>
+    <p>Where a study established an effect but never sized it, <em>our figure is marked as
+      ours</em>.</p>
   </div>
   <div class="shot card big"><img src="../multiplier.png" alt=""></div>
+</section>
+
+<section class="tile promo small" data-tile="small" data-w="440" data-h="280">
+  <div>
+    <div class="brand">
+      <img src="../../icons/icon-128.png" alt="">
+      <b>Wishlytic</b>
+    </div>
+    <div class="crop pill"></div>
+    <div class="tag">Steam revenue, units and wishlists — as ranges.</div>
+  </div>
+</section>
+
+<section class="tile promo marquee" data-tile="marquee" data-w="1400" data-h="560">
+  <div>
+    <div class="brand">
+      <img src="../../icons/icon-128.png" alt="">
+      <b>Wishlytic</b>
+    </div>
+    <h1>Steam revenue, as a range</h1>
+    <p>Units sold, what buyers paid, what reaches the developer, and wishlists before launch —
+      every coefficient traceable to a published study.</p>
+  </div>
+  <div class="crop figures"></div>
 </section>
 
 <script>
@@ -200,4 +282,9 @@
   const tile = document.querySelector(`.tile[data-tile="${wanted}"]`);
   if (!tile) throw new Error(`no tile ${wanted}`);
   tile.classList.add('on');
+  // The canvas is whatever this tile is specified at, not one fixed size.
+  for (const el of [document.documentElement, document.body]) {
+    el.style.width = `${tile.dataset.w}px`;
+    el.style.height = `${tile.dataset.h}px`;
+  }
 </script>

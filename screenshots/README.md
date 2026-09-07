@@ -1,12 +1,13 @@
 # Screenshots
 
-The pictures in the project README, the five tiles of the Chrome Web Store
+The pictures in the project README, the seven images of the Chrome Web Store
 listing, and the harness that makes both.
 
 ```bash
 node screenshots/take.mjs             # retake the pictures from the inputs in inputs/
 node screenshots/take.mjs --collect   # refetch today's figures first, then retake
-node screenshots/store.mjs            # recompose the store tiles from those pictures
+node screenshots/store.mjs            # recompose the store images from those pictures
+node screenshots/store.mjs 3 small    # or just those
 ```
 
 Nothing here is a mock-up. Each shot is the shipping overlay, running the
@@ -28,7 +29,7 @@ the crawl.
 
 ```
 take.mjs      the shots, with their framing. Pictures of the overlay itself.
-store.mjs     the five listing tiles, composed from those pictures
+store.mjs     the listing images, composed from those pictures
 store/        tiles.html holds the words and the layout; the PNGs are its output
 collect.mjs   one game's inputs, from the endpoints scrape.js and the worker read
 serve.mjs     the repo over HTTP, with the headers a store page needs to import it
@@ -45,13 +46,28 @@ chain has steps in it rather than being a bare band.
 
 ## What the store requires
 
-Five screenshots at most, each exactly 1280 x 800, as a JPEG or a 24-bit PNG
-with **no alpha channel**. So the tiles render at a device scale factor of 1 —
-the pixel size is the specification here, and a 2x capture is rejected — and
-`store.mjs` checks the size and the PNG colour type of every file before
-writing it. Chrome emits 24-bit RGB for a page that paints an opaque
-background, which `tiles.html` does; a transparent one would come back as RGBA
-and fail at upload rather than here.
+| File | Size | Why it exists |
+| --- | --- | --- |
+| `1-glance` … `5-sources` | 1280 x 800 | the listing carousel; five is the maximum |
+| `promo-small-440x280` | 440 x 280 | **required.** Listings without one are shown after listings with one |
+| `promo-marquee-1400x560` | 1400 x 560 | optional, and what a featured placement needs |
+
+All of them JPEG or a 24-bit PNG with **no alpha channel**. So they render at a
+device scale factor of 1 — the pixel size is the specification here, and a 2x
+capture is rejected — and `store.mjs` checks the dimensions and the PNG colour
+type of every file before writing it. Chrome emits 24-bit RGB for a page that
+paints an opaque background, which `tiles.html` does; a transparent one would
+come back as RGBA and fail at upload rather than here.
+
+The carousel scales every screenshot to one height and fits as many as the row
+allows, so two 1280 x 800 shots sit side by side; a listing showing one is a
+listing with one uploaded, not one with the wrong size.
+
+Crops are taken on block boundaries rather than by eye. Inside `released.png`
+the panel's blocks run head 0-64, units 64-165, gross 165-318, net 318-419,
+followers 419-555, reviews 555-679, players 679-833, in the CSS pixels the
+overlay was laid out in — every frame height in `tiles.html` lands on one of
+those numbers, so nothing is ever cut through a row of figures.
 
 Headlines are set in Segoe UI Variable Display, which ships with Windows 11.
 Elsewhere they fall back to Segoe UI and then to the platform's UI face, so
