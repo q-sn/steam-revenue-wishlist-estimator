@@ -1027,9 +1027,15 @@ export function renderOverlay(result, opts = {}) {
         note: wishlistNote(wishlists),
         reasons: (confidence.wishlists.reasons ?? []).filter((r) => (r.severity ?? 0) >= 1)
       }));
-    } else if (wishlists.reason === 'released' && wishlists.followers != null) {
-      // Shipped, so there is no wishlist figure; the follower count is real.
-      panel.append(fact(t('mFollowers'), wishlists.followers, integer, t('wReleased'), delta?.followers));
+    } else if (wishlists.reason === 'released') {
+      // Shipped, so the pre-launch figure is not a quantity that still exists.
+      // There is no dash to put in its place either: a row headed "Wishlists,
+      // pre-launch" on a game that came out years ago is wrong whatever number
+      // follows it. The follower count stands in where the community group
+      // gave one up, and where it did not the row goes away.
+      if (wishlists.followers != null) {
+        panel.append(fact(t('mFollowers'), wishlists.followers, integer, t('wReleased'), delta?.followers));
+      }
     } else if (wishlists.ceiling != null) {
       // No follower count and not in the ordering: no estimate, but "below
       // roughly this many" is still an answer.
