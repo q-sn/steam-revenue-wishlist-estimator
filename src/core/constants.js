@@ -160,12 +160,34 @@ export const ADJUSTMENTS = {
     { maxPrice: Infinity, factor: 0.85, label: 'Priced over $30', source: 'VGI_2021', derived: true }
   ],
 
-  reviewScore: [
-    { maxPct: 65, factor: 1.05, label: 'Under 65% positive', source: 'GAMALYTIC_RATIO_2023' },
-    { maxPct: 80, factor: 1.35, label: '65-80% positive', source: 'GAMALYTIC_RATIO_2023' },
-    { maxPct: 90, factor: 1.0, label: '80-90% positive', source: 'GAMALYTIC_RATIO_2023' },
-    { maxPct: 101, factor: 0.9, label: 'Over 90% positive', source: 'GAMALYTIC_RATIO_2023' }
-  ],
+  /**
+   * Switched off, not deleted. The effect is real and the table is not.
+   *
+   * Three measurements agree that sales per review moves with the positive
+   * share, and none of them agrees on how. Over 104 disclosures on 82 ranked
+   * games the relationship is not monotone at all — an inverted U peaking at
+   * 80-90% — and the row measured there for 65-80% is 0.55 against the 1.35
+   * below, backwards rather than merely mis-sized. Over 35 small games found
+   * in developer postmortems it does fall monotonically. Two games in that set
+   * sit half a point of positive share apart and 6.4x apart in sales per
+   * review, which is the size of the thing any coefficient here has to beat.
+   *
+   * Scored against `test/fixtures.json`, every version loses to switching it
+   * off — the shipped table 40.3% of games within 30% error, off 45.2%, the
+   * measured table 33.9%, a single step at 90% 40.3%, three smoothed bands
+   * 35.5%. Games with the truth inside the band: 51.6% shipped, 58.1% off.
+   *
+   * So this is not a claim that review score does not matter. It is that a
+   * wrong coefficient moves every game while the real effect would sharpen
+   * only some, and nobody has yet sized it well enough to pay for that. Put it
+   * back when the fixtures set is large enough to show a version that wins.
+   */
+  // reviewScore: [
+  //   { maxPct: 65, factor: 1.05, label: 'Under 65% positive', source: 'GAMALYTIC_RATIO_2023' },
+  //   { maxPct: 80, factor: 1.35, label: '65-80% positive', source: 'GAMALYTIC_RATIO_2023' },
+  //   { maxPct: 90, factor: 1.0, label: '80-90% positive', source: 'GAMALYTIC_RATIO_2023' },
+  //   { maxPct: 101, factor: 0.9, label: 'Over 90% positive', source: 'GAMALYTIC_RATIO_2023' }
+  // ],
 
   tags: [
     { match: ['mmorpg', 'massively multiplayer'], factor: 1.3, label: 'MMO', source: 'VGI_2021', derived: true },

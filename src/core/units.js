@@ -38,9 +38,13 @@ export function collectAdjustments(game) {
     add({ ...pickTiered(ADJUSTMENTS.price, listPrice, 'maxPrice') });
   }
 
-  if (Number.isFinite(game.positivePct)) {
-    add({ ...pickTiered(ADJUSTMENTS.reviewScore, game.positivePct, 'maxPct') });
-  }
+  // The review-score adjustment is switched off; see ADJUSTMENTS.reviewScore
+  // for what was measured and why. `game.positivePct` is still read — the
+  // panel shows the sentiment and the confidence score uses it — it just no
+  // longer moves the multiple.
+  // if (Number.isFinite(game.positivePct)) {
+  //   add({ ...pickTiered(ADJUSTMENTS.reviewScore, game.positivePct, 'maxPct') });
+  // }
 
   if (Number.isFinite(game.reviews) && game.reviews > 0) {
     add({ ...pickTiered(REVIEW_COUNT_BANDS, game.reviews, 'maxReviews') });

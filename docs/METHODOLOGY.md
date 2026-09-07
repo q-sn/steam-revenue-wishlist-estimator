@@ -55,7 +55,7 @@ Multiplicative adjustments on top:
 
 - **Free to play, ×2.0.** Free games get roughly twice as many downloads per review.
 - **Price.** Under $10 ×1.15, over $30 ×0.85. Read from the **list price**, never from the price on the page today — see "list price versus sale price" below.
-- **Review score.** The curve is non-monotonic: games above 90% positive sit near 30 sales per review, games around 70% climb to roughly 60, and games below 60% fall back toward 30. Apparently the share of players who write negative reviews is fairly constant, while the share writing positive ones rises with how much they enjoyed it. Our coefficients are damped relative to the raw study medians because the base table already reflects a sample skewed toward highly-rated games.
+- **Review score — measured, and switched off.** The published curve is non-monotonic: games above 90% positive sit near 30 sales per review, games around 70% climb to roughly 60, and games below 60% fall back toward 30. The mechanism behind it is sound and is visible in our own data — the share of players who write negative reviews is fairly constant, while the share writing positive ones rises with how much they enjoyed it. What is not sound is any table we can write for it. See "The adjustment that lost to nothing" below.
 - **Review count.** Games under 100 reviews sit at 36x against 52.8x for games with 1,000 to 10,000 — the mid-size band is 1.47x above the small one. That ratio is from Gamalytic's 2023 dataset, whose overall median is about 35x and so cannot be dropped in beside a base table blended from other vintages. The *shape* carries over, anchored at the geometric centre of the published pair (×0.83 and ×1.21), so the table changes the spread between sizes without moving the overall level. Above 10,000 reviews the sources say the ratio falls again but publish no median, so it returns to neutral.
 - **Genre.** MMO ×1.3, visual novel ×1.5, sports and racing ×0.8. One adjustment only, and it is the game's own highest-ranked matching tag: Steam orders store-page tags by how many players applied them, so that order is a signal where the order of our table is not.
 - **Heavy discount, ×1.2.** Players who bought on sale review less often.
@@ -73,6 +73,29 @@ The second half is the average playtime of everyone who owns the game, and we ca
 **The newest reviews are the newest buyers.** The hundred most recent reviews of Enshrouded span three days. Their median playtime is 41.7 hours. Reviewers from the game's launch quarter, measured today, have a median of 100.5 hours. For a game two and a half years old the owner population is mostly people who bought long ago and accumulated time, and sampling the newest reviews measures whoever bought this week. This is the same error as sampling recent reviews for the language mix, in the same function.
 
 **The quantity needed is a mean.** Total hours divided by owners is a mean by definition, and playtime distributions have a long enough tail that the mean sits far above any median — 96.7 against 41.7 hours on that same sample.
+
+### The adjustment that lost to nothing
+
+The review-score row is commented out in `constants.js` rather than tuned, and the reason is worth stating in full because it is the first coefficient here to be removed on evidence.
+
+Three measurements agree that sales per review moves with the positive share and none agrees on how. Over 104 disclosures across 82 ranked games the relationship is not monotone at all — an inverted U peaking at 80–90% — and the row measured there for 65–80% comes out at 0.55 against the 1.35 that shipped, backwards rather than merely mis-sized. Over 35 small games found in developer postmortems it does fall monotonically, Spearman −0.46 at p = 0.006, and it is not a disguised size effect: review count against positive share correlates −0.02. The four games that raised the question in the first place turned out to be coincidence at exactly the rate chance predicts — drawing four games that fall in order of share *and* span 3.3x has probability 4.1%, against 4.2% for pure noise.
+
+What settles it is not the disagreement but the scoring. Against the 62 games in `test/fixtures.json`, every version loses to switching it off:
+
+| review-score table | within 30% | truth inside the band |
+| --- | --- | --- |
+| what shipped, 1.05 / 1.35 / 1.0 / 0.9 | 40.3% | 51.6% |
+| **switched off** | **45.2%** | **58.1%** |
+| measured on the 104 anchors, 0.55 / 1.24 / 0.90 | 33.9% | 48.4% |
+| the same, normalised to 80–90% = 1.0 | 32.3% | 48.4% |
+| one step at 90%, 1.0 / 0.9 | 40.3% | 53.2% |
+| three smoothed bands | 35.5% | 54.8% |
+
+That the honestly-measured table scores *worst* is the finding, not an embarrassment: it was measured on games two to three orders of magnitude larger than the ones it then has to price, and the between-game spread is ×4.9, with the game's own identity explaining 98% of it.
+
+So this is not a claim that review score does not matter. It is that a wrong coefficient moves every game while the real effect would sharpen only some, and nobody has yet sized it well enough to pay for that. It goes back in when the fixtures set is large enough to show a version that wins.
+
+Two caveats belong here rather than in a footnote. Sixty-two games is small, and the gap between 40.3% and 45.2% is three games. And `positivePct` is still read everywhere else — the panel shows it, the confidence score uses it — it simply no longer moves the multiple.
 
 A correction for all this was measured, and it does not transfer. It compares playtime-at-review in the 90 days before each disclosure against the true average at that date, over 26 games: min 0.50x, median 1.09x, max 2.07x. That is a coherent measurement, and the estimator applies it to a different quantity at an arbitrary game age. The measurement's own numbers say why it fails — the correction falls with a game's age, 0.50x for Stardew Valley at six years and 0.55x for Garry's Mod at fifteen, and one global constant papers over that so thoroughly that its middle-80% band does not contain either game.
 
