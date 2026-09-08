@@ -6,7 +6,8 @@
 </p>
 
 <p align="center">
-  <img alt="Licence: MIT" src="https://img.shields.io/badge/licence-MIT-66c0f4?style=flat-square">
+  <a href="https://chromewebstore.google.com/detail/kmolckbdnoohadbcjgdfdlchgacdbjij"><img alt="Chrome Web Store: install" src="https://img.shields.io/badge/Chrome%20Web%20Store-install-66c0f4?style=flat-square"></a>
+  <img alt="Licence: MIT" src="https://img.shields.io/badge/licence-MIT-9aa4b6?style=flat-square">
   <img alt="Chrome, Manifest V3" src="https://img.shields.io/badge/Chrome-Manifest%20V3-c7d5e0?style=flat-square">
   <img alt="Dependencies: none" src="https://img.shields.io/badge/dependencies-none-4ec9a5?style=flat-square">
   <img alt="Languages: 12" src="https://img.shields.io/badge/languages-12-9aa4b6?style=flat-square">
@@ -75,13 +76,17 @@ Every figure comes with a scale showing the low and high end. The width of that 
 
 ## Install
 
-Not on the Chrome Web Store yet: the release is gated on publishing an accuracy figure. Shipping an uncalibrated estimator is how the existing tools ended up with reviews saying they underestimate by two to three times.
+**[Wishlytic on the Chrome Web Store](https://chromewebstore.google.com/detail/kmolckbdnoohadbcjgdfdlchgacdbjij)** — then visit any `store.steampowered.com/app/…` page.
+
+The release was gated on publishing an accuracy figure first: shipping an uncalibrated estimator is how the existing tools ended up with reviews saying they underestimate by two to three times. What that figure is, and where it stops being one, is in [Honest limits](#honest-limits) above and in [docs/METHODOLOGY.md](docs/METHODOLOGY.md).
+
+### From source
 
 ```bash
 git clone https://github.com/q-sn/steam-revenue-wishlist-estimator.git
 ```
 
-Open `chrome://extensions/`, enable Developer mode, click **Load unpacked** and select the folder. Then visit any `store.steampowered.com/app/…` page. No build step, no bundler, no dependencies.
+Open `chrome://extensions/`, enable Developer mode, click **Load unpacked** and select the folder. The tree is the package: no build step, no bundler, no dependencies.
 
 ## Privacy
 

@@ -8,6 +8,9 @@
  *
  *   node tools/pack.mjs
  *
+ * What it writes is the file uploaded to the published item,
+ * kmolckbdnoohadbcjgdfdlchgacdbjij — https://chromewebstore.google.com/detail/kmolckbdnoohadbcjgdfdlchgacdbjij
+ *
  * Four things ship: manifest.json, icons/, _locales/ and src/. Not `data/` —
  * those files are fetched from the CDN at runtime, and a snapshot inside the
  * package would be stale the day after it uploaded. Not tools/, test/, docs/

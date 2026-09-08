@@ -1,7 +1,8 @@
 # Screenshots
 
-The pictures in the project README, the seven images of the Chrome Web Store
-listing, and the harness that makes both.
+The pictures in the project README, the seven images of the [Chrome Web Store
+listing](https://chromewebstore.google.com/detail/kmolckbdnoohadbcjgdfdlchgacdbjij),
+and the harness that makes both.
 
 ```bash
 node screenshots/take.mjs             # retake the pictures from the inputs in inputs/

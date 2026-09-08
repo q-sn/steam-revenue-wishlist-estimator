@@ -1,6 +1,8 @@
 # Privacy Policy
 
 **Wishlytic — Steam Revenue & Wishlist Estimator**
+Chrome Web Store item
+[`kmolckbdnoohadbcjgdfdlchgacdbjij`](https://chromewebstore.google.com/detail/kmolckbdnoohadbcjgdfdlchgacdbjij).
 Effective 7 September 2026.
 
 There is no server behind this extension. Nothing it learns about you is sent

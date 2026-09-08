@@ -9,6 +9,7 @@
     "type": "git",
     "url": "https://github.com/q-sn/steam-revenue-wishlist-estimator.git"
   },
+  "homepage": "https://chromewebstore.google.com/detail/kmolckbdnoohadbcjgdfdlchgacdbjij",
   "scripts": {
     "zip": "node tools/pack.mjs",
     "calibrate": "node tools/calibrate.mjs",
