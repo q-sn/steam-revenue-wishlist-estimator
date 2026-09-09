@@ -12,6 +12,10 @@
   "homepage": "https://chromewebstore.google.com/detail/kmolckbdnoohadbcjgdfdlchgacdbjij",
   "scripts": {
     "zip": "node tools/pack.mjs",
+    "zip:firefox": "node tools/pack.mjs --firefox",
+    "zip:opera": "node tools/pack.mjs --opera",
+    "zip:source": "node tools/pack.mjs --source",
+    "zip:all": "node tools/pack.mjs --all",
     "calibrate": "node tools/calibrate.mjs",
     "calibrate:live": "node tools/calibrate.mjs --live",
     "smoke": "node tools/smoke.mjs",

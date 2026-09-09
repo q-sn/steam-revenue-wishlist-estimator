@@ -8,6 +8,7 @@
     1..5      the listing screenshots, 1280 x 800
     small     the small promotional tile, 440 x 280 — required by the store
     marquee   the featured-placement tile, 1400 x 560 — optional
+    opera-promo  what Opera wants for a featured placement, 300 x 188
 
   Each section carries its own canvas size in data-w / data-h; the script at
   the bottom sizes the page to the one being rendered.
@@ -176,6 +177,22 @@
   .promo.marquee h1 { font-size: 50px; }
   .promo.marquee .brand img { width: 38px; height: 38px; }
   .promo.marquee .brand b { font-size: 25px; }
+
+  /*
+   * Opera's promotional image, at the one size it accepts. 300 x 188 has room
+   * for the mark, the name and a line — which is exactly what Opera's own
+   * advice asks a promotional image to carry — and none for a photograph: the
+   * pill crop that fits inside the 440-wide tile would be nine tenths of the
+   * width here, and a screenshot reduced to fit would be a smudge.
+   */
+  .promo.tiny { padding: 20px 22px; align-content: center; }
+  .promo.tiny .brand { margin-bottom: 11px; gap: 8px; }
+  .promo.tiny .brand img { width: 26px; height: 26px; }
+  .promo.tiny .brand b { font-size: 19px; }
+  .promo.tiny h1 { font-size: 22px; letter-spacing: -.5px; line-height: 1.14; }
+  .promo.tiny .tag {
+    margin-top: 10px; font-size: 12.5px; line-height: 1.42; color: var(--muted);
+  }
 </style>
 
 <section class="tile above" data-tile="1" data-w="1280" data-h="800">
@@ -268,6 +285,20 @@
     </div>
     <div class="crop pill"></div>
     <div class="tag">Steam revenue, units and wishlists — as ranges.</div>
+  </div>
+</section>
+
+<section class="tile promo tiny" data-tile="opera-promo" data-w="300" data-h="188">
+  <div>
+    <div class="brand">
+      <img src="../../icons/icon-128.png" alt="">
+      <b>Wishlytic</b>
+    </div>
+    <h1>Steam revenue, as a range</h1>
+    <!-- Two lines at this size. A third one crowds the tile, and the headline
+         has already made the claim the third line was repeating. -->
+    <div class="tag">Units sold, wishlists and developer net revenue — every
+      coefficient sourced.</div>
   </div>
 </section>
 

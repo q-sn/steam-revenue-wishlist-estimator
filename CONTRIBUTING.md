@@ -73,6 +73,7 @@ tools/
   condense-anchors.mjs          the archive, cut to what a browser needs
   merge-anchors.mjs             two copies of the archive, unioned on publish
   build-locales.mjs             _locales/ from tools/locales.source.json
+  pack.mjs                      one upload per store, refusing a bad package
   smoke.mjs                     offline checks
 ```
 

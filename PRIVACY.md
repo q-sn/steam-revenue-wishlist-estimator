@@ -3,6 +3,8 @@
 **Wishlytic — Steam Revenue & Wishlist Estimator**
 Chrome Web Store item
 [`kmolckbdnoohadbcjgdfdlchgacdbjij`](https://chromewebstore.google.com/detail/kmolckbdnoohadbcjgdfdlchgacdbjij).
+This policy covers every store the same package is published in; the code
+behind each listing is identical.
 Effective 7 September 2026.
 
 There is no server behind this extension. Nothing it learns about you is sent
@@ -26,7 +28,8 @@ them. The extension is signed out of Steam even when you are signed in.
 
 ## What it stores, and where
 
-Two things, both in `chrome.storage.local`, both on your device only:
+Two things, both in the extension's own local storage, both on your device
+only:
 
 - **Visit snapshots.** For each game you open, a dated record of its review
   count, follower count and the estimate produced — at most one point per twelve
@@ -68,8 +71,8 @@ Twice a day the extension downloads two JSON data files —
 `raw.githubusercontent.com` as a fallback. These are published by this
 project's own repository and are identical for every user. They are **data, not
 code**: the extension executes nothing it downloads, and every line of script
-it runs is contained in the package Chrome installed. The download carries no
-information about you beyond the request itself.
+it runs is contained in the package your browser installed. The download
+carries no information about you beyond the request itself.
 
 ## What is never done
 

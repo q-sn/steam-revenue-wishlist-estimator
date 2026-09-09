@@ -88,6 +88,8 @@ git clone https://github.com/q-sn/steam-revenue-wishlist-estimator.git
 
 Open `chrome://extensions/`, enable Developer mode, click **Load unpacked** and select the folder. The tree is the package: no build step, no bundler, no dependencies.
 
+In Firefox, `npm run zip:firefox` first — the tree is Chrome-shaped, and Firefox runs the background script as an event page rather than a service worker — then load `dist/wishlytic-<version>-firefox.zip` from `about:debugging#/runtime/this-firefox`.
+
 ## Privacy
 
 No account, no telemetry, no analytics, and no network calls to anything but Steam, SteamSpy and SteamCharts. Every request sets `credentials: 'omit'`, so your Steam cookies are never attached to one. Visit snapshots and cached lookups live in `chrome.storage.local`, on your device only, and can be wiped from the options page. The whole of what it touches is in [PRIVACY.md](PRIVACY.md).
@@ -104,6 +106,7 @@ npm run calibrate    # grade the estimator on 62 games with disclosed sales
 npm run check:model  # refit the wishlist model from the archive
 npm run locales      # rebuild _locales/ from the master table
 npm run zip          # the store upload, refusing to build what would be rejected
+npm run zip:all      # a package per store, plus the source archive AMO asks for
 ```
 
 `src/core/` holds the estimators and touches no browser API, which is what lets the calibration harness test the exact code that ships rather than a reimplementation of it that drifts. `check:model` exits non-zero when a constant stops reproducing from the archive, so a drifting fit fails instead of passing quietly. The wishlist-ranking jobs (`ranks`, `anchors`, `condense`, `check:ratio`) run in CI; `data/` is where they write locally and is git-ignored, and the published files live on the `data` branch.

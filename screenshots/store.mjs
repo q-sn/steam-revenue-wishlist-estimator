@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
- * Everything the Chrome Web Store listing needs, at the sizes it demands.
+ * Everything the store listings need, at the sizes they demand.
  *
  *   node screenshots/store.mjs             # all of them
  *   node screenshots/store.mjs 3 small     # just those
+ *   node screenshots/store.mjs --opera     # the five, at Opera's size
  *
  * Five listing screenshots at most, each exactly 1280 x 800 (or 640 x 400);
  * one small promotional tile at 440 x 280, which the store requires and ranks
@@ -18,10 +19,19 @@
  * store/tiles.html does; a transparent one would come back as RGBA and be
  * refused at upload rather than here.
  *
+ * Opera asks for something smaller: 612 x 408 is the size its guidelines
+ * prefer and 800 x 600 the most they allow. `--opera` writes the five
+ * screenshots into store/opera at 800 x 500 — the largest size inside that
+ * limit that is an exact fraction of the Chrome tile, five eighths of
+ * 1280 x 800. So the words are laid out once, at the size they were written
+ * for, and the capture reduces the whole tile by a fixed ratio; nothing is
+ * re-typeset for a second canvas and no frame lands on half a pixel. Opera
+ * takes no promotional tile, so `small` and `marquee` are not built for it.
+ *
  * The words and the layout live in store/tiles.html. The pictures are the
  * PNGs one level up, taken by take.mjs.
  */
-import { writeFile } from 'node:fs/promises';
+import { writeFile, mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { startServer } from './serve.mjs';
@@ -37,22 +47,37 @@ const TILES = [
   { id: '4', file: '4-wishlists.png', width: 1280, height: 800 },
   { id: '5', file: '5-sources.png', width: 1280, height: 800 },
   { id: 'small', file: 'promo-small-440x280.png', width: 440, height: 280 },
-  { id: 'marquee', file: 'promo-marquee-1400x560.png', width: 1400, height: 560 }
+  { id: 'marquee', file: 'promo-marquee-1400x560.png', width: 1400, height: 560 },
+  // Opera's is already at its final size, so it is a tile like any other; only
+  // the five screenshots are reduced by --opera.
+  { id: 'opera-promo', file: 'opera/promo-300x188.png', width: 300, height: 188 }
 ];
 
-const asked = process.argv.slice(2);
-const wanted = asked.length ? TILES.filter((t) => asked.includes(t.id)) : TILES;
+/** Opera's listing: the same five tiles, reduced by five eighths. */
+const OPERA = { dir: 'opera', scale: 0.625, ids: ['1', '2', '3', '4', '5'] };
+
+const argv = process.argv.slice(2);
+const opera = argv.includes('--opera');
+const asked = argv.filter((a) => !a.startsWith('--'));
+
+const catalogue = opera ? TILES.filter((t) => OPERA.ids.includes(t.id)) : TILES;
+const wanted = asked.length ? catalogue.filter((t) => asked.includes(t.id)) : catalogue;
 
 if (!wanted.length) {
-  console.error(`no such tile. Known: ${TILES.map((t) => t.id).join(', ')}`);
+  console.error(`no such tile. Known: ${catalogue.map((t) => t.id).join(', ')}`);
   process.exit(1);
 }
+
+const into = opera ? join(HERE, 'store', OPERA.dir) : join(HERE, 'store');
 
 const server = await startServer();
 
 try {
   for (const tile of wanted) {
     const size = { width: tile.width, height: tile.height };
+    // The layout is always the Chrome size; only the capture shrinks.
+    const shrink = opera ? OPERA.scale : 1;
+    const out = { width: size.width * shrink, height: size.height * shrink };
 
     const png = await withPage({ viewport: size, deviceScaleFactor: 1 }, async (cdp) => {
       const loaded = cdp.once('Page.loadEventFired');
@@ -76,20 +101,23 @@ try {
           + ' — shorten it');
       }
 
-      return cdp.png({ x: 0, y: 0, ...size, scale: 1 });
+      return cdp.png({ x: 0, y: 0, ...size, scale: shrink });
     });
 
-    if (png.width !== tile.width || png.height !== tile.height) {
+    if (png.width !== out.width || png.height !== out.height) {
       throw new Error(`${tile.file} came out ${png.width}x${png.height},`
-        + ` not ${tile.width}x${tile.height}`);
+        + ` not ${out.width}x${out.height}`);
     }
     if (png.colourType !== 2) {
       throw new Error(`${tile.file} is PNG colour type ${png.colourType}; the store takes`
         + ' 24-bit RGB (type 2) with no alpha');
     }
 
-    await writeFile(join(HERE, 'store', tile.file), png.data);
-    console.log(`store/${tile.file}: ${png.width}x${png.height}, 24-bit RGB,`
+    const target = join(into, tile.file);
+    await mkdir(dirname(target), { recursive: true });
+    await writeFile(target, png.data);
+    const where = opera ? `store/${OPERA.dir}/${tile.file}` : `store/${tile.file}`;
+    console.log(`${where}: ${png.width}x${png.height}, 24-bit RGB,`
       + ` ${(png.data.length / 1024).toFixed(0)} KB`);
   }
 } finally {
