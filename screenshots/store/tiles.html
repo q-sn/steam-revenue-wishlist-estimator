@@ -84,6 +84,10 @@
     text-wrap: balance;
   }
   .above h1 { font-size: 54px; }
+  /* Tile 2's headline is one sentence with a comma in it, and at 56px it runs
+     four pixels past the column — just enough to break, and every break in it
+     is worse than none. Four pixels off the type sets it on one line. */
+  [data-tile="2"] h1 { font-size: 52px; }
 
   p, li { font-size: 21px; line-height: 1.5; color: var(--muted); max-width: 30em; }
   p { margin-top: 20px; }
@@ -194,7 +198,10 @@
       <b>Wishlytic</b>
       <span>Units &amp; revenue</span>
     </div>
-    <h1>A range, not fake precision</h1>
+    <!-- One line on the fonts these pictures are taken with. The binding is for
+         a machine whose fallback face is wider: it breaks at the comma there,
+         rather than after "not". -->
+    <h1>A range, not&nbsp;fake&nbsp;precision</h1>
     <ul>
       <li><em>Units sold, gross revenue and what reaches the developer</em>, each with a low
         and a high end.</li>
