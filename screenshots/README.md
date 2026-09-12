@@ -2,13 +2,16 @@
 
 The pictures in the project README, the seven images of the [Chrome Web Store
 listing](https://chromewebstore.google.com/detail/kmolckbdnoohadbcjgdfdlchgacdbjij),
-and the harness that makes both.
+the five of the [Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/wishlytic/), and the harness that
+makes all of them.
 
 ```bash
 node screenshots/take.mjs             # retake the pictures from the inputs in inputs/
 node screenshots/take.mjs --collect   # refetch today's figures first, then retake
 node screenshots/store.mjs            # recompose the store images from those pictures
 node screenshots/store.mjs 3 small    # or just those
+node screenshots/store.mjs --opera    # the five again, at Opera's size
+node screenshots/store.mjs --firefox  # and at the size AMO takes
 ```
 
 Nothing here is a mock-up. Each shot is the shipping overlay, running the
@@ -63,6 +66,35 @@ come back as RGBA and fail at upload rather than here.
 The carousel scales every screenshot to one height and fits as many as the row
 allows, so two 1280 x 800 shots sit side by side; a listing showing one is a
 listing with one uploaded, not one with the wrong size.
+
+## What the other two listings ask for
+
+`--opera` and `--firefox` write the same five tiles at a second size, into
+`store/opera` and `store/firefox`. Each size is an exact fraction of the
+Chrome tile — five eighths, 800 x 500, for Opera's 800 x 600 ceiling; five
+fourths, 1600 x 1000, for AMO — so the words are typeset once, at the size
+they were written for, and only the capture changes. Neither listing takes a
+promotional tile of Chrome's kind; Opera's own 300 x 188 image is laid out at
+that size in `tiles.html` and comes out of `store.mjs` like any other tile,
+and its 64 x 64 icon out of `icon-64.mjs`.
+
+AMO's maximum, and its recommendation, is 2400 x 1800; 1600 x 1000 stops short
+of that deliberately. The photographs inside the tiles were captured at a
+device scale factor of 2, and 1.25 is where the tightest of them runs out of
+real pixels — `steam-page-wide.png` is 1480 of them wide in a 1180px frame.
+Past 1.25 a tile stops being a photograph and becomes an enlargement of one,
+and AMO takes any size up to its maximum.
+
+AMO also asks for a caption per screenshot, which nothing in the tile itself
+carries:
+
+| File | Caption, English (US) |
+| --- | --- |
+| `1-glance` | The collapsed pill on a Steam store page: English reviews, units sold, gross revenue. |
+| `2-ranges` | The panel open: units, gross and developer net, each a range, with the methods that produced it. |
+| `3-waterfall` | Where the money goes: discount, regional pricing and VAT, refunds, then Valve's tiered royalty. |
+| `4-wishlists` | An unreleased game: wishlists from a published figure, the store's ranking and the follower count. |
+| `5-sources` | Why this multiplier: the band for the release year, what moved it, and the studies behind it. |
 
 Crops are taken on block boundaries rather than by eye. Inside `released.png`
 the panel's blocks run head 0-64, units 64-165, gross 165-318, net 318-419,

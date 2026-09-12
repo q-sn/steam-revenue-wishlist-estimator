@@ -5,6 +5,7 @@
  *   node screenshots/store.mjs             # all of them
  *   node screenshots/store.mjs 3 small     # just those
  *   node screenshots/store.mjs --opera     # the five, at Opera's size
+ *   node screenshots/store.mjs --firefox   # the five, at the size AMO takes
  *
  * Five listing screenshots at most, each exactly 1280 x 800 (or 640 x 400);
  * one small promotional tile at 440 x 280, which the store requires and ranks
@@ -28,6 +29,17 @@
  * re-typeset for a second canvas and no frame lands on half a pixel. Opera
  * takes no promotional tile, so `small` and `marquee` are not built for it.
  *
+ * AMO asks the other way: 2400 x 1800 is the most it takes and the size it
+ * recommends. `--firefox` enlarges the same five to 1600 x 1000, five fourths
+ * of the Chrome tile, and stops there — because 1.25 is where the photographs
+ * inside the tiles run out of pixels. They are captures at a device scale
+ * factor of 2, and the tightest of them is steam-page-wide.png: 740 CSS
+ * pixels wide, so 1480 real ones, shown in a 1180px frame. Past 1.25 the
+ * harness would be enlarging a photograph to fill a bigger canvas, which is
+ * the one thing none of these pictures does. AMO accepts any size up to its
+ * maximum, so a tile that is honest at 1600 beats one that is soft at 2400.
+ * Like Opera, AMO takes no promotional image.
+ *
  * The words and the layout live in store/tiles.html. The pictures are the
  * PNGs one level up, taken by take.mjs.
  */
@@ -49,18 +61,24 @@ const TILES = [
   { id: 'small', file: 'promo-small-440x280.png', width: 440, height: 280 },
   { id: 'marquee', file: 'promo-marquee-1400x560.png', width: 1400, height: 560 },
   // Opera's is already at its final size, so it is a tile like any other; only
-  // the five screenshots are reduced by --opera.
+  // the five screenshots are rescaled, by --opera and --firefox.
   { id: 'opera-promo', file: 'opera/promo-300x188.png', width: 300, height: 188 }
 ];
 
 /** Opera's listing: the same five tiles, reduced by five eighths. */
 const OPERA = { dir: 'opera', scale: 0.625, ids: ['1', '2', '3', '4', '5'] };
 
+/** AMO's listing: the same five, enlarged by five fourths. */
+const FIREFOX = { dir: 'firefox', scale: 1.25, ids: ['1', '2', '3', '4', '5'] };
+
 const argv = process.argv.slice(2);
-const opera = argv.includes('--opera');
+// One store at a time: each flag is a different size for the same five tiles.
+const variant = argv.includes('--opera') ? OPERA
+  : argv.includes('--firefox') ? FIREFOX
+    : null;
 const asked = argv.filter((a) => !a.startsWith('--'));
 
-const catalogue = opera ? TILES.filter((t) => OPERA.ids.includes(t.id)) : TILES;
+const catalogue = variant ? TILES.filter((t) => variant.ids.includes(t.id)) : TILES;
 const wanted = asked.length ? catalogue.filter((t) => asked.includes(t.id)) : catalogue;
 
 if (!wanted.length) {
@@ -68,16 +86,16 @@ if (!wanted.length) {
   process.exit(1);
 }
 
-const into = opera ? join(HERE, 'store', OPERA.dir) : join(HERE, 'store');
+const into = variant ? join(HERE, 'store', variant.dir) : join(HERE, 'store');
 
 const server = await startServer();
 
 try {
   for (const tile of wanted) {
     const size = { width: tile.width, height: tile.height };
-    // The layout is always the Chrome size; only the capture shrinks.
-    const shrink = opera ? OPERA.scale : 1;
-    const out = { width: size.width * shrink, height: size.height * shrink };
+    // The layout is always the Chrome size; only the capture is scaled.
+    const ratio = variant ? variant.scale : 1;
+    const out = { width: size.width * ratio, height: size.height * ratio };
 
     const png = await withPage({ viewport: size, deviceScaleFactor: 1 }, async (cdp) => {
       const loaded = cdp.once('Page.loadEventFired');
@@ -101,7 +119,7 @@ try {
           + ' — shorten it');
       }
 
-      return cdp.png({ x: 0, y: 0, ...size, scale: shrink });
+      return cdp.png({ x: 0, y: 0, ...size, scale: ratio });
     });
 
     if (png.width !== out.width || png.height !== out.height) {
@@ -116,7 +134,7 @@ try {
     const target = join(into, tile.file);
     await mkdir(dirname(target), { recursive: true });
     await writeFile(target, png.data);
-    const where = opera ? `store/${OPERA.dir}/${tile.file}` : `store/${tile.file}`;
+    const where = variant ? `store/${variant.dir}/${tile.file}` : `store/${tile.file}`;
     console.log(`${where}: ${png.width}x${png.height}, 24-bit RGB,`
       + ` ${(png.data.length / 1024).toFixed(0)} KB`);
   }
