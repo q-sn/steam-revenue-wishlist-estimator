@@ -35,9 +35,10 @@
  *                Only Firefox 140 and later reads the key, which is what pins
  *                strict_min_version — 140 is also the current ESR, so the
  *                floor costs no supported user.
- *   homepage_url the published item is on the Chrome Web Store, and a link to
- *                one store is the wrong front door for a listing in another.
- *                Both non-Chrome packages point at the source instead.
+ *   homepage_url the manifest's own link is the Chrome Web Store item, and a
+ *                link to one store is the wrong front door for a listing in
+ *                another. The Firefox package points at its own AMO listing;
+ *                Opera, which has none yet, points at the source.
  *
  * Opera runs Chromium and takes the Chrome manifest as it is; only the
  * homepage moves. Its store refused Manifest V3 uploads until June 2026, so
@@ -88,8 +89,10 @@ const SOURCE = [
   'icons', '_locales', 'src', 'tools', 'test', 'docs', 'screenshots', '.github', '.gitignore'
 ];
 
-/** Where a listing outside the Chrome Web Store should send a reader. */
+/** Where a listing with no store page of its own should send a reader. */
 const SOURCE_URL = 'https://github.com/q-sn/steam-revenue-wishlist-estimator';
+/** The Firefox listing, live since September 2026. */
+const AMO_URL = 'https://addons.mozilla.org/en-US/firefox/addon/wishlytic/';
 
 /**
  * One entry per store. `manifest` is the edit that store needs, or null to
@@ -109,7 +112,7 @@ const TARGETS = {
     edits: ['background.scripts (event page)', 'browser_specific_settings.gecko', 'homepage_url'],
     manifest: (m) => ({
       ...m,
-      homepage_url: SOURCE_URL,
+      homepage_url: AMO_URL,
       background: { scripts: [m.background.service_worker], type: 'module' },
       browser_specific_settings: {
         gecko: {

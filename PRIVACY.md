@@ -2,7 +2,8 @@
 
 **Wishlytic — Steam Revenue & Wishlist Estimator**
 Chrome Web Store item
-[`kmolckbdnoohadbcjgdfdlchgacdbjij`](https://chromewebstore.google.com/detail/kmolckbdnoohadbcjgdfdlchgacdbjij).
+[`kmolckbdnoohadbcjgdfdlchgacdbjij`](https://chromewebstore.google.com/detail/kmolckbdnoohadbcjgdfdlchgacdbjij)
+and Firefox add-on [`wishlytic`](https://addons.mozilla.org/en-US/firefox/addon/wishlytic/).
 This policy covers every store the same package is published in; the code
 behind each listing is identical.
 Effective 7 September 2026.

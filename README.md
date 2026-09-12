@@ -7,8 +7,9 @@
 
 <p align="center">
   <a href="https://chromewebstore.google.com/detail/kmolckbdnoohadbcjgdfdlchgacdbjij"><img alt="Chrome Web Store: install" src="https://img.shields.io/badge/Chrome%20Web%20Store-install-66c0f4?style=flat-square"></a>
+  <a href="https://addons.mozilla.org/en-US/firefox/addon/wishlytic/"><img alt="Firefox Add-ons: install" src="https://img.shields.io/badge/Firefox%20Add--ons-install-66c0f4?style=flat-square"></a>
   <img alt="Licence: MIT" src="https://img.shields.io/badge/licence-MIT-9aa4b6?style=flat-square">
-  <img alt="Chrome, Manifest V3" src="https://img.shields.io/badge/Chrome-Manifest%20V3-c7d5e0?style=flat-square">
+  <img alt="Chrome and Firefox, Manifest V3" src="https://img.shields.io/badge/Chrome%20%C2%B7%20Firefox-Manifest%20V3-c7d5e0?style=flat-square">
   <img alt="Dependencies: none" src="https://img.shields.io/badge/dependencies-none-4ec9a5?style=flat-square">
   <img alt="Languages: 12" src="https://img.shields.io/badge/languages-12-9aa4b6?style=flat-square">
 </p>
@@ -76,7 +77,7 @@ Every figure comes with a scale showing the low and high end. The width of that 
 
 ## Install
 
-**[Wishlytic on the Chrome Web Store](https://chromewebstore.google.com/detail/kmolckbdnoohadbcjgdfdlchgacdbjij)** — then visit any `store.steampowered.com/app/…` page.
+**[Wishlytic on the Chrome Web Store](https://chromewebstore.google.com/detail/kmolckbdnoohadbcjgdfdlchgacdbjij)** or **[on Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/wishlytic/)** — then visit any `store.steampowered.com/app/…` page. Both listings carry the same package; only the manifest differs, in the ways `tools/pack.mjs` lists.
 
 The release was gated on publishing an accuracy figure first: shipping an uncalibrated estimator is how the existing tools ended up with reviews saying they underestimate by two to three times. What that figure is, and where it stops being one, is in [Honest limits](#honest-limits) above and in [docs/METHODOLOGY.md](docs/METHODOLOGY.md).
 
