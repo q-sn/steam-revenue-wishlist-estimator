@@ -228,6 +228,30 @@
   "footSettings": {
     "message": "Settings"
   },
+  "rateTitle": {
+    "message": "Enjoying Wishlytic?"
+  },
+  "rateBody": {
+    "message": "A quick rating on the Chrome Web Store helps others find it."
+  },
+  "rateCta": {
+    "message": "Rate it"
+  },
+  "rateLater": {
+    "message": "Maybe later"
+  },
+  "rateIssue": {
+    "message": "Found a bug?"
+  },
+  "rateThanks": {
+    "message": "Thank you, it means a lot!"
+  },
+  "optRate": {
+    "message": "Rate Wishlytic on the Chrome Web Store"
+  },
+  "optIssue": {
+    "message": "Report a problem"
+  },
   "tYesterday": {
     "message": "yesterday"
   },

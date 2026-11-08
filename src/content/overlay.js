@@ -253,8 +253,43 @@ summary:focus-visible { outline: 2px solid #67c1f5; outline-offset: -2px; }
 .foot a:hover { color: #67c1f5; border-color: #67c1f5; }
 .foot a:focus-visible { outline: 2px solid #67c1f5; outline-offset: 2px; }
 
+/* The review ask. A card set into the panel rather than a section of it, so
+   it never reads as one of the figures; Steam's accent for the one button. */
+.ask {
+  margin: 12px 14px 0; padding: 11px 13px 10px; border-radius: 8px;
+  background: linear-gradient(135deg, rgba(103,193,245,.10), rgba(103,193,245,.035));
+  border: 1px solid rgba(103,193,245,.18);
+}
+.ask-head { display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 600; color: #dfe4ee; }
+.ask-star { color: #ffc94d; font-size: 12px; line-height: 1; }
+.ask-body { margin-top: 3px; font-size: 11.5px; line-height: 1.5; color: #8b95a8; }
+.ask-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin-top: 9px; }
+.ask-cta {
+  padding: 5px 12px; border-radius: 5px;
+  background: #67c1f5; color: #0d1b26;
+  font-size: 12px; font-weight: 600; text-decoration: none; white-space: nowrap;
+}
+.ask-cta:hover { background: #8fd3fa; }
+.ask-later {
+  background: none; border: none; padding: 5px 2px; cursor: pointer;
+  font: inherit; font-size: 12px; color: #8b95a8; white-space: nowrap;
+}
+.ask-later:hover { color: #dfe4ee; }
+.ask-issue {
+  margin-left: auto; font-size: 11px; color: #6f7889;
+  text-decoration: none; border-bottom: 1px solid #2b3242;
+}
+.ask-issue:hover { color: #67c1f5; border-color: #67c1f5; }
+.ask-cta:focus-visible, .ask-later:focus-visible, .ask-issue:focus-visible {
+  outline: 2px solid #67c1f5; outline-offset: 2px;
+}
+.ask-thanks { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; color: #4ec9a5; }
+
 @media (prefers-reduced-motion: no-preference) {
   .pill, .close, .foot a { transition: border-color .12s ease, color .12s ease; }
+  .ask-cta, .ask-later, .ask-issue { transition: background-color .12s ease, color .12s ease, border-color .12s ease; }
+  .ask { animation: ask-in .32s ease-out both; }
+  @keyframes ask-in { from { opacity: 0; transform: translateY(4px); } }
 }
 `;
 
@@ -734,7 +769,7 @@ const REASON_KEY = {
 
 export function renderOverlay(result, opts = {}) {
   const {
-    onOpenOptions, history = null, delta = null,
+    onOpenOptions, onExpand, reviewAsk = null, history = null, delta = null,
     position = 'pos-br', scale: uiScale = 1.25, pill: pillConfig = {}
   } = opts;
 
@@ -757,6 +792,8 @@ export function renderOverlay(result, opts = {}) {
 
   const { units, revenue, wishlists, weekOne, confidence, game, crossChecks } = result;
   let expanded = false;
+  /** null until the review ask qualifies on this page; then 'open', 'thanked' or 'gone'. */
+  let askPhase = null;
 
   const draw = () => {
     root.replaceChildren();
@@ -830,7 +867,9 @@ export function renderOverlay(result, opts = {}) {
     meta.append(el('span', 'pill-version', VERSION));
     pill.append(meta);
 
-    const open = () => { expanded = true; draw(); };
+    // Counted before drawing, so the open that crosses the review-ask
+    // threshold is the one that shows the card.
+    const open = () => { onExpand?.(); expanded = true; draw(); };
     pill.addEventListener('click', open);
     pill.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
@@ -968,6 +1007,10 @@ export function renderOverlay(result, opts = {}) {
     close.addEventListener('click', () => { expanded = false; draw(); });
     head.append(close);
     panel.append(head);
+
+    // First thing under the title, where it is seen; it goes after one answer.
+    const ask = askCard();
+    if (ask) panel.append(ask);
 
     // A page that is not a game gets one sentence and nothing else.
     if (units.reason === 'unsupported-type') {
@@ -1238,6 +1281,77 @@ export function renderOverlay(result, opts = {}) {
     panel.append(footNode());
 
     return panel;
+  }
+
+  /**
+   * The review ask, decided once per page: when it qualifies, it stays for
+   * every reopen of the panel on this page until answered, even if the record
+   * moves on underneath (the third unanswered day snoozes it while it is still
+   * on screen). Answers swap the card in place rather than redrawing, so the
+   * panel keeps its scroll position.
+   */
+  function askCard() {
+    if (!reviewAsk) return null;
+    if (askPhase === null && reviewAsk.wanted()) askPhase = 'open';
+    if (askPhase === 'thanked') {
+      const done = el('section', 'ask ask-thanks');
+      done.setAttribute('role', 'status');
+      done.append(el('span', 'ask-star', '★'), el('span', null, t('rateThanks')));
+      return done;
+    }
+    if (askPhase !== 'open') return null;
+
+    const card = el('section', 'ask');
+    card.setAttribute('aria-label', t('rateTitle'));
+
+    const head = el('div', 'ask-head');
+    head.append(el('span', 'ask-star', '★'), el('span', null, t('rateTitle')));
+    card.append(head, el('p', 'ask-body', t('rateBody')));
+
+    const actions = el('div', 'ask-actions');
+
+    const cta = el('a', 'ask-cta', t('rateCta'));
+    cta.href = reviewAsk.reviewUrl;
+    cta.target = '_blank';
+    cta.rel = 'noopener noreferrer';
+    cta.addEventListener('click', () => {
+      reviewAsk.onAnswer?.('review');
+      askPhase = 'thanked';
+      card.replaceWith(askCard());
+    });
+
+    const later = el('button', 'ask-later', t('rateLater'));
+    later.type = 'button';
+    later.addEventListener('click', () => {
+      reviewAsk.onAnswer?.('later');
+      askPhase = 'gone';
+      card.remove();
+    });
+
+    const issue = el('a', 'ask-issue', t('rateIssue'));
+    issue.href = reviewAsk.issuesUrl;
+    issue.target = '_blank';
+    issue.rel = 'noopener noreferrer';
+    issue.addEventListener('click', () => {
+      reviewAsk.onAnswer?.('issue');
+      askPhase = 'gone';
+      card.remove();
+    });
+
+    actions.append(cta, later, issue);
+    card.append(actions);
+
+    // Seen means on screen, not merely in a panel scrolled past it: three
+    // days of being seen and ignored is what puts the card away.
+    if (typeof IntersectionObserver === 'function') {
+      const seen = new IntersectionObserver((entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        seen.disconnect();
+        reviewAsk.onShown?.();
+      }, { threshold: 0.6 });
+      seen.observe(card);
+    }
+    return card;
   }
 
   function footNode() {

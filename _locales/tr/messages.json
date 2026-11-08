@@ -228,6 +228,30 @@
   "footSettings": {
     "message": "Ayarlar"
   },
+  "rateTitle": {
+    "message": "Wishlytic'i beğendiniz mi?"
+  },
+  "rateBody": {
+    "message": "Chrome Web Mağazası'nda puanlayın, başkaları da bulabilsin."
+  },
+  "rateCta": {
+    "message": "Puanla"
+  },
+  "rateLater": {
+    "message": "Sonra"
+  },
+  "rateIssue": {
+    "message": "Hata mı buldunuz?"
+  },
+  "rateThanks": {
+    "message": "Teşekkürler, bizim için çok değerli!"
+  },
+  "optRate": {
+    "message": "Wishlytic'i Chrome Web Mağazası'nda puanlayın"
+  },
+  "optIssue": {
+    "message": "Sorun bildir"
+  },
   "tYesterday": {
     "message": "dün"
   },

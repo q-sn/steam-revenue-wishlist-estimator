@@ -228,6 +228,30 @@
   "footSettings": {
     "message": "设置"
   },
+  "rateTitle": {
+    "message": "喜欢 Wishlytic 吗？"
+  },
+  "rateBody": {
+    "message": "在 Chrome 应用商店给它评个分，让更多人发现它。"
+  },
+  "rateCta": {
+    "message": "去评分"
+  },
+  "rateLater": {
+    "message": "稍后"
+  },
+  "rateIssue": {
+    "message": "发现问题？"
+  },
+  "rateThanks": {
+    "message": "谢谢，这对我们意义重大！"
+  },
+  "optRate": {
+    "message": "在 Chrome 应用商店为 Wishlytic 评分"
+  },
+  "optIssue": {
+    "message": "报告问题"
+  },
   "tYesterday": {
     "message": "昨天"
   },

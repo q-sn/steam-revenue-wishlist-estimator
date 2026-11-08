@@ -3,6 +3,7 @@ import { PILL_ITEMS, PILL_DEFAULTS } from '../core/pill.js';
 import { estimateRevenue } from '../core/revenue.js';
 import { setLocale, pct } from '../core/format.js';
 import { t, initLocale, uiLanguage, LOCALES } from '../content/i18n.js';
+import { REVIEW_ASK, mayAskHere } from '../core/review-ask.js';
 
 // Top-level await: the page must not paint English and then correct itself.
 const boot = await chrome.storage.local.get(['settings', 'ui']);
@@ -15,6 +16,21 @@ const $ = (id) => document.getElementById(id);
 /** Translate everything marked up in the HTML, so markup carries no English. */
 for (const node of document.querySelectorAll('[data-i18n]')) {
   node.textContent = t(node.dataset.i18n);
+}
+
+// The review link only where a review would land on this copy's listing; the
+// problem link everywhere, since the issue tracker is the same for every store.
+$('issue').href = REVIEW_ASK.issuesUrl;
+const devFlag = (await chrome.storage.local.get(REVIEW_ASK.devFlagKey))[REVIEW_ASK.devFlagKey];
+if (mayAskHere(chrome.runtime.getManifest(), chrome.runtime.getURL(''), chrome.runtime.id, devFlag)) {
+  $('rate').href = REVIEW_ASK.reviewUrl;
+  $('rateWrap').hidden = false;
+  // Whoever reviewed from here is not asked again in the panel.
+  $('rate').addEventListener('click', async () => {
+    const key = REVIEW_ASK.storageKey;
+    const record = (await chrome.storage.local.get(key))[key];
+    if (record) await chrome.storage.local.set({ [key]: { ...record, done: true } });
+  });
 }
 
 const REGION_KEY = { 'us-eu': 'regionUsEu', mixed: 'regionMixed', emerging: 'regionEmerging' };

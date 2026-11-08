@@ -15,6 +15,8 @@ import {
   regionalFromLanguages, wishlistMultiplierFor,
   wishlistsFromRank, curveAt, wishlistsFromAnnouncement,
   makeSnapshot, appendSnapshot, diffSince, sparklinePoints,
+  REVIEW_ASK, installedFromChromeWebStore, mayAskHere, newReviewState, noteVisit, noteOpen, shouldAsk,
+  noteShown, noteAnswer,
   WISHLIST, WISHLIST_RANK, WISHLIST_CURVE, CCU, OWNERS_TO_UNITS, PLAYTIME, REGIONAL_PROFILES, REGIONAL_ORDER, REFUNDS, HISTORY,
   CONFIDENCE, ENSEMBLE, APP_TYPES, REVIEW_GATES, scoreConfidence, firstSaleDate
 } from '../src/core/index.js';
@@ -1631,6 +1633,76 @@ check('the player-count row is translated',
 check('and takes the multiplier from the result',
   /nCcuRow', \[String\(ccu\.multiplier\)\]/.test(overlaySrc),
   'not from a literal that has to be kept in step');
+
+group('Asking for a review');
+
+{
+  const CWS = { update_url: 'https://clients2.google.com/service/update2/crx' };
+  const URL_CHROME = `chrome-extension://${REVIEW_ASK.storeId}/`;
+  check('a Chrome Web Store install is asked',
+    installedFromChromeWebStore(CWS, URL_CHROME, REVIEW_ASK.storeId));
+  check('Opera\'s store copy is not, though it runs Chromium',
+    !installedFromChromeWebStore({ update_url: 'https://extension-updates.opera.com/api/omaha/update/' },
+      URL_CHROME, REVIEW_ASK.storeId));
+  check('nor Edge\'s',
+    !installedFromChromeWebStore({ update_url: 'https://edge.microsoft.com/extensionwebstorebase/v1/crx' },
+      URL_CHROME, REVIEW_ASK.storeId));
+  check('nor Firefox, whatever its manifest says',
+    !installedFromChromeWebStore(CWS, 'moz-extension://0b1e/', REVIEW_ASK.storeId));
+  check('nor an unpacked checkout',
+    !installedFromChromeWebStore({}, URL_CHROME, REVIEW_ASK.storeId));
+  check('nor a fork published under another id',
+    !installedFromChromeWebStore(CWS, 'chrome-extension://abc/', 'abc'));
+
+  check('the dev flag opens an unpacked checkout',
+    mayAskHere({}, 'chrome-extension://abc/', 'abc', true));
+  check('but never a store install, whatever is in its storage',
+    !mayAskHere({ update_url: 'https://extension-updates.opera.com/api/omaha/update/' },
+      URL_CHROME, REVIEW_ASK.storeId, true));
+  check('nor Firefox', !mayAskHere({}, 'moz-extension://0b1e/', 'x', true));
+  check('and without the flag an unpacked checkout stays quiet',
+    !mayAskHere({}, 'chrome-extension://abc/', 'abc', false));
+
+  const DAY = 86_400_000;
+  const t0 = Date.UTC(2026, 0, 5, 12);
+  // Seven days of use across a fortnight, the panel opened on each.
+  let s = newReviewState(t0);
+  for (let d = 0; d < 7; d += 1) s = noteOpen(noteVisit(s, t0 + d * 2 * DAY));
+  check('not before two weeks have passed', !shouldAsk(s, t0 + 13 * DAY));
+  check('asked once they have', shouldAsk(s, t0 + 14 * DAY));
+
+  let busy = newReviewState(t0);
+  for (let i = 0; i < 40; i += 1) busy = noteOpen(noteVisit(busy, t0 + i * 60_000));
+  check('forty pages in one afternoon are one day of use', busy.activeDays === 1,
+    `${busy.activeDays} day(s)`);
+  check('and do not qualify', !shouldAsk(busy, t0 + 30 * DAY));
+
+  const backdated = newReviewState(t0, t0 - 60 * DAY);
+  check('an existing user\'s history dates their first use', backdated.firstSeen === t0 - 60 * DAY);
+
+  const now = t0 + 14 * DAY;
+  const reviewed = noteAnswer(s, 'review', now);
+  check('a review ends it for good', !shouldAsk(reviewed, now + 365 * DAY));
+
+  const later = noteAnswer(s, 'later', now);
+  check('"not now" puts it away', !shouldAsk(later, now + 44 * DAY));
+  check('for a while', shouldAsk(later, now + REVIEW_ASK.snoozeDays * DAY));
+  const twice = noteAnswer(later, 'later', now + 50 * DAY);
+  check('and the second time for good', !shouldAsk(twice, now + 400 * DAY));
+
+  const reported = noteAnswer(s, 'issue', now);
+  check('reporting a problem is not asked again straight away', !shouldAsk(reported, now + DAY));
+
+  let ignored = s;
+  for (let d = 0; d < REVIEW_ASK.ignoredAfterDays; d += 1) ignored = noteShown(ignored, now + d * DAY);
+  check('three days seen and ignored count as "not now"',
+    ignored.asks === 1 && !shouldAsk(ignored, now + 3 * DAY));
+  const sameDay = noteShown(noteShown(s, now), now + 60_000);
+  check('being seen twice in a day is one day', sameDay.shownDays === 1);
+}
+
+check('the overlay asks only through what main.js hands it',
+  /reviewAsk\.wanted\(\)/.test(overlaySrc) && !/chromewebstore/.test(overlaySrc));
 
 group('Store pages that are not games');
 

@@ -228,6 +228,30 @@
   "footSettings": {
     "message": "설정"
   },
+  "rateTitle": {
+    "message": "Wishlytic이 마음에 드시나요?"
+  },
+  "rateBody": {
+    "message": "Chrome 웹 스토어에서 평가해 주시면 더 많은 분들이 찾을 수 있어요."
+  },
+  "rateCta": {
+    "message": "평가하기"
+  },
+  "rateLater": {
+    "message": "나중에"
+  },
+  "rateIssue": {
+    "message": "버그를 발견하셨나요?"
+  },
+  "rateThanks": {
+    "message": "감사합니다, 큰 힘이 돼요!"
+  },
+  "optRate": {
+    "message": "Chrome 웹 스토어에서 Wishlytic 평가하기"
+  },
+  "optIssue": {
+    "message": "문제 신고"
+  },
   "tYesterday": {
     "message": "어제"
   },

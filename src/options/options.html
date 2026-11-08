@@ -59,6 +59,12 @@
   /* Quieter than the sentence above it: this explains where the profile came
      from, which matters less than the figure it produced. */
   .sanity-note { color: #5b6475; font-size: 13px; margin-top: 6px; }
+  /* Below everything, and quieter than any setting: here for whoever wants it. */
+  .support { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 44px; font-size: 14px; }
+  .support a { color: #7c8698; text-decoration: none; border-bottom: 1px solid #2b3242; }
+  .support a:hover { color: #67c1f5; border-color: #67c1f5; }
+  .support a:focus-visible { outline: 2px solid #67c1f5; outline-offset: 2px; }
+  .support .star { color: #ffc94d; margin-right: 6px; }
 </style>
 </head>
 <body>
@@ -146,6 +152,11 @@
     <button id="reset" type="button" data-i18n="optReset"></button>
     <span class="saved" id="saved"></span>
   </div>
+
+  <p class="support">
+    <span id="rateWrap" hidden><span class="star" aria-hidden="true">&#9733;</span><a id="rate" target="_blank" rel="noopener noreferrer" data-i18n="optRate"></a></span>
+    <a id="issue" target="_blank" rel="noopener noreferrer" data-i18n="optIssue"></a>
+  </p>
 
 </main>
 <script type="module" src="options.js"></script>

@@ -34,6 +34,10 @@ export {
   scoreWishlistConfidence, worstLevel
 } from './ensemble.js';
 export { PILL_ITEMS, PILL_DEFAULTS, pillFigures } from './pill.js';
+export {
+  REVIEW_ASK, installedFromChromeWebStore, mayAskHere, dayStamp, newReviewState,
+  noteVisit, noteOpen, shouldAsk, noteShown, noteAnswer
+} from './review-ask.js';
 
 function buildConfidence(combined, flags, revenue, wishlists) {
   const units = scoreConfidence(combined, flags);

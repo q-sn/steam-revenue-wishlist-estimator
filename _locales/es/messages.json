@@ -228,6 +228,30 @@
   "footSettings": {
     "message": "Ajustes"
   },
+  "rateTitle": {
+    "message": "¿Te gusta Wishlytic?"
+  },
+  "rateBody": {
+    "message": "Valóralo en Chrome Web Store para que más gente lo encuentre."
+  },
+  "rateCta": {
+    "message": "Valorar"
+  },
+  "rateLater": {
+    "message": "Más tarde"
+  },
+  "rateIssue": {
+    "message": "¿Algún error?"
+  },
+  "rateThanks": {
+    "message": "¡Gracias, significa mucho!"
+  },
+  "optRate": {
+    "message": "Valora Wishlytic en Chrome Web Store"
+  },
+  "optIssue": {
+    "message": "Informar de un problema"
+  },
   "tYesterday": {
     "message": "ayer"
   },

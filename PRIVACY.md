@@ -6,7 +6,7 @@ Chrome Web Store item
 and Firefox add-on [`wishlytic`](https://addons.mozilla.org/en-US/firefox/addon/wishlytic/).
 This policy covers every store the same package is published in; the code
 behind each listing is identical.
-Effective 7 September 2026.
+Effective 8 November 2026.
 
 There is no server behind this extension. Nothing it learns about you is sent
 anywhere, because there is nowhere to send it: no account, no sign-in, no
@@ -29,7 +29,7 @@ them. The extension is signed out of Steam even when you are signed in.
 
 ## What it stores, and where
 
-Two things, both in the extension's own local storage, both on your device
+Three things, all in the extension's own local storage, all on your device
 only:
 
 - **Visit snapshots.** For each game you open, a dated record of its review
@@ -41,10 +41,15 @@ only:
 - **Cached lookups.** The figures fetched from the sources below, held so that
   a game costs a handful of requests per day rather than per page view, plus
   the two shared data files described under *Downloads*.
+- **When to ask for a review.** In a copy installed from the Chrome Web Store,
+  a few counters — the date the extension first ran, how many days it has been
+  used and how often its panel was opened — and whether you have answered the
+  card that asks for a review. They decide whether that card appears, and
+  nothing else; which games you opened is not part of them.
 
-Neither is synced, uploaded, backed up or transmitted. Both are erasable at any
-time from the extension's options page, and both are deleted with the extension
-when you uninstall it.
+None of these is synced, uploaded, backed up or transmitted. The first two are
+erasable at any time from the extension's options page, and all three are
+deleted with the extension when you uninstall it.
 
 ## What leaves your browser
 

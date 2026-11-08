@@ -228,6 +228,30 @@
   "footSettings": {
     "message": "設定"
   },
+  "rateTitle": {
+    "message": "Wishlytic は気に入りましたか？"
+  },
+  "rateBody": {
+    "message": "Chrome ウェブストアで評価していただけると、もっと多くの人に届きます。"
+  },
+  "rateCta": {
+    "message": "評価する"
+  },
+  "rateLater": {
+    "message": "あとで"
+  },
+  "rateIssue": {
+    "message": "不具合を報告"
+  },
+  "rateThanks": {
+    "message": "ありがとうございます！とても励みになります。"
+  },
+  "optRate": {
+    "message": "Chrome ウェブストアで Wishlytic を評価"
+  },
+  "optIssue": {
+    "message": "問題を報告"
+  },
   "tYesterday": {
     "message": "昨日"
   },

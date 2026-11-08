@@ -84,7 +84,12 @@ renderOverlay(result, {
   // be the only invented number in these pictures.
   history: null,
   delta: null,
-  onOpenOptions: () => {}
+  onOpenOptions: () => {},
+  // ask=1 shows the review card, as a user who qualifies sees it. Nothing is
+  // recorded: the answers only change what is on screen.
+  reviewAsk: params.get('ask') === '1'
+    ? { wanted: () => true, reviewUrl: '#review', issuesUrl: '#issues' }
+    : null
 });
 
 const host = document.getElementById('srwe-overlay-host');
