@@ -4,8 +4,8 @@
 # support and privacy-policy links by fetching them, and github.com repository
 # pages answer automated fetches with 504s often enough to block a submission.
 # Pages is served from separate infrastructure. The Markdown files stay the
-# single source — README.md becomes the index and PRIVACY.md /privacy/, so the
-# policy on the site cannot drift from the one in the repository.
+# single source — README.md becomes the index, PRIVACY.md /privacy/ and
+# docs/SUPPORT.md /support/, so the site cannot drift from the repository.
 
 title: Wishlytic
 description: Steam revenue, units sold and wishlists on any store page, as sourced ranges.
@@ -15,6 +15,10 @@ defaults:
       path: PRIVACY.md
     values:
       permalink: /privacy/
+  - scope:
+      path: docs/SUPPORT.md
+    values:
+      permalink: /support/
 
 # Code, generated tables and tooling: nothing a reader of the site needs.
 exclude:

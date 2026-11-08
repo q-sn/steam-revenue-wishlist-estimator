@@ -22,14 +22,14 @@ A pill in the corner of the page carries the figures at a glance. Click it and t
 
 <table>
 <tr>
-<td width="50%" valign="top">
+<td width="50%" valign="top" markdown="1">
 
 **A released game.** Units and both money figures, each on a scale marked with its low and high end, and a tick where every contributing method landed. Underneath, the measured inputs they were derived from — and the follower count, with the reason no wishlist number is offered after release.
 
 <img alt="The expanded panel on a released game" src="screenshots/released.png">
 
 </td>
-<td width="50%" valign="top">
+<td width="50%" valign="top" markdown="1">
 
 **An unreleased game.** Three independent marks — a figure the studio published, the game's place in Steam's wishlist ordering, its follower count — with the weight each earned and the overlap they leave. Agreement here means a common figure, not close midpoints.
 
